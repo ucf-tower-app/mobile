@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Name as TabName } from './utils/routes/tabs/names';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
 import tabNameToRouteData from './utils/routes/routes';
+import { NativeBaseProvider } from 'native-base';
 
 // Tabs used for bottom tray, stack for in-tab nav
 const Stack = createNativeStackNavigator();
@@ -31,17 +32,19 @@ const buildStack = (tabName: TabName) => {
 // Construct tabs and their subtrees
 export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <Tabs.Navigator screenOptions={{ headerShown: false }}>
-        {tabRoutes.map((route) => (
-          <Tabs.Screen
-            name={route.name}
-            component={buildStack(route.name)}
-            key={route.name}
-          />
-        ))}
-      </Tabs.Navigator>
-    </NavigationContainer>
+    <NativeBaseProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Tabs.Navigator screenOptions={{ headerShown: false }}>
+          {tabRoutes.map((route) => (
+            <Tabs.Screen
+              name={route.name}
+              component={buildStack(route.name)}
+              key={route.name}
+            />
+          ))}
+        </Tabs.Navigator>
+      </NavigationContainer>
+    </NativeBaseProvider>
   );
 }
