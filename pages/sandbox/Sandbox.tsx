@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { Button, Text, ScrollView, Box } from 'native-base';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   names as routeNames,
@@ -18,44 +12,20 @@ type Props = {
 export default function Sandbox({ navigation }: Props) {
   const buildEntryButton = (routeName: RouteName) => {
     return (
-      <TouchableOpacity
+      <Button
+        mx="2"
+        my="1"
         onPress={() => navigation.push(routeName)}
-        style={styles.entryButton}
         key={routeName}
       >
-        <Text style={styles.entryText}>{routeName}</Text>
-      </TouchableOpacity>
+        <Text>{routeName}</Text>
+      </Button>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <Box>
       <ScrollView>{routeNames.map(buildEntryButton)}</ScrollView>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    height: '100%',
-    padding: '10%',
-  },
-  entryButton: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: 50,
-    padding: 5,
-    marginBottom: 5,
-    borderRadius: 10,
-    borderColor: 'black',
-    borderWidth: 2,
-    backgroundColor: 'azure',
-  },
-  entryText: {
-    fontSize: 30,
-    fontWeight: '600',
-  },
-});

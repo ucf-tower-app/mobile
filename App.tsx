@@ -1,11 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { StatusBar } from 'expo-status-bar';
+import { NativeBaseProvider } from 'native-base';
+import tabNameToRouteData from './utils/routes/routes';
 import { Name as TabName } from './utils/routes/tabs/names';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
-import tabNameToRouteData from './utils/routes/routes';
-import { NativeBaseProvider } from 'native-base';
 
 // Tabs used for bottom tray, stack for in-tab nav
 const Stack = createNativeStackNavigator();
