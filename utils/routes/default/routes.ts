@@ -9,7 +9,11 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Null',
+    name: 'Default',
     component: View,
   },
 ];
+
+export type PropMap = {
+  Default: undefined;
+};

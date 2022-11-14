@@ -1,12 +1,18 @@
 // Combine useful route datas, and map tabs to their routes
-import { routes as defaultRoutes } from './default/routes';
-import { routes as sandboxRoutes } from './sandbox/routes';
+import {
+  routes as defaultRoutes,
+  PropMap as DefaultPropMap,
+} from './default/routes';
+import {
+  routes as sandboxRoutes,
+  PropMap as SandboxPropMap,
+} from './sandbox/routes';
 
 import { Name as DefaultName } from './default/names';
 import { Name as SandboxName } from './sandbox/names';
 import { Name as TabName } from './tabs/names';
 
-export type RouteName = DefaultName | SandboxName | TabName;
+export type RouteName = DefaultName | SandboxName;
 export type Route = {
   name: RouteName;
   component: any;
@@ -18,7 +24,7 @@ type RouteData = {
 };
 const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
   DefaultTab: {
-    initialRouteName: 'Null',
+    initialRouteName: 'Default',
     routes: defaultRoutes,
   },
   SandboxTab: {
@@ -27,4 +33,6 @@ const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
   },
 };
 
-export default tabNameToRouteData;
+type PropMap = DefaultPropMap & SandboxPropMap;
+
+export { tabNameToRouteData, PropMap };
