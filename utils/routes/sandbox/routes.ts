@@ -1,7 +1,7 @@
 // Route metadata for the sandbox tab
 import { Name } from './names';
 import Sandbox from '../../../pages/sandbox/Sandbox';
-import { Avatar } from 'native-base';
+import RouteRow from '../../../components/route/RouteRow';
 
 export type Route = {
   name: Name;
@@ -14,7 +14,19 @@ export const routes: Array<Route> = [
     component: Sandbox,
   },
   {
-    name: 'Avatar',
-    component: Avatar,
+    name: 'RouteRow',
+    component: RouteRow,
   },
 ];
+
+export type PropMap = {
+  Sandbox: undefined;
+
+  // Maybe replace this with RouteRef backend object down the line
+  RouteRow: {
+    thumbnail: string;
+    name: string;
+    grade: string;
+    tags: Array<string>;
+  };
+};
