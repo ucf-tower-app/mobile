@@ -2,7 +2,7 @@
 import { Name } from './names';
 import Sandbox from '../../../pages/sandbox/Sandbox';
 import RouteRow from '../../../components/route/RouteRow';
-import StatBox from '../../../components/route/profile/stats/StatBox';
+import StatBox from '../../../components/profile/stats/StatBox';
 
 export type Route = {
   name: Name;
