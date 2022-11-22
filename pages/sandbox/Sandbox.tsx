@@ -10,11 +10,18 @@ import { PropMap as SandboxPropMap } from '../../utils/routes/sandbox/routes';
 // Sandbox test data
 const propMap: SandboxPropMap = {
   Sandbox: undefined,
+
   RouteRow: {
     thumbnail: 'https://wallpaperaccess.com/full/317501.jpg',
     name: 'Example route',
     grade: '10.9',
     tags: ['Solid, Dyno'],
+  },
+
+  UserRow: {
+    avatarUrl: 'https://tinyurl.com/498kzhpy',
+    userName: 'Tyler Hostler-Mathis',
+    userHandle: '@tylerhm',
   },
 };
 
