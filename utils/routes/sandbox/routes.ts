@@ -38,5 +38,6 @@ export type PropMap = {
   StatBox: {
     stat: string;
     value: string;
+    onPressEventName: string;
   };
 };

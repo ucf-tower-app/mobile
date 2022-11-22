@@ -1,5 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Box, Button, ScrollView, Text } from 'native-base';
+import { useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { PropMap } from '../../utils/routes/routes';
 import {
   Name as RouteName,
@@ -19,14 +21,25 @@ const propMap: SandboxPropMap = {
   },
 
   StatBox: {
-    stat: 'Stat',
-    value: 'value',
+    stat: 'Boulder',
+    value: 'V5',
+    onPressEventName: 'statBox.testEvent',
   },
 };
 
 // List of buttons that navigate directly to test components in a dry environment
 type Props = NativeStackScreenProps<PropMap, 'Sandbox'>;
 export default function Sandbox({ navigation }: Props) {
+  useEffect(() => {
+    DeviceEventEmitter.addListener('statBox.testEvent', () => {
+      console.log('Statbox was pressed!');
+    });
+
+    return () => {
+      DeviceEventEmitter.removeAllListeners('statBox.testEvent');
+    };
+  }, []);
+
   const buildEntryButton = (routeName: RouteName) => {
     return (
       <Button
