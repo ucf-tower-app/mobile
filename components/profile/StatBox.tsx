@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pressable, Text, VStack, Center } from 'native-base';
 import { DeviceEventEmitter } from 'react-native';
-import { PropMap } from '../../../utils/routes/routes';
+import { PropMap } from '../../utils/routes/routes';
 
 type Props = NativeStackScreenProps<PropMap, 'StatBox'>;
 const StatBox = ({ route }: Props) => {
