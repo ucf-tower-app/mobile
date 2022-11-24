@@ -7,7 +7,6 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import React from 'react';
 import { PropMap } from '../../utils/routes/routes';
 
 type Props = NativeStackScreenProps<PropMap, 'RouteRow'>;

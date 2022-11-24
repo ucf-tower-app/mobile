@@ -3,6 +3,7 @@ import { Name } from './names';
 import Sandbox from '../../../pages/sandbox/Sandbox';
 import RouteRow from '../../../components/route/RouteRow';
 import ProfileBanner from '../../../components/profile/ProfileBanner';
+import StatBox from '../../../components/profile/StatBox';
 
 export type Route = {
   name: Name;
@@ -22,12 +23,16 @@ export const routes: Array<Route> = [
     name: 'ProfileBanner',
     component: ProfileBanner,
   },
+  {
+    name: 'StatBox',
+    component: StatBox,
+  },
 ];
 
+// Verbose props may be swapped for middleware lazy-objects down the line
 export type PropMap = {
   Sandbox: undefined;
 
-  // Maybe replace this with RouteRef backend object down the line
   RouteRow: {
     thumbnail: string;
     name: string;
@@ -39,5 +44,11 @@ export type PropMap = {
     avatarUrl: string;
     userName: string;
     userHandle: string;
+  };
+  
+  StatBox: {
+    stat: string;
+    value: string;
+    onPressEventName: string;
   };
 };
