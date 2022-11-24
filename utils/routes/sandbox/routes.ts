@@ -2,6 +2,7 @@
 import { Name } from './names';
 import Sandbox from '../../../pages/sandbox/Sandbox';
 import RouteRow from '../../../components/route/RouteRow';
+import ProfileBanner from '../../../components/profile/ProfileBanner';
 import StatBox from '../../../components/profile/StatBox';
 
 export type Route = {
@@ -17,6 +18,10 @@ export const routes: Array<Route> = [
   {
     name: 'RouteRow',
     component: RouteRow,
+  },
+  {
+    name: 'ProfileBanner',
+    component: ProfileBanner,
   },
   {
     name: 'StatBox',
@@ -35,6 +40,12 @@ export type PropMap = {
     tags: Array<string>;
   };
 
+  ProfileBanner: {
+    avatarUrl: string;
+    userName: string;
+    userHandle: string;
+  };
+  
   StatBox: {
     stat: string;
     value: string;
