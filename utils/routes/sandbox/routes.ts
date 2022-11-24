@@ -3,6 +3,7 @@ import { Name } from './names';
 import Sandbox from '../../../pages/sandbox/Sandbox';
 import RouteRow from '../../../components/route/RouteRow';
 import StatBox from '../../../components/profile/StatBox';
+import LostAndFoundCard from '../../../components/lostandfound/LostAndFoundCard';
 
 export type Route = {
   name: Name;
@@ -22,6 +23,10 @@ export const routes: Array<Route> = [
     name: 'StatBox',
     component: StatBox,
   },
+  {
+    name: 'LostAndFoundCard',
+    component: LostAndFoundCard,
+  },
 ];
 
 // Verbose props may be swapped for middleware lazy-objects down the line
@@ -39,5 +44,10 @@ export type PropMap = {
     stat: string;
     value: string;
     onPressEventName: string;
+  };
+
+  LostAndFoundCard: {
+    title: string;
+    description: string;
   };
 };

@@ -25,6 +25,11 @@ const propMap: SandboxPropMap = {
     value: 'V5',
     onPressEventName: 'statBox.testEvent',
   },
+
+  LostAndFoundCard: {
+    title: 'Title',
+    description: 'fjoiuwenfoiwnefoiwnefoiwefoiwneoifjnwe',
+  },
 };
 
 // List of buttons that navigate directly to test components in a dry environment
