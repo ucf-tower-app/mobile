@@ -25,12 +25,14 @@ const propMap: SandboxPropMap = {
     userName: 'Tyler Hostler-Mathis',
     userHandle: 'tylerhm',
   },
-  
+
   StatBox: {
     stat: 'Boulder',
     value: 'V5',
     onPressEventName: 'statBox.testEvent',
   },
+
+  Footer: undefined,
 };
 
 // List of buttons that navigate directly to test components in a dry environment
