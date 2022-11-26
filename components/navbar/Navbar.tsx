@@ -10,6 +10,7 @@ type Props = NativeStackScreenProps<PropMap, 'Navbar'>;
 const Navbar = ({ route }: Props) => {
     const scrollRef = useRef<ScrollView>(null);
     const [selected, setSelected] = useState(0);
+    const navBarTitles = ['All', 'Following', 'Leaderboards', 'Lost and Found', 'Routes'];
 
     const handlePress = (index: number) => {
         setSelected(index);
@@ -25,14 +26,16 @@ const Navbar = ({ route }: Props) => {
             <Flex direction="row" p="2">
                 <Box w="80%">
                     <Text fontSize="xl" bold>
-                        {selected === 0 ? "All" : selected === 1 ? "Following" : selected === 2 ? "Leaderboards" : selected === 3 ? "Lost and Found" : "ERROR"}
+                        {navBarTitles[selected]}
                     </Text>
                 </Box>
                 <Box w="20%" justifyContent="center">
                     <HStack justifyContent="space-around">
-                        <Center>
-                            <SearchIcon size="md" />
-                        </Center>
+                        <Pressable onPress={() => setSelected(4)}>
+                            <Center>
+                                <SearchIcon size="md" />
+                            </Center>
+                        </Pressable>
                         <Center>
                             <ThreeDotsIcon size="md" />
                         </Center>
