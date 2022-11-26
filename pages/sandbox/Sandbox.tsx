@@ -20,6 +20,12 @@ const propMap: SandboxPropMap = {
     tags: ['Solid, Dyno'],
   },
 
+  ProfileBanner: {
+    avatarUrl: 'https://tinyurl.com/498kzhpy',
+    userName: 'Tyler Hostler-Mathis',
+    userHandle: 'tylerhm',
+  },
+  
   StatBox: {
     stat: 'Boulder',
     value: 'V5',
