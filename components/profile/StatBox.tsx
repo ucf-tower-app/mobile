@@ -1,18 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pressable, Text, VStack } from 'native-base';
-import { DeviceEventEmitter } from 'react-native';
 import { PropMap } from '../../utils/routes/routes';
 
 type Props = NativeStackScreenProps<PropMap, 'StatBox'>;
 const StatBox = ({ route }: Props) => {
   return (
-    <Pressable
-      p={2}
-      bg="white"
-      onPress={() => {
-        DeviceEventEmitter.emit(route.params.onPressEventName);
-      }}
-    >
+    <Pressable p={2} bg="white" onPress={route.params.onPress}>
       {({ isHovered, isPressed }) => {
         return (
           <VStack
