@@ -50,11 +50,11 @@ export type PropMap = {
     userName: string;
     userHandle: string;
   };
-  
+
   StatBox: {
     stat: string;
     value: string;
-    onPressEventName: string;
+    onPress: () => void;
   };
 
   LostAndFoundCard: {
