@@ -15,8 +15,8 @@ type Props = {
 const RouteRow = ({ route }: Props) => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [thumbnailUrl, setThumbnailUrl] = useState<string>(
-    'https://upload.wikimedia.org/wikipedia/commons/c/cb/Square_gray.svg'
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
+    undefined
   );
 
   // Fetch all relevant data and update the state accordingly.
