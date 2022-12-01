@@ -1,17 +1,18 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Box, VStack, Text, ChevronDownIcon, Pressable } from 'native-base';
 import { useState } from 'react';
-import { PropMap } from '../../utils/routes/routes';
 
-type Props = NativeStackScreenProps<PropMap, 'LostAndFoundCard'>;
-const LostAndFoundCard = ({ route }: Props) => {
+type Props = {
+  title: string;
+  description: string;
+};
+const LostAndFoundCard = ({ title, description }: Props) => {
   const [seeMore, setSeeMore] = useState(false);
 
   return (
     <Box width="95%" rounded="10px" bg="muted.50" p="2">
       <VStack space="2">
         <Box px="1">
-          <Text fontSize="2xl">{route.params.title}</Text>
+          <Text fontSize="2xl">{title}</Text>
         </Box>
         <Box
           pt="2"
@@ -21,9 +22,7 @@ const LostAndFoundCard = ({ route }: Props) => {
           borderColor="muted.300"
           rounded="5px"
         >
-          <Text noOfLines={!seeMore ? 5 : undefined}>
-            {route.params.description}
-          </Text>
+          <Text noOfLines={!seeMore ? 5 : undefined}>{description}</Text>
           <Box width="100%" alignItems="flex-end">
             <Pressable onPress={() => setSeeMore(!seeMore)}>
               {({ isHovered, isPressed }) => {

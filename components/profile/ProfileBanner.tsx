@@ -1,17 +1,34 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Avatar, VStack, Heading, Text } from 'native-base';
-import { PropMap } from '../../utils/routes/routes';
+import { useEffect, useState } from 'react';
+import { User } from '../../xplat/types/user';
 
-type Props = NativeStackScreenProps<PropMap, 'ProfileBanner'>;
-const ProfileBanner = ({ route }: Props) => {
+type Props = {
+  user: User;
+};
+const ProfileBanner = ({ user }: Props) => {
+  const [handle, setHandle] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      user.getUsername().then(setHandle);
+
+      // TODO: get avatar and name pending:
+      // Avatars: https://github.com/ucf-tower-app/xplat/pull/11/files
+      // Fullname: https://github.com/ucf-tower-app/xplat/issues/12
+    };
+
+    fetchData();
+  }, [user]);
   return (
     <VStack justifyContent="center" alignItems="center" bg="white">
-      <Avatar source={{ uri: route.params.avatarUrl }} size="2xl" mb={3} />
+      <Avatar source={{ uri: avatarUrl }} bg="gray.300" size="2xl" mb={3} />
       <Heading fontSize="3xl" mb={1}>
-        {route.params.userName}
+        {name}
       </Heading>
       <Text fontSize="lg" color="gray.400">
-        {`@${route.params.userHandle}`}
+        {`@${handle}`}
       </Text>
     </VStack>
   );
