@@ -3,8 +3,8 @@ export const names = [
   'Sandbox',
   'RouteRow',
   'ProfileBanner',
-  /*
   'StatBox',
+  /*
   'LostAndFoundCard',
   */
 ] as const;

@@ -3,6 +3,7 @@ import { Name } from './names';
 import Sandbox from '../../../screens/sandbox/Sandbox';
 import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
 import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
+import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
 
 export type Route = {
   name: Name;
@@ -22,11 +23,11 @@ export const routes: Array<Route> = [
     name: 'ProfileBanner',
     component: ProfileBannerWrapper,
   },
-  /*
   {
     name: 'StatBox',
-    component: StatBox,
+    component: StatBoxWrapper,
   },
+  /*
   {
     name: 'LostAndFoundCard',
     component: LostAndFoundCard,
