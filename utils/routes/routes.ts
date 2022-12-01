@@ -16,7 +16,7 @@ type RouteData = {
   initialRouteName: RouteName;
   routes: Array<Route>;
 };
-const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
+export const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
   DefaultTab: {
     initialRouteName: 'Default',
     routes: defaultRoutes,
@@ -26,5 +26,3 @@ const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
     routes: sandboxRoutes,
   },
 };
-
-export { tabNameToRouteData };
