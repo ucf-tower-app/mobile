@@ -4,7 +4,7 @@ import Sandbox from '../../../pages/sandbox/Sandbox';
 import RouteRow from '../../../components/route/RouteRow';
 import ProfileBanner from '../../../components/profile/ProfileBanner';
 import StatBox from '../../../components/profile/StatBox';
-import Footer from '../../../components/footer/Footer';
+import LostAndFoundCard from '../../../components/lostandfound/LostAndFoundCard';
 
 export type Route = {
   name: Name;
@@ -29,8 +29,8 @@ export const routes: Array<Route> = [
     component: StatBox,
   },
   {
-    name: 'Footer',
-    component: Footer,
+    name: 'LostAndFoundCard',
+    component: LostAndFoundCard,
   },
 ];
 
@@ -54,7 +54,12 @@ export type PropMap = {
   StatBox: {
     stat: string;
     value: string;
-    onPressEventName: string;
+    onPress: () => void;
+  };
+
+  LostAndFoundCard: {
+    title: string;
+    description: string;
   };
 
   Footer: undefined;
