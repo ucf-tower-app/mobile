@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Box, Button, ScrollView, Text } from 'native-base';
 import { useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
+import Footer from '../../components/footer/Footer';
 import { PropMap } from '../../utils/routes/routes';
 import {
   Name as RouteName,
