@@ -10,7 +10,19 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'DefaultTab',
+    name: 'HomeTab',
+    component: View,
+  },
+  {
+    name: 'LikesTab',
+    component: View,
+  },
+  {
+    name: 'SearchTab',
+    component: View,
+  },
+  {
+    name: 'ProfileTab',
     component: View,
   },
   {
