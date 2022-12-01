@@ -4,8 +4,6 @@ export const names = [
   'RouteRow',
   'ProfileBanner',
   'StatBox',
-  /*
   'LostAndFoundCard',
-  */
 ] as const;
 export type Name = typeof names[number];

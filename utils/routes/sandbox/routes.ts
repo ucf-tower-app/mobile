@@ -4,6 +4,7 @@ import Sandbox from '../../../screens/sandbox/Sandbox';
 import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
 import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
 import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
+import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWrapper';
 
 export type Route = {
   name: Name;
@@ -27,10 +28,8 @@ export const routes: Array<Route> = [
     name: 'StatBox',
     component: StatBoxWrapper,
   },
-  /*
   {
     name: 'LostAndFoundCard',
-    component: LostAndFoundCard,
+    component: LostAndFoundCardWrapper,
   },
-  */
 ];
