@@ -2,6 +2,7 @@
 import { Name } from './names';
 import Sandbox from '../../../screens/sandbox/Sandbox';
 import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
+import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
 
 export type Route = {
   name: Name;
@@ -17,11 +18,11 @@ export const routes: Array<Route> = [
     name: 'RouteRow',
     component: RouteRowWrapper,
   },
-  /*
   {
     name: 'ProfileBanner',
-    component: ProfileBanner,
+    component: ProfileBannerWrapper,
   },
+  /*
   {
     name: 'StatBox',
     component: StatBox,
