@@ -32,8 +32,4 @@ export const routes: Array<Route> = [
     name: 'LostAndFoundCard',
     component: LostAndFoundCardWrapper,
   },
-  {
-    name: 'Navbar',
-    component: Navbar,
-  },
 ];

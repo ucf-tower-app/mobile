@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   Text,
   HStack,
@@ -10,13 +9,10 @@ import {
   ThreeDotsIcon,
   Flex,
 } from 'native-base';
-import { PropMap } from '../../utils/routes/routes';
 import { useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 
-type Props = NativeStackScreenProps<PropMap, 'Navbar'>;
-
-const Navbar = ({ route }: Props) => {
+const Navbar = () => {
   const scrollRef = useRef<ScrollView>(null);
   const [selected, setSelected] = useState(0);
   const navBarTitles = [
