@@ -1,4 +1,4 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
@@ -9,7 +9,7 @@ import { routes as tabRoutes } from './utils/routes/tabs/routes';
 
 // Tabs used for bottom tray, stack for in-tab nav
 const Stack = createNativeStackNavigator();
-const Tabs = createBottomTabNavigator();
+const Tabs = createMaterialBottomTabNavigator();
 
 // Builds a navigator stack for a given tab
 const buildStack = (tabName: TabName) => {
@@ -35,11 +35,21 @@ export default function App() {
     <NativeBaseProvider>
       <NavigationContainer>
         <StatusBar style="auto" />
-        <Tabs.Navigator screenOptions={{ headerShown: false }}>
+        <Tabs.Navigator
+          initialRouteName="Home"
+          barStyle={{
+            backgroundColor: 'white',
+          }}
+          labeled={false}
+        >
           {tabRoutes.map((route) => (
             <Tabs.Screen
               name={route.name}
               component={buildStack(route.name)}
+              options={{
+                tabBarIcon: ({ focused }) =>
+                  focused ? route.focusedIcon : route.unfocusedIcon,
+              }}
               key={route.name}
             />
           ))}
