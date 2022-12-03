@@ -13,7 +13,3 @@ export const routes: Array<Route> = [
     component: View,
   },
 ];
-
-export type PropMap = {
-  Default: undefined;
-};
