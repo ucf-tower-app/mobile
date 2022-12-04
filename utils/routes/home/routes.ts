@@ -9,7 +9,19 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Home',
+    name: 'All',
+    component: View,
+  },
+  {
+    name: 'Following',
+    component: View,
+  },
+  {
+    name: 'Leaderboards',
+    component: View,
+  },
+  {
+    name: 'Lost and Found',
     component: View,
   },
 ];
