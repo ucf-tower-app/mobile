@@ -5,6 +5,7 @@ import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
 import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
 import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
 import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWrapper';
+import SearchBarWrapper from '../../../screens/sandbox/SearchBarWrapper';
 
 export type Route = {
   name: Name;
@@ -31,5 +32,9 @@ export const routes: Array<Route> = [
   {
     name: 'LostAndFoundCard',
     component: LostAndFoundCardWrapper,
+  },
+  {
+    name: 'SearchBar',
+    component: SearchBarWrapper,
   },
 ];
