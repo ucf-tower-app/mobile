@@ -49,6 +49,7 @@ const LeaderboardCard = ({
             source={{ uri: avatarUrl }}
             size="2xl"
             mb={3}
+            bg="cyan.500"
           />
           <Badge
             rounded="full"
