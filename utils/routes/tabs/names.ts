@@ -1,7 +1,8 @@
 // All valid route names for tabs
 export const names = [
   'HomeTab',
-  'LikesTab',
+  'LeaderboardsTab',
+  'ActiveRoutesTab',
   'SearchTab',
   'ProfileTab',
   'SandboxTab',

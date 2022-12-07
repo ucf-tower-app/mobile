@@ -5,6 +5,7 @@ import { Name } from './names';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
 export type Route = {
   name: Name;
@@ -23,18 +24,16 @@ export const routes: Array<Route> = [
     ),
   },
   {
-    name: 'LikesTab',
+    name: 'LeaderboardsTab',
     component: View,
-    focusedIcon: (
-      <MaterialCommunityIcons name="cards-heart" size={26} color="black" />
-    ),
-    unfocusedIcon: (
-      <MaterialCommunityIcons
-        name="cards-heart-outline"
-        size={26}
-        color="black"
-      />
-    ),
+    focusedIcon: <Ionicons name="trophy" size={26} color="black" />,
+    unfocusedIcon: <Ionicons name="trophy-outline" size={26} color="black" />,
+  },
+  {
+    name: 'ActiveRoutesTab',
+    component: View,
+    focusedIcon: <AntDesign name="questioncircle" size={26} color="black" />,
+    unfocusedIcon: <AntDesign name="questioncircleo" size={26} color="black" />,
   },
   {
     name: 'SearchTab',
