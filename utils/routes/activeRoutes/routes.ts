@@ -1,4 +1,4 @@
-// Route metadata for the likes tab
+// Route metadata for the activeRoutes tab
 import { Name } from './names';
 import { View } from 'react-native';
 
@@ -9,7 +9,7 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Likes',
+    name: 'Active Routes',
     component: View,
   },
 ];
