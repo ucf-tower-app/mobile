@@ -1,4 +1,4 @@
-import { Avatar, VStack, Heading, Text } from 'native-base';
+import { Avatar, VStack, Heading, Text, useColorModeValue } from 'native-base';
 import { useEffect, useState } from 'react';
 import { User } from '../../xplat/types/user';
 
@@ -9,6 +9,7 @@ const ProfileBanner = ({ user }: Props) => {
   const [handle, setHandle] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +23,7 @@ const ProfileBanner = ({ user }: Props) => {
     fetchData();
   }, [user]);
   return (
-    <VStack justifyContent="center" alignItems="center" bg="white">
+    <VStack justifyContent="center" alignItems="center" bg={baseBgColor}>
       <Avatar source={{ uri: avatarUrl }} bg="gray.300" size="2xl" mb={3} />
       <Heading fontSize="3xl" mb={1}>
         {name}

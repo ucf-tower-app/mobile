@@ -1,4 +1,11 @@
-import { Box, VStack, Text, ChevronDownIcon, Pressable } from 'native-base';
+import {
+  Box,
+  VStack,
+  Text,
+  ChevronDownIcon,
+  Pressable,
+  useColorModeValue,
+} from 'native-base';
 import { useState } from 'react';
 
 type Props = {
@@ -7,9 +14,14 @@ type Props = {
 };
 const LostAndFoundCard = ({ title, description }: Props) => {
   const [seeMore, setSeeMore] = useState(false);
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const primaryBgColor = useColorModeValue(
+    'lightMode.primary',
+    'darkMode.primary'
+  );
 
   return (
-    <Box width="95%" rounded="10px" bg="muted.50" p="2">
+    <Box width="95%" rounded="10px" bg={baseBgColor} p="2">
       <VStack space="2">
         <Box px="1">
           <Text fontSize="2xl">{title}</Text>
@@ -17,7 +29,7 @@ const LostAndFoundCard = ({ title, description }: Props) => {
         <Box
           pt="2"
           px="2"
-          bg="muted.200"
+          bg={primaryBgColor}
           borderWidth="1"
           borderColor="muted.300"
           rounded="5px"
