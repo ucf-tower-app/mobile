@@ -5,6 +5,7 @@ export const names = [
   'ProfileBanner',
   'StatBox',
   'LostAndFoundCard',
+  'SearchBar',
   'LeaderboardCard',
 ] as const;
 export type Name = typeof names[number];
