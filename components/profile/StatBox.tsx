@@ -1,4 +1,4 @@
-import { Pressable, Text, VStack } from 'native-base';
+import { Pressable, Text, VStack, useColorModeValue } from 'native-base';
 
 type Props = {
   stat: string;
@@ -6,8 +6,10 @@ type Props = {
   onPress: () => void;
 };
 const StatBox = ({ stat, value, onPress }: Props) => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
   return (
-    <Pressable p={2} bg="white" onPress={onPress}>
+    <Pressable p={2} bg={baseBgColor} onPress={onPress}>
       {({ isHovered, isPressed }) => {
         return (
           <VStack

@@ -5,6 +5,7 @@ import {
   Image,
   Text,
   VStack,
+  useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Route } from '../../xplat/types/route';
@@ -18,6 +19,7 @@ const RouteRow = ({ route }: Props) => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
     undefined
   );
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   // Fetch all relevant data and update the state accordingly.
   useEffect(() => {
@@ -41,7 +43,7 @@ const RouteRow = ({ route }: Props) => {
   }, [route]);
 
   return (
-    <HStack h={20} pl={2} my={3} backgroundColor="white">
+    <HStack h={20} pl={2} my={3} backgroundColor={baseBgColor}>
       <Center w="20%">
         <Image
           size={16}

@@ -1,4 +1,13 @@
-import { VStack, Text, HStack, Avatar, Center, Icon, Badge } from 'native-base';
+import {
+  VStack,
+  Text,
+  HStack,
+  Avatar,
+  Center,
+  Icon,
+  Badge,
+  useColorModeValue,
+} from 'native-base';
 import { Entypo } from '@expo/vector-icons';
 
 type Props = {
@@ -6,23 +15,19 @@ type Props = {
   topNumOfSends: number;
   avatarUrl: string;
 };
-
-const avatarStyle = {
-  borderColor: '#9B40BF',
-  borderWidth: 3,
-};
-
-const purple500 = {
-  backgroundColor: '#9B40BF',
-};
-
 const LeaderboardCard = ({
   leaderboardTitle,
   topNumOfSends,
   avatarUrl,
 }: Props) => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const secondaryBgColor = useColorModeValue(
+    'lightMode.secondary',
+    'darkMode.secondary'
+  );
+
   return (
-    <Center width="95%" rounded="12px" bg="white" p="2" shadow="1">
+    <Center width="95%" rounded="12px" bg={baseBgColor} p="2" shadow="1">
       <HStack justifyContent="center" width="full">
         <Center width="50%">
           <VStack space={2}>
@@ -45,17 +50,18 @@ const LeaderboardCard = ({
         </Center>
         <Center width="50%">
           <Avatar
-            style={avatarStyle}
             source={{ uri: avatarUrl }}
             size="2xl"
             mb={3}
             bg="cyan.500"
+            borderColor={secondaryBgColor}
+            borderWidth={2}
           />
           <Badge
             rounded="full"
             variant="solid"
             mt={-6}
-            style={purple500}
+            bg={secondaryBgColor}
             fontSize="md"
           >
             1

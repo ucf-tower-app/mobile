@@ -2,7 +2,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { NativeBaseProvider } from 'native-base';
+import { NativeBaseProvider, extendTheme } from 'native-base';
 import { tabNameToRouteData } from './utils/routes/routes';
 import { Name as TabName } from './utils/routes/tabs/names';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
@@ -34,10 +34,25 @@ const buildStack = (tabName: TabName) => {
   };
 };
 
+const theme = extendTheme({
+  colors: {
+    lightMode: {
+      base: '#fafafa',
+      primary: '#e5e5e5',
+      secondary: '#a855f7',
+    },
+    darkMode: {
+      base: '#e3f2f9',
+      primary: '#c5e4f3',
+      secondary: '#a2d4ec',
+    },
+  },
+});
+
 // Construct tabs and their subtrees
 export default function App() {
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider theme={theme}>
       <NavigationContainer>
         <StatusBar style="auto" />
         <Tabs.Navigator
