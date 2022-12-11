@@ -42,9 +42,9 @@ const theme = extendTheme({
       secondary: '#a855f7',
     },
     darkMode: {
-      base: '#E3F2F9',
-      primary: '#C5E4F3',
-      secondary: '#A2D4EC',
+      base: '#e3f2f9',
+      primary: '#c5e4f3',
+      secondary: '#a2d4ec',
     },
   },
 });
