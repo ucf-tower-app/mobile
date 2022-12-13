@@ -2,7 +2,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeBaseProvider, extendTheme } from 'native-base';
+import { tabNameToRouteData } from './utils/routes/routes';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
+import { Name as TabName } from './utils/routes/tabs/names';
 import { ParamList as RootTabParamList } from './utils/routes/tabs/paramList';
 
 // Style for tab bar
@@ -12,6 +14,25 @@ const tabBarStyle = {
 
 // Tabs used for bottom tray, stack for in-tab nav
 const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
+
+// Builds a navigator stack for a given tab
+const buildStack = (tabName: TabName, stack: any) => {
+  const routeData = tabNameToRouteData[tabName];
+  const Stack = stack;
+  return () => {
+    return (
+      <Stack.Navigator initialRouteName={routeData.initialRouteName}>
+        {routeData.routes.map((route) => (
+          <Stack.Screen
+            name={route.name}
+            component={route.component}
+            key={route.name}
+          />
+        ))}
+      </Stack.Navigator>
+    );
+  };
+};
 
 const theme = extendTheme({
   colors: {
@@ -42,7 +63,7 @@ export default function App() {
           {tabRoutes.map((route) => (
             <Tabs.Screen
               name={route.name}
-              component={route.component}
+              component={buildStack(route.name, route.stack)}
               options={{
                 tabBarIcon: ({ focused }) =>
                   focused ? route.focusedIcon : route.unfocusedIcon,
