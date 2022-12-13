@@ -1,6 +1,9 @@
 // Route metadata for the likes tab
 import { Name } from './names';
-import { View } from 'react-native';
+import Leaderboards from '../../../screens/leaderboards/Leaderboards';
+import AllTimeLeaderboard from '../../../screens/leaderboards/AllTimeLeaderboard';
+import MonthlyLeaderboard from '../../../screens/leaderboards/MonthlyLeaderboard';
+import FriendsLeaderboard from '../../../screens/leaderboards/FriendsLeaderboard';
 
 export type Route = {
   name: Name;
@@ -10,6 +13,18 @@ export type Route = {
 export const routes: Array<Route> = [
   {
     name: 'Leaderboards',
-    component: View,
+    component: Leaderboards,
+  },
+  {
+    name: 'AllTimeLeaderboard',
+    component: AllTimeLeaderboard,
+  },
+  {
+    name: 'MonthlyLeaderboard',
+    component: MonthlyLeaderboard,
+  },
+  {
+    name: 'FriendsLeaderboard',
+    component: FriendsLeaderboard,
   },
 ];

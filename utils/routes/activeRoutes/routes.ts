@@ -9,7 +9,7 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Active Routes',
+    name: 'ActiveRoutes',
     component: View,
   },
 ];

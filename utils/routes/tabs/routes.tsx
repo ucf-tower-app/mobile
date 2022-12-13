@@ -1,12 +1,16 @@
 // Route metadata for tabs
-import { View } from 'react-native';
-import Sandbox from '../../../screens/sandbox/Sandbox';
 import { Name } from './names';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { Icon } from 'native-base';
+import HomeStack from '../../../stackNavigators/HomeStack';
+import LeaderboardsStack from '../../../stackNavigators/LeaderboardsStack';
+import ActiveRoutesStack from '../../../stackNavigators/ActiveRoutesStack';
+import SearchStack from '../../../stackNavigators/SearchStack';
+import ProfileStack from '../../../stackNavigators/ProfileStack';
+import SandboxStack from '../../../stackNavigators/SandboxStack';
 
 export type Route = {
   name: Name;
@@ -18,7 +22,7 @@ export type Route = {
 export const routes: Array<Route> = [
   {
     name: 'HomeTab',
-    component: View,
+    component: HomeStack,
     focusedIcon: (
       <Icon
         as={<MaterialCommunityIcons name="home" />}
@@ -36,7 +40,7 @@ export const routes: Array<Route> = [
   },
   {
     name: 'LeaderboardsTab',
-    component: View,
+    component: LeaderboardsStack,
     focusedIcon: (
       <Icon as={<Ionicons name="trophy" />} color="black" size="xl" />
     ),
@@ -46,7 +50,7 @@ export const routes: Array<Route> = [
   },
   {
     name: 'ActiveRoutesTab',
-    component: View,
+    component: ActiveRoutesStack,
     focusedIcon: (
       <Icon as={<AntDesign name="questioncircle" />} color="black" size="xl" />
     ),
@@ -56,7 +60,7 @@ export const routes: Array<Route> = [
   },
   {
     name: 'SearchTab',
-    component: View,
+    component: SearchStack,
     focusedIcon: (
       <Icon as={<Ionicons name="search" />} color="black" size="xl" />
     ),
@@ -66,7 +70,7 @@ export const routes: Array<Route> = [
   },
   {
     name: 'ProfileTab',
-    component: View,
+    component: ProfileStack,
     focusedIcon: (
       <Icon as={<Ionicons name="person" />} color="black" size="xl" />
     ),
@@ -76,7 +80,7 @@ export const routes: Array<Route> = [
   },
   {
     name: 'SandboxTab',
-    component: Sandbox,
+    component: SandboxStack,
     focusedIcon: (
       <Icon as={<Feather name="codesandbox" />} color="black" size="xl" />
     ),
