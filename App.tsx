@@ -1,11 +1,11 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { NativeBaseProvider, extendTheme } from 'native-base';
 import { tabNameToRouteData } from './utils/routes/routes';
-import { Name as TabName } from './utils/routes/tabs/names';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
+import { Name as TabName } from './utils/routes/tabs/names';
+import { ParamList as RootTabParamList } from './utils/routes/tabs/paramList';
 
 // Style for tab bar
 const tabBarStyle = {
@@ -13,12 +13,12 @@ const tabBarStyle = {
 };
 
 // Tabs used for bottom tray, stack for in-tab nav
-const Stack = createNativeStackNavigator();
-const Tabs = createMaterialBottomTabNavigator();
+const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
 
 // Builds a navigator stack for a given tab
-const buildStack = (tabName: TabName) => {
+const buildStack = (tabName: TabName, stack: any) => {
   const routeData = tabNameToRouteData[tabName];
+  const Stack = stack;
   return () => {
     return (
       <Stack.Navigator initialRouteName={routeData.initialRouteName}>
@@ -56,14 +56,14 @@ export default function App() {
       <NavigationContainer>
         <StatusBar style="auto" />
         <Tabs.Navigator
-          initialRouteName="Home"
+          initialRouteName="HomeTab"
           barStyle={tabBarStyle}
           labeled={false}
         >
           {tabRoutes.map((route) => (
             <Tabs.Screen
               name={route.name}
-              component={buildStack(route.name)}
+              component={buildStack(route.name, route.stack)}
               options={{
                 tabBarIcon: ({ focused }) =>
                   focused ? route.focusedIcon : route.unfocusedIcon,
