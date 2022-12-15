@@ -1,8 +1,13 @@
 // Route metadata for the sandbox tab
 import { Name } from './names';
-import Sandbox from '../../../pages/sandbox/Sandbox';
-import RouteRow from '../../../components/route/RouteRow';
-import UserRow from '../../../components/profile/UserRow';
+import Sandbox from '../../../screens/sandbox/Sandbox';
+import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
+import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
+import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
+import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWrapper';
+import SearchBarWrapper from '../../../screens/sandbox/SearchBarWrapper';
+import LeaderboardCardWrapper from '../../../screens/sandbox/LeaderboardCardWrapper';
+import UserRowWrapper from '../../../screens/sandbox/UserRowWrapper';
 
 export type Route = {
   name: Name;
@@ -16,28 +21,30 @@ export const routes: Array<Route> = [
   },
   {
     name: 'RouteRow',
-    component: RouteRow,
+    component: RouteRowWrapper,
+  },
+  {
+    name: 'ProfileBanner',
+    component: ProfileBannerWrapper,
+  },
+  {
+    name: 'StatBox',
+    component: StatBoxWrapper,
+  },
+  {
+    name: 'LostAndFoundCard',
+    component: LostAndFoundCardWrapper,
+  },
+  {
+    name: 'SearchBar',
+    component: SearchBarWrapper,
+  },
+  {
+    name: 'LeaderboardCard',
+    component: LeaderboardCardWrapper,
   },
   {
     name: 'UserRow',
-    component: UserRow,
+    component: UserRowWrapper,
   },
 ];
-
-export type PropMap = {
-  Sandbox: undefined;
-
-  // Maybe replace this with RouteRef backend object down the line
-  RouteRow: {
-    thumbnail: string;
-    name: string;
-    grade: string;
-    tags: Array<string>;
-  };
-
-  UserRow: {
-    avatarUrl: string;
-    userName: string;
-    userHandle: string;
-  };
-};

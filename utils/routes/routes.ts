@@ -1,18 +1,25 @@
 // Combine useful route datas, and map tabs to their routes
-import {
-  routes as defaultRoutes,
-  PropMap as DefaultPropMap,
-} from './default/routes';
-import {
-  routes as sandboxRoutes,
-  PropMap as SandboxPropMap,
-} from './sandbox/routes';
-
-import { Name as DefaultName } from './default/names';
+import { routes as homeRoutes } from './home/routes';
+import { routes as leaderboardsRoutes } from './leaderboards/routes';
+import { routes as profileRoutes } from './profile/routes';
+import { routes as searchRoutes } from './search/routes';
+import { routes as sandboxRoutes } from './sandbox/routes';
+import { routes as activeRoutesRoutes } from './activeRoutes/routes';
+import { Name as HomeName } from './home/names';
+import { Name as LeaderboardsName } from './leaderboards/names';
+import { Name as ActiveRoutesName } from './activeRoutes/names';
+import { Name as SearchName } from './search/names';
+import { Name as ProfileName } from './profile/names';
 import { Name as SandboxName } from './sandbox/names';
 import { Name as TabName } from './tabs/names';
 
-export type RouteName = DefaultName | SandboxName;
+export type RouteName =
+  | HomeName
+  | LeaderboardsName
+  | SearchName
+  | ProfileName
+  | ActiveRoutesName
+  | SandboxName;
 export type Route = {
   name: RouteName;
   component: any;
@@ -22,17 +29,29 @@ type RouteData = {
   initialRouteName: RouteName;
   routes: Array<Route>;
 };
-const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
-  DefaultTab: {
-    initialRouteName: 'Default',
-    routes: defaultRoutes,
+export const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
+  HomeTab: {
+    initialRouteName: 'MainFeed',
+    routes: homeRoutes,
+  },
+  LeaderboardsTab: {
+    initialRouteName: 'Leaderboards',
+    routes: leaderboardsRoutes,
+  },
+  ActiveRoutesTab: {
+    initialRouteName: 'ActiveRoutes',
+    routes: activeRoutesRoutes,
+  },
+  SearchTab: {
+    initialRouteName: 'Search',
+    routes: searchRoutes,
+  },
+  ProfileTab: {
+    initialRouteName: 'Profile',
+    routes: profileRoutes,
   },
   SandboxTab: {
     initialRouteName: 'Sandbox',
     routes: sandboxRoutes,
   },
 };
-
-type PropMap = DefaultPropMap & SandboxPropMap;
-
-export { tabNameToRouteData, PropMap };

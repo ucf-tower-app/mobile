@@ -1,4 +1,4 @@
-// Route metadata for the default tab
+// Route metadata for the home tab
 import { Name } from './names';
 import { View } from 'react-native';
 
@@ -9,11 +9,7 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Default',
+    name: 'Home',
     component: View,
   },
 ];
-
-export type PropMap = {
-  Default: undefined;
-};

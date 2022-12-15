@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   ArrowForwardIcon,
   Center,
@@ -6,31 +5,57 @@ import {
   Image,
   Text,
   VStack,
+  useColorModeValue,
 } from 'native-base';
-import React from 'react';
-import { PropMap } from '../../utils/routes/routes';
+import { useEffect, useState } from 'react';
+import { Route } from '../../xplat/types/route';
 
-type Props = NativeStackScreenProps<PropMap, 'RouteRow'>;
+type Props = {
+  route: Route;
+};
 const RouteRow = ({ route }: Props) => {
-  let description = route.params.grade;
-  route.params.tags.forEach((tag) => {
-    description = description + ', ' + tag;
-  });
+  const [name, setName] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
+    undefined
+  );
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  // Fetch all relevant data and update the state accordingly.
+  useEffect(() => {
+    const fetchData = async () => {
+      route.getName().then(setName);
+      route.getRating().then((rating) => {
+        let descriptionBuilder = rating;
+        route.getTags().then(async (tags) => {
+          for (const tag of tags) {
+            const tagName = await tag.getName();
+            descriptionBuilder = descriptionBuilder + ', ' + tagName;
+          }
+          setDescription(descriptionBuilder);
+        });
+      });
+
+      setThumbnailUrl('https://wallpaperaccess.com/full/317501.jpg');
+    };
+
+    fetchData();
+  }, [route]);
 
   return (
-    <HStack h={20} pl={2} my={3} backgroundColor="white">
+    <HStack h={20} pl={2} my={3} backgroundColor={baseBgColor}>
       <Center w="20%">
         <Image
           size={16}
           borderRadius={5}
-          source={{ uri: route.params.thumbnail }}
-          alt={route.params.name}
+          source={{ uri: thumbnailUrl }}
+          alt={name}
         />
       </Center>
       <Center w="65%">
         <VStack w="full" h="full" pl={2} pt={2}>
           <Text fontSize="xl" fontWeight="bold">
-            {route.params.name}
+            {name}
           </Text>
           <Text fontSize="lg" color="grey">
             {description}
