@@ -7,6 +7,8 @@ import { TagMock } from '../../xplat/types/tag';
 
 const setterMock = new UserMock(
   'mockymock',
+  'setter@setter.com',
+  'Mock mock',
   "I'm a mocked user, I like mocks!",
   UserStatus.Employee,
   [],
