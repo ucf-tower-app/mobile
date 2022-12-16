@@ -6,4 +6,5 @@ export type ParamList = {
   LostAndFoundCard: undefined;
   SearchBar: undefined;
   LeaderboardCard: undefined;
+  UserRow: undefined;
 };

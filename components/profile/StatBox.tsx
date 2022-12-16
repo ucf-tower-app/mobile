@@ -7,15 +7,17 @@ type Props = {
 };
 const StatBox = ({ stat, value, onPress }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const primaryBgColor = useColorModeValue(
+    'lightMode.primary',
+    'darkMode.primary'
+  );
 
   return (
     <Pressable p={2} bg={baseBgColor} onPress={onPress}>
       {({ isHovered, isPressed }) => {
         return (
           <VStack
-            bg={
-              isPressed ? 'coolGray.100' : isHovered ? 'coolGray.100' : 'white'
-            }
+            bg={isPressed || isHovered ? primaryBgColor : baseBgColor}
             justifyContent="center"
             alignItems="center"
           >

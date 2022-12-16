@@ -7,6 +7,7 @@ import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
 import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWrapper';
 import SearchBarWrapper from '../../../screens/sandbox/SearchBarWrapper';
 import LeaderboardCardWrapper from '../../../screens/sandbox/LeaderboardCardWrapper';
+import UserRowWrapper from '../../../screens/sandbox/UserRowWrapper';
 
 export type Route = {
   name: Name;
@@ -41,5 +42,9 @@ export const routes: Array<Route> = [
   {
     name: 'LeaderboardCard',
     component: LeaderboardCardWrapper,
+  },
+  {
+    name: 'UserRow',
+    component: UserRowWrapper,
   },
 ];
