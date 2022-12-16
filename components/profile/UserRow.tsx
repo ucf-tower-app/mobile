@@ -1,12 +1,29 @@
-import { Avatar, HStack, VStack, Center, Text } from 'native-base';
+import {
+  Avatar,
+  HStack,
+  VStack,
+  Center,
+  Text,
+  Pressable,
+  useColorModeValue,
+} from 'native-base';
 import { User } from '../../xplat/types/user';
 import { useEffect, useState } from 'react';
+
+// TODO
+const navigateToProfile = () => {};
 
 type Props = {
   user: User;
   endComponent?: JSX.Element;
 };
 const UserRow = ({ user, endComponent }: Props) => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const primaryBgColor = useColorModeValue(
+    'lightMode.primary',
+    'darkMode.primary'
+  );
+
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const [displayName, setDisplayName] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -24,22 +41,33 @@ const UserRow = ({ user, endComponent }: Props) => {
   }, [user]);
 
   return (
-    <HStack h={20} pl={2} my={3} backgroundColor="white">
-      <Center w="20%">
-        <Avatar size="lg" source={{ uri: avatarUrl }} />
-      </Center>
-      <Center w="65%">
-        <VStack w="full" h="full" pl={2} pt={2}>
-          <Text fontSize="xl" fontWeight="bold">
-            {displayName}
-          </Text>
-          <Text fontSize="lg" color="grey">
-            @{username}
-          </Text>
-        </VStack>
-      </Center>
-      <Center w="15%">{endComponent}</Center>
-    </HStack>
+    <Pressable bg={baseBgColor} onPress={navigateToProfile}>
+      {({ isHovered, isPressed }) => {
+        return (
+          <HStack
+            h={20}
+            pl={2}
+            my={3}
+            bg={isPressed || isHovered ? primaryBgColor : baseBgColor}
+          >
+            <Center w="20%">
+              <Avatar size="lg" source={{ uri: avatarUrl }} />
+            </Center>
+            <Center w="65%">
+              <VStack w="full" h="full" pl={2} pt={2}>
+                <Text fontSize="xl" fontWeight="bold">
+                  {displayName}
+                </Text>
+                <Text fontSize="lg" color="grey">
+                  @{username}
+                </Text>
+              </VStack>
+            </Center>
+            <Center w="15%">{endComponent}</Center>
+          </HStack>
+        );
+      }}
+    </Pressable>
   );
 };
 
