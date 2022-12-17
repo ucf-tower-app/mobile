@@ -4,6 +4,7 @@ import Leaderboards from '../../../screens/leaderboards/Leaderboards';
 import AllTimeLeaderboard from '../../../screens/leaderboards/AllTimeLeaderboard';
 import MonthlyLeaderboard from '../../../screens/leaderboards/MonthlyLeaderboard';
 import FriendsLeaderboard from '../../../screens/leaderboards/FriendsLeaderboard';
+import LeaderboardUserProfile from '../../../screens/leaderboards/LeaderboardUserProfile';
 
 export type Route = {
   name: Name;
@@ -26,5 +27,9 @@ export const routes: Array<Route> = [
   {
     name: 'FriendsLeaderboard',
     component: FriendsLeaderboard,
+  },
+  {
+    name: 'LeaderboardUserProfile',
+    component: LeaderboardUserProfile,
   },
 ];
