@@ -4,5 +4,6 @@ export const names = [
   'MonthlyLeaderboard',
   'FriendsLeaderboard',
   'Leaderboards',
+  'LeaderboardUserProfile',
 ] as const;
 export type Name = typeof names[number];

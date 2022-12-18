@@ -1,16 +1,17 @@
-import { Center, Box, VStack } from 'native-base';
 import LeaderboardRanking from '../../components/leaderboard/LeaderboardRanking';
-import type { LeaderboardsScreenNavigationProp } from '../../utils/types';
+import { Center, VStack, Box } from 'native-base';
 
-const FriendsLeaderboard = ({
-  navigation,
-}: LeaderboardsScreenNavigationProp<'FriendsLeaderboard'>) => {
+const mockNavigate = () => {
+  console.log('Navigate');
+};
+
+const LeaderboardRankingWrapper = () => {
   return (
     <VStack>
       <Center>
         <Box w="95%">
           <LeaderboardRanking
-            navigate={navigation.navigate}
+            navigate={mockNavigate}
             ranking={1}
             numOfSends={20}
             username="bobby"
@@ -21,7 +22,7 @@ const FriendsLeaderboard = ({
       <Center>
         <Box w="95%">
           <LeaderboardRanking
-            navigate={navigation.navigate}
+            navigate={mockNavigate}
             ranking={2}
             numOfSends={20}
             username="bobby"
@@ -33,4 +34,4 @@ const FriendsLeaderboard = ({
   );
 };
 
-export default FriendsLeaderboard;
+export default LeaderboardRankingWrapper;

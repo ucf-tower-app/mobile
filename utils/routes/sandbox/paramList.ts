@@ -7,4 +7,5 @@ export type ParamList = {
   SearchBar: undefined;
   LeaderboardCard: undefined;
   UserRow: undefined;
+  LeaderboardRanking: undefined;
 };
