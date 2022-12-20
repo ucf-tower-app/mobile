@@ -1,17 +1,5 @@
 import ProfileBanner from '../../components/profile/ProfileBanner';
-import { UserStatus } from '../../xplat/types/common';
-import { UserMock } from '../../xplat/types/user';
-
-const userMock = new UserMock(
-  'mockymock',
-  'mail@mail.com',
-  'Mocky Mock',
-  "I'm a mocked user, I like mocks!",
-  UserStatus.Employee,
-  [],
-  [],
-  []
-);
+import { userMock } from '../../utils/mocks';
 
 const ProfileBannerWrapper = () => {
   return <ProfileBanner user={userMock} />;
