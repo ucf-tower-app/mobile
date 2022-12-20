@@ -9,6 +9,7 @@ import SearchBarWrapper from '../../../screens/sandbox/SearchBarWrapper';
 import LeaderboardCardWrapper from '../../../screens/sandbox/LeaderboardCardWrapper';
 import UserRowWrapper from '../../../screens/sandbox/UserRowWrapper';
 import LeaderboardRankingWrapper from '../../../screens/sandbox/LeaderboardRankingWrapper';
+import UserTagWrapper from '../../../screens/sandbox/UserTagWrapper';
 
 export type Route = {
   name: Name;
@@ -51,5 +52,9 @@ export const routes: Array<Route> = [
   {
     name: 'LeaderboardRanking',
     component: LeaderboardRankingWrapper,
+  },
+  {
+    name: 'UserTag',
+    component: UserTagWrapper,
   },
 ];

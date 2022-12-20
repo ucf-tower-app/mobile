@@ -8,4 +8,5 @@ export type ParamList = {
   LeaderboardCard: undefined;
   UserRow: undefined;
   LeaderboardRanking: undefined;
+  UserTag: undefined;
 };
