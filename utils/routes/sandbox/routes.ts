@@ -10,6 +10,7 @@ import LeaderboardCardWrapper from '../../../screens/sandbox/LeaderboardCardWrap
 import UserRowWrapper from '../../../screens/sandbox/UserRowWrapper';
 import LeaderboardRankingWrapper from '../../../screens/sandbox/LeaderboardRankingWrapper';
 import UserTagWrapper from '../../../screens/sandbox/UserTagWrapper';
+import PostWrapper from '../../../screens/sandbox/PostWrapper';
 
 export type Route = {
   name: Name;
@@ -56,5 +57,9 @@ export const routes: Array<Route> = [
   {
     name: 'UserTag',
     component: UserTagWrapper,
+  },
+  {
+    name: 'Post',
+    component: PostWrapper,
   },
 ];
