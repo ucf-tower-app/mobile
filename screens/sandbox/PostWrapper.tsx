@@ -5,7 +5,7 @@ import { postMock } from '../../utils/mocks';
 const PostWrapper = () => {
   return (
     <Center>
-      <Post post={postMock} />
+      <Post post={undefined} />
     </Center>
   );
 };

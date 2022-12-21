@@ -68,7 +68,7 @@ const UserTag = ({ user, size = 'sm' }: Props) => {
         return (
           <Box rounded="full" bg={baseBgColor}>
             <Tintable tinted={isHovered || isPressed} rounded />
-            <HStack alignItems="center" p={1} pr={3}>
+            <HStack alignItems="center" pr={3}>
               <Skeleton
                 w={sizedStyles[size].avatarSize}
                 h={sizedStyles[size].avatarSize}
