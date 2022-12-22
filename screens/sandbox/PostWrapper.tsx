@@ -1,12 +1,25 @@
-import { Center } from 'native-base';
+import { Divider, ScrollView, useColorModeValue, VStack } from 'native-base';
 import Post from '../../components/media/Post';
-import { postMock } from '../../utils/mocks';
+import { postMock, postMockNoImage } from '../../utils/mocks';
+
+const padifyPost = (post: JSX.Element) => {
+  return (
+    <VStack>
+      <Divider my={4} />
+      {post}
+    </VStack>
+  );
+};
 
 const PostWrapper = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
   return (
-    <Center>
+    <ScrollView w="full" bg={baseBgColor}>
       <Post post={postMock} />
-    </Center>
+      {padifyPost(<Post post={postMockNoImage} />)}
+      {padifyPost(<Post post={undefined} />)}
+    </ScrollView>
   );
 };
 

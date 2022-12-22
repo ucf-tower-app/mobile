@@ -48,7 +48,14 @@ export const postMock = new PostMock(
   userMock,
   new Date(Date.now()),
   'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
-  profilePic,
+  [],
+  [],
+  profilePic
+);
+export const postMockNoImage = new PostMock(
+  userMock,
+  new Date(Date.now()),
+  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
   [],
   []
 );

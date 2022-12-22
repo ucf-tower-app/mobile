@@ -67,6 +67,9 @@ const ImageCarousel = ({ imageUrls }: Props) => {
         onProgressChange={(_, absoluteProgress) =>
           setFocusedIndex(Math.round(absoluteProgress))
         }
+        panGestureHandlerProps={{
+          activeOffsetX: [-10, 10],
+        }}
       />
       <Center>
         <HStack space={1.5}>
