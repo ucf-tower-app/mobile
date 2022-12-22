@@ -56,7 +56,7 @@ const Post = ({ post }: Props) => {
 
   return (
     <VStack w="full" alignItems="start" bg={baseBgColor}>
-      <Box p={2}>
+      <Box pl={2}>
         <UserTag user={author} />
       </Box>
       <Skeleton.Text p={2} lines={2} isLoaded={isTextContentLoaded}>

@@ -16,9 +16,11 @@ const PostWrapper = () => {
 
   return (
     <ScrollView w="full" bg={baseBgColor}>
+      <Divider mb={4} />
       <Post post={postMock} />
       {padifyPost(<Post post={postMockNoImage} />)}
       {padifyPost(<Post post={undefined} />)}
+      <Divider mt={4} />
     </ScrollView>
   );
 };
