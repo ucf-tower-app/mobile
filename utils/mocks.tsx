@@ -1,5 +1,6 @@
 import { LazyStaticImage } from '../xplat/types/common';
 import { ForumMock } from '../xplat/types/forum';
+import { PostMock } from '../xplat/types/post';
 import { RouteMock } from '../xplat/types/route';
 import { TagMock } from '../xplat/types/tag';
 import { UserStatus } from '../xplat/types/types';
@@ -42,4 +43,19 @@ export const userMock = new UserMock(
   [],
   [],
   profilePic
+);
+export const postMock = new PostMock(
+  userMock,
+  new Date(Date.now()),
+  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
+  [],
+  [],
+  profilePic
+);
+export const postMockNoImage = new PostMock(
+  userMock,
+  new Date(Date.now()),
+  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
+  [],
+  []
 );

@@ -10,5 +10,6 @@ export const names = [
   'UserRow',
   'LeaderboardRanking',
   'UserTag',
+  'Post',
 ] as const;
 export type Name = typeof names[number];

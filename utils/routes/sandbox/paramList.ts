@@ -9,4 +9,5 @@ export type ParamList = {
   UserRow: undefined;
   LeaderboardRanking: undefined;
   UserTag: undefined;
+  Post: undefined;
 };

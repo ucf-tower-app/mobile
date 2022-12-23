@@ -6,6 +6,7 @@ import { tabNameToRouteData } from './utils/routes/routes';
 import { routes as tabRoutes } from './utils/routes/tabs/routes';
 import { Name as TabName } from './utils/routes/tabs/names';
 import { ParamList as RootTabParamList } from './utils/routes/tabs/paramList';
+import 'react-native-gesture-handler';
 
 // Style for tab bar
 const tabBarStyle = {
