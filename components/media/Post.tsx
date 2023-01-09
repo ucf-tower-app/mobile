@@ -26,6 +26,8 @@ const Post = ({ post }: Props) => {
   const [author, setAuthor] = useState<User | undefined>(undefined);
 
   // Video content
+  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState<string>('');
+  const [videoUrl, setVideoUrl] = useState<string>('');
 
   // Image content
   const [imageUrls, setImageUrls] = useState<Array<string> | undefined>(
@@ -42,6 +44,7 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
+      // TODO: Actually get video content from post when xplat is ready
       post.hasImageContent().then((hasImageContent) => {
         if (!hasImageContent) return;
         post.getImageContentUrl().then((url) => setImageUrls([url!, url!]));
@@ -53,6 +56,8 @@ const Post = ({ post }: Props) => {
   }, [post]);
 
   const isTextContentLoaded = textContent !== '';
+  const hasImages = imageUrls !== undefined;
+  const hasVideo = videoThumbnailUrl !== '' && videoUrl !== '';
 
   return (
     <VStack w="full" alignItems="start" bg={baseBgColor}>
@@ -72,6 +77,7 @@ const Post = ({ post }: Props) => {
         pt={2}
       >
         <Skeleton w="full" h={40} isLoaded={isTextContentLoaded}>
+          {VideoPlaybackQuality}
           {imageUrls !== undefined ? (
             <ImageCarousel imageUrls={imageUrls} />
           ) : null}
