@@ -42,10 +42,7 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
-      post.hasImageContent().then((hasImageContent) => {
-        if (!hasImageContent) return;
-        post.getImageContentUrl().then((url) => setImageUrls([url!, url!]));
-      });
+      post.getImageContentUrls().then(setImageUrls);
       post.getTextContent().then(setTextContent);
     };
 
