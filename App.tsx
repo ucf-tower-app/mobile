@@ -38,6 +38,7 @@ export default function App() {
               name={route.name}
               component={route.component}
               key={route.name}
+              options={{ headerShown: route.name === 'Tabs' ? false : true }}
             />
           ))}
         </RootStack.Navigator>
