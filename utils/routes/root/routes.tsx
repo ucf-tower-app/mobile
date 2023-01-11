@@ -15,7 +15,7 @@ const tabBarStyle = {
   backgroundColor: 'white',
 };
 
-const BuildTabs = () => {
+const TabsNavigator = () => {
   // Tabs used for bottom tray, stack for in-tab nav
   const Tabs = createMaterialBottomTabNavigator<TabParamList>();
 
@@ -43,7 +43,7 @@ const BuildTabs = () => {
 export const routes: Array<Route> = [
   {
     name: 'Tabs',
-    component: BuildTabs,
+    component: TabsNavigator,
   },
   {
     name: 'Settings',
