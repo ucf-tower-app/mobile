@@ -15,6 +15,7 @@ import { tabNameToRouteData } from '../routes';
 import { ParamList as SandboxParamList } from '../sandbox/paramList';
 import { ParamList as SearchParamList } from '../search/paramList';
 import { Name, Name as TabName } from './names';
+import HeaderMenu from '../../../components/header/HeaderMenu';
 
 export type Route = {
   name: Name;
@@ -23,13 +24,22 @@ export type Route = {
   stack: any;
 };
 
+const headerRightButton = (navigation: any) => {
+  return <HeaderMenu navigate={navigation.navigate} />;
+};
+
 // Builds a navigator stack for a given tab
 const buildStack = (tabName: TabName, stack: any) => {
   const routeData = tabNameToRouteData[tabName];
   const Stack = stack;
   return () => {
     return (
-      <Stack.Navigator initialRouteName={routeData.initialRouteName}>
+      <Stack.Navigator
+        initialRouteName={routeData.initialRouteName}
+        screenOptions={({ navigation }: { navigation: any }) => ({
+          headerRight: () => headerRightButton(navigation),
+        })}
+      >
         {routeData.routes.map((route) => (
           <Stack.Screen
             name={route.name}
