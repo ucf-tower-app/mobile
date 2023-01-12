@@ -7,6 +7,7 @@ import {
 } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon } from 'native-base';
+import HeaderMenu from '../../../components/header/HeaderMenu';
 import { ParamList as ActiveRoutesParamList } from '../activeRoutes/paramList';
 import { ParamList as HomeParamList } from '../home/paramList';
 import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
@@ -15,7 +16,6 @@ import { tabNameToRouteData } from '../routes';
 import { ParamList as SandboxParamList } from '../sandbox/paramList';
 import { ParamList as SearchParamList } from '../search/paramList';
 import { Name as TabName } from './names';
-import HeaderMenu from '../../../components/header/HeaderMenu';
 
 export type Route = {
   name: TabName;

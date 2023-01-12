@@ -115,6 +115,8 @@ const Register = ({ setIsRegistering }: Props) => {
             <Input
               placeholder="CrimpMaster@knights.ucf.edu"
               onChangeText={(email) => setData({ ...formData, email })}
+              autoCorrect={false}
+              autoCapitalize="none"
             />
             {'email' in errorData ? (
               <FormControl.ErrorMessage>
@@ -133,6 +135,8 @@ const Register = ({ setIsRegistering }: Props) => {
             <Input
               placeholder="SendyMcSendIt"
               onChangeText={(username) => setData({ ...formData, username })}
+              autoCorrect={false}
+              autoCapitalize="none"
             />
             {'username' in errorData ? (
               <FormControl.ErrorMessage>
@@ -153,6 +157,8 @@ const Register = ({ setIsRegistering }: Props) => {
               onChangeText={(displayName) =>
                 setData({ ...formData, displayName })
               }
+              autoCorrect={false}
+              autoCapitalize="none"
             />
             {'displayName' in errorData ? (
               <FormControl.ErrorMessage>
@@ -172,6 +178,8 @@ const Register = ({ setIsRegistering }: Props) => {
               placeholder="mysecretpassword"
               onChangeText={(password) => setData({ ...formData, password })}
               type="password"
+              autoCorrect={false}
+              autoCapitalize="none"
             />
             {'password' in errorData ? (
               <FormControl.ErrorMessage>

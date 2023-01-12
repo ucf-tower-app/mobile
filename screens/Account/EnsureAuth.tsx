@@ -1,12 +1,11 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { Flex, Spinner } from 'native-base';
 import { useEffect, useState } from 'react';
 import 'react-native-gesture-handler';
-import { tabNameToRouteData } from '../../utils/routes/routes';
-import { Name as TabName } from '../../utils/routes/tabs/names';
 import { ParamList as RootTabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
-import SignInOrRegister from './SignInOrRegister';
 import { auth } from '../../xplat/Firebase';
+import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
 
 // Style for tab bar
@@ -17,24 +16,15 @@ const tabBarStyle = {
 // Tabs used for bottom tray, stack for in-tab nav
 const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
 
-// Builds a navigator stack for a given tab
-const buildStack = (tabName: TabName, Stack: any) => {
-  const routeData = tabNameToRouteData[tabName];
-  return () => {
-    return (
-      <Stack.Navigator initialRouteName={routeData.initialRouteName}>
-        {routeData.routes.map((route) => (
-          <Stack.Screen
-            name={route.name}
-            component={route.component}
-            key={route.name}
-          />
-        ))}
-      </Stack.Navigator>
-    );
-  };
-};
-
+/**
+ * [EnsureAuth] is a wrapper component for the main tab navigator.
+ * It listens to auth events from Firebase, and updates the UI accordingly.
+ * There are three states
+ *
+ * 1. Not logged in --> Render SignInOrRegister
+ * 2. Logged in, email not verified --> Render email verification
+ * 3. Logged in, email verified --> Render tab navigator
+ */
 const EnsureAuth = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [signedIn, setSignedIn] = useState<boolean>(false);
@@ -42,7 +32,7 @@ const EnsureAuth = () => {
     auth.currentUser?.emailVerified ?? false
   );
 
-  const onUserStateChanged = (user: any) => {
+  const updateUserStatus = (user: any) => {
     if (user !== null) {
       setSignedIn(true);
       setIsEmailVerified(user.emailVerified);
@@ -54,24 +44,21 @@ const EnsureAuth = () => {
   };
 
   // Listen to firebase authentication changes
-  useEffect(() => {
-    const unsubscribers: Array<() => void> = [];
-    unsubscribers.push(auth.onAuthStateChanged(onUserStateChanged));
-    unsubscribers.push(auth.onIdTokenChanged(onUserStateChanged));
-    return () => {
-      unsubscribers.forEach((handle) => handle());
-    };
-  }, []);
+  useEffect(() => auth.onAuthStateChanged(updateUserStatus), []);
 
-  // TODO, render spinner
-  if (initializing) return null;
+  if (initializing)
+    return (
+      <Flex w="full" h="full" justifyContent="center" alignItems="center">
+        <Spinner size="lg" />
+      </Flex>
+    );
 
   if (!signedIn) {
     return <SignInOrRegister />;
   }
 
   if (!isEmailVerified) {
-    return <VerifyEmail />;
+    return <VerifyEmail setIsEmailVerified={setIsEmailVerified} />;
   }
 
   return (
@@ -83,7 +70,7 @@ const EnsureAuth = () => {
       {tabRoutes.map((route) => (
         <Tabs.Screen
           name={route.name}
-          component={buildStack(route.name, route.stack)}
+          component={route.stack}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? route.focusedIcon : route.unfocusedIcon,

@@ -1,10 +1,10 @@
 import {
-  VStack,
+  Button,
   Center,
   FormControl,
-  Input,
   Heading,
-  Button,
+  Input,
+  VStack,
 } from 'native-base';
 import { useState } from 'react';
 import { signIn } from '../../xplat/api';
@@ -20,13 +20,16 @@ const SignInOrRegister = () => {
     usernameOrEmail: '',
     password: '',
   });
-
+  const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
 
   const onSubmit = () => {
     // TODO: Validate the data
     console.log(formData);
-    signIn(formData.usernameOrEmail, formData.password);
+    setIsServerProcessing(true);
+    signIn(formData.usernameOrEmail, formData.password).finally(() =>
+      setIsServerProcessing(false)
+    );
   };
 
   return isRegistering ? (
@@ -48,6 +51,8 @@ const SignInOrRegister = () => {
             onChangeText={(usernameOrEmail) =>
               setData({ ...formData, usernameOrEmail })
             }
+            autoCorrect={false}
+            autoCapitalize="none"
           />
           <FormControl.Label
             _text={{
@@ -60,9 +65,11 @@ const SignInOrRegister = () => {
             placeholder="mysecretpassword"
             onChangeText={(password) => setData({ ...formData, password })}
             type="password"
+            autoCorrect={false}
+            autoCapitalize="none"
           />
         </FormControl>
-        <Button onPress={onSubmit} mt={5}>
+        <Button onPress={onSubmit} mt={5} isLoading={isServerProcessing}>
           Submit
         </Button>
         <Button variant="link" onPress={() => setIsRegistering(true)}>

@@ -1,11 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native';
-import 'react-native-gesture-handler';
-import { routes as rootStackRoutes } from './utils/routes/root/routes';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { extendTheme, NativeBaseProvider } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
+import { extendTheme, NativeBaseProvider } from 'native-base';
 import 'react-native-gesture-handler';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
+import { routes as rootStackRoutes } from './utils/routes/root/routes';
 
 const theme = extendTheme({
   colors: {
