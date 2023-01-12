@@ -5,6 +5,7 @@ import {
   Heading,
   Input,
   KeyboardAvoidingView,
+  useToast,
   VStack,
 } from 'native-base';
 import { useState } from 'react';
@@ -62,6 +63,8 @@ type Props = {
   setIsRegistering: (isRegistering: boolean) => void;
 };
 const Register = ({ setIsRegistering }: Props) => {
+  const toast = useToast();
+
   const [formData, setData] = useState<RegisterFormData>(emptyFormData);
   const [errorData, setErrorData] = useState<RegisterErrorData>({});
   const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
@@ -90,7 +93,10 @@ const Register = ({ setIsRegistering }: Props) => {
         await signIn(formData.email, formData.password);
         await sendAuthEmail();
       } catch {
-        // TODO: Show an error to the user
+        toast.show({
+          description: 'Oops, this email already exists. Please try again.',
+          placement: 'top',
+        });
       } finally {
         setIsServerProcessing(false);
       }
