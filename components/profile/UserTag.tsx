@@ -1,12 +1,12 @@
 import {
   Avatar,
+  Box,
   HStack,
   Pressable,
+  Skeleton,
+  Text,
   useColorModeValue,
   VStack,
-  Text,
-  Skeleton,
-  Box,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { User } from '../../xplat/types/user';

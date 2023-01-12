@@ -2,9 +2,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { extendTheme, NativeBaseProvider } from 'native-base';
-import { routes as rootStackRoutes } from './utils/routes/root/routes';
 import 'react-native-gesture-handler';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
+import { routes as rootStackRoutes } from './utils/routes/root/routes';
 
 const theme = extendTheme({
   colors: {
@@ -27,12 +27,9 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
+      <StatusBar style="auto" />
       <NavigationContainer>
-        <StatusBar style="auto" />
-        <RootStack.Navigator
-          initialRouteName="Tabs"
-          screenOptions={{ headerShown: false }}
-        >
+        <RootStack.Navigator initialRouteName="Tabs">
           {rootStackRoutes.map((route) => (
             <RootStack.Screen
               name={route.name}

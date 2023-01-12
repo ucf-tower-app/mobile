@@ -4,8 +4,8 @@ import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
 export type ParamList = {
   HomeTab: undefined;
   LeaderboardsTab: BottomTabScreenProps<LeaderboardsParamList>;
-  ProfileTab: undefined;
-  SearchTab: undefined;
   ActiveRoutesTab: undefined;
+  SearchTab: undefined;
+  ProfileTab: undefined;
   SandboxTab: undefined;
 };

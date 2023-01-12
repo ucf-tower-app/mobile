@@ -7,6 +7,7 @@ import {
 } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon } from 'native-base';
+import HeaderMenu from '../../../components/header/HeaderMenu';
 import { ParamList as ActiveRoutesParamList } from '../activeRoutes/paramList';
 import { ParamList as HomeParamList } from '../home/paramList';
 import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
@@ -14,11 +15,10 @@ import { ParamList as ProfileParamList } from '../profile/paramList';
 import { tabNameToRouteData } from '../routes';
 import { ParamList as SandboxParamList } from '../sandbox/paramList';
 import { ParamList as SearchParamList } from '../search/paramList';
-import { Name, Name as TabName } from './names';
-import HeaderMenu from '../../../components/header/HeaderMenu';
+import { Name as TabName } from './names';
 
 export type Route = {
-  name: Name;
+  name: TabName;
   focusedIcon: any;
   unfocusedIcon: any;
   stack: any;
@@ -29,9 +29,8 @@ const headerRightButton = (navigation: any) => {
 };
 
 // Builds a navigator stack for a given tab
-const buildStack = (tabName: TabName, stack: any) => {
+const buildStack = (tabName: TabName, Stack: any) => {
   const routeData = tabNameToRouteData[tabName];
-  const Stack = stack;
   return () => {
     return (
       <Stack.Navigator

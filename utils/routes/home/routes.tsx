@@ -1,6 +1,6 @@
 // Route metadata for the home tab
 import { Name } from './names';
-import { View } from 'react-native';
+import { View } from 'native-base';
 
 export type Route = {
   name: Name;
@@ -9,7 +9,7 @@ export type Route = {
 
 export const routes: Array<Route> = [
   {
-    name: 'Home',
+    name: 'MainFeed',
     component: View,
   },
 ];

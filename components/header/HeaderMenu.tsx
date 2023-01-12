@@ -1,5 +1,6 @@
-import { HStack, Icon, Menu, Pressable } from 'native-base';
 import { Entypo } from '@expo/vector-icons';
+import { HStack, Icon, Menu, Pressable } from 'native-base';
+import { auth } from '../../xplat/Firebase';
 
 type Props = {
   navigate: Function;
@@ -30,7 +31,7 @@ const HeaderMenu = ({ navigate }: Props) => {
         <Menu.Item onPress={() => navigate('LostAndFound')}>
           Lost and Found
         </Menu.Item>
-        <Menu.Item>Logout</Menu.Item>
+        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
       </Menu>
     </HStack>
   );
