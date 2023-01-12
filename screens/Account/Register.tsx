@@ -4,9 +4,11 @@ import {
   FormControl,
   Heading,
   Input,
+  KeyboardAvoidingView,
   VStack,
 } from 'native-base';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import { createUser, sendAuthEmail, signIn } from '../../xplat/api';
 
 type RegisterFormData = {
@@ -96,92 +98,96 @@ const Register = ({ setIsRegistering }: Props) => {
   };
 
   return (
-    <Center>
-      <VStack w="90%" h="full" mx="3" maxW="300px" justifyContent="center">
-        <Heading size="xl">Register</Heading>
-        <FormControl isRequired isInvalid={'email' in errorData}>
-          <FormControl.Label
-            _text={{
-              bold: true,
-            }}
-          >
-            Email
-          </FormControl.Label>
-          <Input
-            placeholder="CrimpMaster@knights.ucf.edu"
-            onChangeText={(email) => setData({ ...formData, email })}
-          />
-          {'email' in errorData ? (
-            <FormControl.ErrorMessage>
-              {errorData.email}
-            </FormControl.ErrorMessage>
-          ) : null}
-        </FormControl>
-        <FormControl isRequired isInvalid={'username' in errorData}>
-          <FormControl.Label
-            _text={{
-              bold: true,
-            }}
-          >
-            Username
-          </FormControl.Label>
-          <Input
-            placeholder="SendyMcSendIt"
-            onChangeText={(username) => setData({ ...formData, username })}
-          />
-          {'username' in errorData ? (
-            <FormControl.ErrorMessage>
-              {errorData.username}
-            </FormControl.ErrorMessage>
-          ) : null}
-        </FormControl>
-        <FormControl isRequired isInvalid={'displayName' in errorData}>
-          <FormControl.Label
-            _text={{
-              bold: true,
-            }}
-          >
-            Display Name
-          </FormControl.Label>
-          <Input
-            placeholder="Senderson Ranx"
-            onChangeText={(displayName) =>
-              setData({ ...formData, displayName })
-            }
-          />
-          {'displayName' in errorData ? (
-            <FormControl.ErrorMessage>
-              {errorData.displayName}
-            </FormControl.ErrorMessage>
-          ) : null}
-        </FormControl>
-        <FormControl isRequired isInvalid={'password' in errorData}>
-          <FormControl.Label
-            _text={{
-              bold: true,
-            }}
-          >
-            Password
-          </FormControl.Label>
-          <Input
-            placeholder="mysecretpassword"
-            onChangeText={(password) => setData({ ...formData, password })}
-            type="password"
-          />
-          {'password' in errorData ? (
-            <FormControl.ErrorMessage>
-              {errorData.password}
-            </FormControl.ErrorMessage>
-          ) : null}
-        </FormControl>
-        <Button onPress={onSubmit} mt={5} isLoading={isServerProcessing}>
-          Register
-        </Button>
-        <Button variant="link" onPress={() => setIsRegistering(false)}>
-          Already have an account?
-        </Button>
-      </VStack>
-    </Center>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <Center>
+        <VStack w="90%" h="full" mx="3" maxW="300px" justifyContent="center">
+          <Heading size="xl">Register</Heading>
+          <FormControl isRequired isInvalid={'email' in errorData}>
+            <FormControl.Label
+              _text={{
+                bold: true,
+              }}
+            >
+              Email
+            </FormControl.Label>
+            <Input
+              placeholder="CrimpMaster@knights.ucf.edu"
+              onChangeText={(email) => setData({ ...formData, email })}
+            />
+            {'email' in errorData ? (
+              <FormControl.ErrorMessage>
+                {errorData.email}
+              </FormControl.ErrorMessage>
+            ) : null}
+          </FormControl>
+          <FormControl isRequired isInvalid={'username' in errorData}>
+            <FormControl.Label
+              _text={{
+                bold: true,
+              }}
+            >
+              Username
+            </FormControl.Label>
+            <Input
+              placeholder="SendyMcSendIt"
+              onChangeText={(username) => setData({ ...formData, username })}
+            />
+            {'username' in errorData ? (
+              <FormControl.ErrorMessage>
+                {errorData.username}
+              </FormControl.ErrorMessage>
+            ) : null}
+          </FormControl>
+          <FormControl isRequired isInvalid={'displayName' in errorData}>
+            <FormControl.Label
+              _text={{
+                bold: true,
+              }}
+            >
+              Display Name
+            </FormControl.Label>
+            <Input
+              placeholder="Senderson Ranx"
+              onChangeText={(displayName) =>
+                setData({ ...formData, displayName })
+              }
+            />
+            {'displayName' in errorData ? (
+              <FormControl.ErrorMessage>
+                {errorData.displayName}
+              </FormControl.ErrorMessage>
+            ) : null}
+          </FormControl>
+          <FormControl isRequired isInvalid={'password' in errorData}>
+            <FormControl.Label
+              _text={{
+                bold: true,
+              }}
+            >
+              Password
+            </FormControl.Label>
+            <Input
+              placeholder="mysecretpassword"
+              onChangeText={(password) => setData({ ...formData, password })}
+              type="password"
+            />
+            {'password' in errorData ? (
+              <FormControl.ErrorMessage>
+                {errorData.password}
+              </FormControl.ErrorMessage>
+            ) : null}
+          </FormControl>
+          <Button onPress={onSubmit} mt={5} isLoading={isServerProcessing}>
+            Register
+          </Button>
+          <Button variant="link" onPress={() => setIsRegistering(false)}>
+            Already have an account?
+          </Button>
+        </VStack>
+      </Center>
+    </KeyboardAvoidingView>
   );
 };
 

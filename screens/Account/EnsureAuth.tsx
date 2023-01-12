@@ -1,13 +1,13 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { useEffect, useState } from 'react';
 import 'react-native-gesture-handler';
-import { tabNameToRouteData } from '../utils/routes/routes';
-import { Name as TabName } from '../utils/routes/tabs/names';
-import { ParamList as RootTabParamList } from '../utils/routes/tabs/paramList';
-import { routes as tabRoutes } from '../utils/routes/tabs/routes';
-import SignInOrRegister from './Account/SignInOrRegister';
-import { auth } from '../xplat/Firebase';
-import VerifyEmail from './Account/VerifyEmail';
+import { tabNameToRouteData } from '../../utils/routes/routes';
+import { Name as TabName } from '../../utils/routes/tabs/names';
+import { ParamList as RootTabParamList } from '../../utils/routes/tabs/paramList';
+import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
+import SignInOrRegister from './SignInOrRegister';
+import { auth } from '../../xplat/Firebase';
+import VerifyEmail from './VerifyEmail';
 
 // Style for tab bar
 const tabBarStyle = {
@@ -18,9 +18,8 @@ const tabBarStyle = {
 const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
 
 // Builds a navigator stack for a given tab
-const buildStack = (tabName: TabName, stack: any) => {
+const buildStack = (tabName: TabName, Stack: any) => {
   const routeData = tabNameToRouteData[tabName];
-  const Stack = stack;
   return () => {
     return (
       <Stack.Navigator initialRouteName={routeData.initialRouteName}>
@@ -36,14 +35,14 @@ const buildStack = (tabName: TabName, stack: any) => {
   };
 };
 
-const Main = () => {
+const EnsureAuth = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [signedIn, setSignedIn] = useState<boolean>(false);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(
     auth.currentUser?.emailVerified ?? false
   );
 
-  const onAuthStateChanged = (user: any) => {
+  const onUserStateChanged = (user: any) => {
     if (user !== null) {
       setSignedIn(true);
       setIsEmailVerified(user.emailVerified);
@@ -56,8 +55,12 @@ const Main = () => {
 
   // Listen to firebase authentication changes
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(onAuthStateChanged);
-    return unsubscribe;
+    const unsubscribers: Array<() => void> = [];
+    unsubscribers.push(auth.onAuthStateChanged(onUserStateChanged));
+    unsubscribers.push(auth.onIdTokenChanged(onUserStateChanged));
+    return () => {
+      unsubscribers.forEach((handle) => handle());
+    };
   }, []);
 
   // TODO, render spinner
@@ -92,4 +95,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default EnsureAuth;

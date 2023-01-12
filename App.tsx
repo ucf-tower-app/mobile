@@ -1,7 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { extendTheme, NativeBaseProvider } from 'native-base';
 import 'react-native-gesture-handler';
-import Main from './screens/Main';
+import { routes as rootStackRoutes } from './utils/routes/root/routes';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { extendTheme, NativeBaseProvider } from 'native-base';
+import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
+import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 
 const theme = extendTheme({
   colors: {
@@ -18,12 +22,24 @@ const theme = extendTheme({
   },
 });
 
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+
 // Construct tabs and their subtrees
 export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
+      <StatusBar style="auto" />
       <NavigationContainer>
-        <Main />
+        <RootStack.Navigator initialRouteName="Tabs">
+          {rootStackRoutes.map((route) => (
+            <RootStack.Screen
+              name={route.name}
+              component={route.component}
+              key={route.name}
+              options={{ headerShown: route.name === 'Tabs' ? false : true }}
+            />
+          ))}
+        </RootStack.Navigator>
       </NavigationContainer>
     </NativeBaseProvider>
   );

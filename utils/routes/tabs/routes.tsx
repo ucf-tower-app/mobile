@@ -1,23 +1,54 @@
 // Route metadata for tabs
-import { Name } from './names';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
-import { Icon } from 'native-base';
+import {
+  AntDesign,
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Icon } from 'native-base';
 import { ParamList as ActiveRoutesParamList } from '../activeRoutes/paramList';
-import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
 import { ParamList as HomeParamList } from '../home/paramList';
-import { ParamList as SearchParamList } from '../search/paramList';
+import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
 import { ParamList as ProfileParamList } from '../profile/paramList';
+import { tabNameToRouteData } from '../routes';
 import { ParamList as SandboxParamList } from '../sandbox/paramList';
+import { ParamList as SearchParamList } from '../search/paramList';
+import { Name as TabName } from './names';
+import HeaderMenu from '../../../components/header/HeaderMenu';
 
 export type Route = {
-  name: Name;
+  name: TabName;
   focusedIcon: any;
   unfocusedIcon: any;
   stack: any;
+};
+
+const headerRightButton = (navigation: any) => {
+  return <HeaderMenu navigate={navigation.navigate} />;
+};
+
+// Builds a navigator stack for a given tab
+const buildStack = (tabName: TabName, Stack: any) => {
+  const routeData = tabNameToRouteData[tabName];
+  return () => {
+    return (
+      <Stack.Navigator
+        initialRouteName={routeData.initialRouteName}
+        screenOptions={({ navigation }: { navigation: any }) => ({
+          headerRight: () => headerRightButton(navigation),
+        })}
+      >
+        {routeData.routes.map((route) => (
+          <Stack.Screen
+            name={route.name}
+            component={route.component}
+            key={route.name}
+          />
+        ))}
+      </Stack.Navigator>
+    );
+  };
 };
 
 export const routes: Array<Route> = [
@@ -37,7 +68,7 @@ export const routes: Array<Route> = [
         size="xl"
       />
     ),
-    stack: createNativeStackNavigator<HomeParamList>(),
+    stack: buildStack('HomeTab', createNativeStackNavigator<HomeParamList>()),
   },
   {
     name: 'LeaderboardsTab',
@@ -47,7 +78,10 @@ export const routes: Array<Route> = [
     unfocusedIcon: (
       <Icon as={<Ionicons name="trophy-outline" />} color="black" size="xl" />
     ),
-    stack: createNativeStackNavigator<LeaderboardsParamList>(),
+    stack: buildStack(
+      'LeaderboardsTab',
+      createNativeStackNavigator<LeaderboardsParamList>()
+    ),
   },
   {
     name: 'ActiveRoutesTab',
@@ -57,7 +91,10 @@ export const routes: Array<Route> = [
     unfocusedIcon: (
       <Icon as={<AntDesign name="questioncircleo" />} color="black" size="xl" />
     ),
-    stack: createNativeStackNavigator<ActiveRoutesParamList>(),
+    stack: buildStack(
+      'ActiveRoutesTab',
+      createNativeStackNavigator<ActiveRoutesParamList>()
+    ),
   },
   {
     name: 'SearchTab',
@@ -67,7 +104,10 @@ export const routes: Array<Route> = [
     unfocusedIcon: (
       <Icon as={<Ionicons name="search-outline" />} color="black" size="xl" />
     ),
-    stack: createNativeStackNavigator<SearchParamList>(),
+    stack: buildStack(
+      'SearchTab',
+      createNativeStackNavigator<SearchParamList>()
+    ),
   },
   {
     name: 'ProfileTab',
@@ -77,7 +117,10 @@ export const routes: Array<Route> = [
     unfocusedIcon: (
       <Icon as={<Ionicons name="person-outline" />} color="black" size="xl" />
     ),
-    stack: createNativeStackNavigator<ProfileParamList>(),
+    stack: buildStack(
+      'ProfileTab',
+      createNativeStackNavigator<ProfileParamList>()
+    ),
   },
   {
     name: 'SandboxTab',
@@ -87,6 +130,9 @@ export const routes: Array<Route> = [
     unfocusedIcon: (
       <Icon as={<Feather name="codesandbox" />} color="black" size="xl" />
     ),
-    stack: createNativeStackNavigator<SandboxParamList>(),
+    stack: buildStack(
+      'SandboxTab',
+      createNativeStackNavigator<SandboxParamList>()
+    ),
   },
 ];
