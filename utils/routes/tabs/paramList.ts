@@ -1,9 +1,9 @@
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
 
 export type ParamList = {
   HomeTab: undefined;
-  LeaderboardsTab: BottomTabScreenProps<LeaderboardsParamList>;
+  LeaderboardsTab: NavigatorScreenParams<LeaderboardsParamList>;
   ActiveRoutesTab: undefined;
   SearchTab: undefined;
   ProfileTab: undefined;
