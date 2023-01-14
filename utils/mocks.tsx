@@ -1,4 +1,5 @@
 import { ForumMock } from '../xplat/types/forum';
+import { LazyStaticVideo } from '../xplat/types/media';
 import { PostMock } from '../xplat/types/post';
 import { RouteMock } from '../xplat/types/route';
 import { TagMock } from '../xplat/types/tag';
@@ -32,6 +33,12 @@ export const profilePic = new LazyStaticImage(
   'mock/path',
   'https://wallpaperaccess.com/full/317501.jpg'
 );
+export const videoMock = new LazyStaticVideo(
+  'mock/path',
+  'mock/path',
+  'https://i.insider.com/602ee9ced3ad27001837f2ac?width=2000&format=jpeg&auto=webp',
+  'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
+);
 export const userMock = new UserMock(
   'mockitymock',
   'fakeemail@mail.com',
@@ -49,10 +56,23 @@ export const postMock = new PostMock(
   'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
   [],
   [],
-  [profilePic, profilePic]
+  [profilePic, profilePic],
+  videoMock
 );
 export const postMockNoImage = new PostMock(
   userMock,
   new Date(Date.now()),
-  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.'
+  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
+  [],
+  [],
+  [],
+  videoMock
+);
+export const postMockNoVideo = new PostMock(
+  userMock,
+  new Date(Date.now()),
+  'This is really the best post ever. Like, wow! I like rocks. Who would have thought that rocks would be so cool. Also grabbing them.',
+  [],
+  [],
+  [profilePic, profilePic]
 );

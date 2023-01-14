@@ -1,6 +1,6 @@
 import { Divider, ScrollView, useColorModeValue, VStack } from 'native-base';
 import Post from '../../components/media/Post';
-import { postMock, postMockNoImage } from '../../utils/mocks';
+import { postMock, postMockNoImage, postMockNoVideo } from '../../utils/mocks';
 
 const padifyPost = (post: JSX.Element) => {
   return (
@@ -18,6 +18,7 @@ const PostWrapper = () => {
     <ScrollView w="full" bg={baseBgColor}>
       <Divider mb={4} />
       <Post post={postMock} />
+      {padifyPost(<Post post={postMockNoVideo} />)}
       {padifyPost(<Post post={postMockNoImage} />)}
       {padifyPost(<Post post={undefined} />)}
       <Divider mt={4} />

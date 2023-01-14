@@ -43,7 +43,12 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
-      // TODO: Get video content
+      post.hasVideoContent().then((hasVideoContent) => {
+        if (hasVideoContent) {
+          post.getVideoThumbnailUrl().then(setVideoThumbnailUrl);
+          post.getVideoUrl().then(setVideoUrl);
+        }
+      });
       post.getImageContentUrls().then(setImageUrls);
       post.getTextContent().then(setTextContent);
     };
@@ -64,23 +69,23 @@ const Post = ({ post }: Props) => {
           <Text>{textContent}</Text>
         </Box>
       </Skeleton.Text>
-      <VStack
-        justifyContent="start"
-        alignItems="start"
-        w="full"
-        space={2}
-        pt={2}
-      >
-        <Skeleton w="full" h={40} isLoaded={isTextContentLoaded}>
+      <Skeleton w="full" pt={2} h={40} isLoaded={isTextContentLoaded}>
+        <VStack
+          justifyContent="start"
+          alignItems="start"
+          w="full"
+          space={2}
+          pt={2}
+        >
+          <ImageCarousel imageUrls={imageUrls} />
           {hasVideo ? (
             <VideoWithThumbnail
               thumbnailUrl={videoThumbnailUrl}
               videoUrl={videoUrl}
             />
           ) : null}
-          <ImageCarousel imageUrls={imageUrls} />
-        </Skeleton>
-      </VStack>
+        </VStack>
+      </Skeleton>
     </VStack>
   );
 };
