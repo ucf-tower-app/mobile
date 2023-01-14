@@ -31,7 +31,7 @@ type RouteData = {
 };
 export const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
   HomeTab: {
-    initialRouteName: 'MainFeed',
+    initialRouteName: 'Home',
     routes: homeRoutes,
   },
   LeaderboardsTab: {

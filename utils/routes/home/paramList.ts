@@ -1,3 +1,3 @@
 export type ParamList = {
-  MainFeed: undefined;
+  Home: undefined;
 };

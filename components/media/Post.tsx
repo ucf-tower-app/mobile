@@ -4,6 +4,7 @@ import { Post as PostObj } from '../../xplat/types/post';
 import { User } from '../../xplat/types/user';
 import UserTag from '../profile/UserTag';
 import ImageCarousel from './ImageCarousel';
+import VideoWithThumbnail from './VideoWithThumbnail';
 
 /**
  * A Post is a modular component that displays all relevant information about a user's post
@@ -30,9 +31,7 @@ const Post = ({ post }: Props) => {
   const [videoUrl, setVideoUrl] = useState<string>('');
 
   // Image content
-  const [imageUrls, setImageUrls] = useState<Array<string> | undefined>(
-    undefined
-  );
+  const [imageUrls, setImageUrls] = useState<Array<string>>([]);
 
   // Text content
   const [textContent, setTextContent] = useState<string>('');
@@ -44,11 +43,8 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
-      // TODO: Actually get video content from post when xplat is ready
-      post.hasImageContent().then((hasImageContent) => {
-        if (!hasImageContent) return;
-        post.getImageContentUrl().then((url) => setImageUrls([url!, url!]));
-      });
+      // TODO: Get video content
+      post.getImageContentUrls().then(setImageUrls);
       post.getTextContent().then(setTextContent);
     };
 
@@ -56,7 +52,6 @@ const Post = ({ post }: Props) => {
   }, [post]);
 
   const isTextContentLoaded = textContent !== '';
-  const hasImages = imageUrls !== undefined;
   const hasVideo = videoThumbnailUrl !== '' && videoUrl !== '';
 
   return (
@@ -77,10 +72,13 @@ const Post = ({ post }: Props) => {
         pt={2}
       >
         <Skeleton w="full" h={40} isLoaded={isTextContentLoaded}>
-          {VideoPlaybackQuality}
-          {imageUrls !== undefined ? (
-            <ImageCarousel imageUrls={imageUrls} />
+          {hasVideo ? (
+            <VideoWithThumbnail
+              thumbnailUrl={videoThumbnailUrl}
+              videoUrl={videoUrl}
+            />
           ) : null}
+          <ImageCarousel imageUrls={imageUrls} />
         </Skeleton>
       </VStack>
     </VStack>
