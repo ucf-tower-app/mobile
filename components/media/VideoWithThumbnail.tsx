@@ -1,26 +1,22 @@
 import { ResizeMode, Video } from 'expo-av';
 import { Flex } from 'native-base';
-import { useEffect, useState } from 'react';
-import { Dimensions, Image as ImageRN, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet } from 'react-native';
 import VideoThumbnail from './VideoThumbnail';
 
 type Props = {
   thumbnailUrl: string;
   videoUrl: string;
+  width: number;
+  height: number;
 };
-const VideoWithThumbnail = ({ thumbnailUrl, videoUrl }: Props) => {
+const VideoWithThumbnail = ({
+  thumbnailUrl,
+  videoUrl,
+  width,
+  height,
+}: Props) => {
   const [tappedThumbnail, setTappedThumbnail] = useState<boolean>(false);
-
-  const width = Dimensions.get('window').width;
-  const [height, setHeight] = useState<number>(200);
-
-  useEffect(() => {
-    ImageRN.getSize(thumbnailUrl, (imageWidth, imageHeight) => {
-      const aspectRatio = imageWidth / imageHeight;
-      const calculatedHeight = width / aspectRatio;
-      setHeight(calculatedHeight);
-    });
-  }, [thumbnailUrl, width]);
 
   return tappedThumbnail ? (
     <Flex w={width} h={height} justifyContent="center" alignItems="center">

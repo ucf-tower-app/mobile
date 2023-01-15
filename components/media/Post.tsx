@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { Post as PostObj } from '../../xplat/types/post';
 import { User } from '../../xplat/types/user';
 import UserTag from '../profile/UserTag';
-import ImageCarousel from './ImageCarousel';
-import VideoWithThumbnail from './VideoWithThumbnail';
+import { MediaType } from './Media';
+import MediaCarousel from './MediaCarousel';
 
 /**
  * A Post is a modular component that displays all relevant information about a user's post
@@ -23,17 +23,10 @@ type Props = {
 const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  // Author
   const [author, setAuthor] = useState<User | undefined>(undefined);
-
-  // Video content
-  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState<string>('');
-  const [videoUrl, setVideoUrl] = useState<string>('');
-
-  // Image content
-  const [imageUrls, setImageUrls] = useState<Array<string>>([]);
-
-  // Text content
+  const [mediaList, setMediaList] = useState<Array<MediaType> | undefined>(
+    undefined
+  );
   const [textContent, setTextContent] = useState<string>('');
 
   useEffect(() => {
@@ -43,21 +36,26 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
-      post.hasVideoContent().then((hasVideoContent) => {
-        if (hasVideoContent) {
-          post.getVideoThumbnailUrl().then(setVideoThumbnailUrl);
-          post.getVideoUrl().then(setVideoUrl);
-        }
-      });
-      post.getImageContentUrls().then(setImageUrls);
       post.getTextContent().then(setTextContent);
+
+      const newMediaList: Array<MediaType> = [];
+      if (await post.hasVideoContent()) {
+        newMediaList.push({
+          imageUrl: await post.getVideoThumbnailUrl(),
+          videoUrl: await post.getVideoUrl(),
+        });
+      }
+      (await post.getImageContentUrls()).forEach((url) =>
+        newMediaList.push({ imageUrl: url })
+      );
+      setMediaList(newMediaList);
     };
 
     getData();
   }, [post]);
 
   const isTextContentLoaded = textContent !== '';
-  const hasVideo = videoThumbnailUrl !== '' && videoUrl !== '';
+  const isMediaLoaded = mediaList !== undefined;
 
   return (
     <VStack w="full" alignItems="start" bg={baseBgColor}>
@@ -69,22 +67,12 @@ const Post = ({ post }: Props) => {
           <Text>{textContent}</Text>
         </Box>
       </Skeleton.Text>
-      <Skeleton w="full" pt={2} h={40} isLoaded={isTextContentLoaded}>
-        <VStack
-          justifyContent="start"
-          alignItems="start"
-          w="full"
-          space={2}
-          pt={2}
-        >
-          <ImageCarousel imageUrls={imageUrls} />
-          {hasVideo ? (
-            <VideoWithThumbnail
-              thumbnailUrl={videoThumbnailUrl}
-              videoUrl={videoUrl}
-            />
-          ) : null}
-        </VStack>
+      <Skeleton w="full" pt={2} h={40} isLoaded={isMediaLoaded}>
+        {mediaList === undefined ? null : (
+          <Box w="full" pt={2}>
+            <MediaCarousel mediaList={mediaList} />
+          </Box>
+        )}
       </Skeleton>
     </VStack>
   );

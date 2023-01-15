@@ -1,19 +1,13 @@
-import {
-  Box,
-  Center,
-  HStack,
-  Image,
-  useColorModeValue,
-  VStack,
-} from 'native-base';
+import { Box, Center, HStack, useColorModeValue, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Dimensions, Image as ImageRN } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
+import Media, { MediaType } from './Media';
 
 type Props = {
-  imageUrls: Array<string>;
+  mediaList: Array<MediaType>;
 };
-const ImageCarousel = ({ imageUrls }: Props) => {
+const MediaCarousel = ({ mediaList }: Props) => {
   const primaryColor = useColorModeValue(
     'lightMode.primary',
     'darkMode.primary'
@@ -29,25 +23,18 @@ const ImageCarousel = ({ imageUrls }: Props) => {
   const [data, setData] = useState<Array<number>>([]);
 
   useEffect(() => {
-    if (imageUrls.length === 0) return;
-    setData([...imageUrls.keys()]);
-    ImageRN.getSize(imageUrls[0], (imageWidth, imageHeight) => {
+    setData([...mediaList.keys()]);
+    if (mediaList.length === 0) return;
+    ImageRN.getSize(mediaList[0].imageUrl, (imageWidth, imageHeight) => {
       const aspectRatio = imageWidth / imageHeight;
       const calculatedHeight = width / aspectRatio;
       setHeight(calculatedHeight);
     });
-  }, [imageUrls, width]);
+  }, [mediaList, width]);
 
-  if (imageUrls.length === 0) return null;
-  if (imageUrls.length === 1)
-    return (
-      <Image
-        source={{ uri: imageUrls[0] }}
-        alt="Post image content"
-        width={width}
-        height={height}
-      />
-    );
+  if (mediaList.length === 0) return null;
+  if (mediaList.length === 1)
+    return <Media media={mediaList[0]} width={width} height={height} />;
 
   return (
     <VStack space={2} width={width}>
@@ -57,12 +44,7 @@ const ImageCarousel = ({ imageUrls }: Props) => {
         width={width}
         height={height}
         renderItem={({ index }) => (
-          <Image
-            source={{ uri: imageUrls[index] }}
-            alt="Post image content"
-            width={width}
-            height={height}
-          />
+          <Media media={mediaList[index]} width={width} height={height} />
         )}
         onProgressChange={(_, absoluteProgress) =>
           setFocusedIndex(Math.round(absoluteProgress))
@@ -88,4 +70,4 @@ const ImageCarousel = ({ imageUrls }: Props) => {
   );
 };
 
-export default ImageCarousel;
+export default MediaCarousel;
