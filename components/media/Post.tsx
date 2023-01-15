@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { Post as PostObj } from '../../xplat/types/post';
 import { User } from '../../xplat/types/user';
 import UserTag from '../profile/UserTag';
-import ImageCarousel from './ImageCarousel';
+import { MediaType } from './Media';
+import MediaCarousel from './MediaCarousel';
 
 /**
  * A Post is a modular component that displays all relevant information about a user's post
@@ -22,17 +23,10 @@ type Props = {
 const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  // Author
   const [author, setAuthor] = useState<User | undefined>(undefined);
-
-  // Video content
-
-  // Image content
-  const [imageUrls, setImageUrls] = useState<Array<string> | undefined>(
+  const [mediaList, setMediaList] = useState<Array<MediaType> | undefined>(
     undefined
   );
-
-  // Text content
   const [textContent, setTextContent] = useState<string>('');
 
   useEffect(() => {
@@ -42,14 +36,26 @@ const Post = ({ post }: Props) => {
       await post.getData();
 
       post.getAuthor().then(setAuthor);
-      post.getImageContentUrls().then(setImageUrls);
       post.getTextContent().then(setTextContent);
+
+      const newMediaList: Array<MediaType> = [];
+      if (await post.hasVideoContent()) {
+        newMediaList.push({
+          imageUrl: await post.getVideoThumbnailUrl(),
+          videoUrl: await post.getVideoUrl(),
+        });
+      }
+      (await post.getImageContentUrls()).forEach((url) =>
+        newMediaList.push({ imageUrl: url })
+      );
+      setMediaList(newMediaList);
     };
 
     getData();
   }, [post]);
 
   const isTextContentLoaded = textContent !== '';
+  const isMediaLoaded = mediaList !== undefined;
 
   return (
     <VStack w="full" alignItems="start" bg={baseBgColor}>
@@ -61,19 +67,13 @@ const Post = ({ post }: Props) => {
           <Text>{textContent}</Text>
         </Box>
       </Skeleton.Text>
-      <VStack
-        justifyContent="start"
-        alignItems="start"
-        w="full"
-        space={2}
-        pt={2}
-      >
-        <Skeleton w="full" h={40} isLoaded={isTextContentLoaded}>
-          {imageUrls !== undefined ? (
-            <ImageCarousel imageUrls={imageUrls} />
-          ) : null}
-        </Skeleton>
-      </VStack>
+      <Skeleton w="full" pt={2} h={40} isLoaded={isMediaLoaded}>
+        {mediaList === undefined ? null : (
+          <Box w="full" pt={2}>
+            <MediaCarousel mediaList={mediaList} />
+          </Box>
+        )}
+      </Skeleton>
     </VStack>
   );
 };
