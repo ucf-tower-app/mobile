@@ -1,8 +1,8 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { ParamList as TabParamList } from '../tabs/paramList';
 
 export type ParamList = {
-  Tabs: NativeStackScreenProps<TabParamList>;
+  Tabs: NavigatorScreenParams<TabParamList>;
   Settings: undefined;
   LostAndFound: undefined;
   Tutorial: undefined;

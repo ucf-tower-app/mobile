@@ -1,6 +1,6 @@
 // Route metadata for the home tab
+import { View } from 'native-base';
 import { Name } from './names';
-import { View } from 'react-native';
 
 export type Route = {
   name: Name;
