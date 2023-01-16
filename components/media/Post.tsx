@@ -58,7 +58,7 @@ const Post = ({ post }: Props) => {
   const isMediaLoaded = mediaList !== undefined;
 
   return (
-    <VStack w="full" alignItems="start" bg={baseBgColor}>
+    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
       <Box pl={2}>
         <UserTag user={author} />
       </Box>
