@@ -7,6 +7,8 @@ import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import { auth } from '../../xplat/Firebase';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
+import { signedInState } from '../../utils/atoms';
+import { useRecoilState } from 'recoil';
 
 // Style for tab bar
 const tabBarStyle = {
@@ -27,7 +29,7 @@ const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
  */
 const EnsureAuth = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
-  const [signedIn, setSignedIn] = useState<boolean>(false);
+  const [signedIn, setSignedIn] = useRecoilState(signedInState);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(
     auth.currentUser?.emailVerified ?? false
   );
