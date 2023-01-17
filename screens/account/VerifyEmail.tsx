@@ -1,13 +1,13 @@
 import { Button, Center, Heading, Text, VStack } from 'native-base';
 import { useEffect } from 'react';
+import { useSetRecoilState } from 'recoil';
+import { isEmailVerifiedAtom } from '../../utils/atoms';
 import { sendAuthEmail, startWaitForVerificationPoll } from '../../xplat/api';
 import { auth } from '../../xplat/Firebase';
 
-type Props = {
-  setIsEmailVerified: (emailIsVerified: boolean) => void;
-};
-const VerifyEmail = ({ setIsEmailVerified }: Props) => {
-  // When this page loads, we start a global poll that checks for email verification
+const VerifyEmail = () => {
+  const setIsEmailVerified = useSetRecoilState(isEmailVerifiedAtom);
+
   useEffect(() => {
     startWaitForVerificationPoll(() => setIsEmailVerified(true));
   }, [setIsEmailVerified]);
