@@ -35,7 +35,7 @@ const SearchBar = ({ queryHandler }: Props) => {
       onChangeText={handleInput}
       value={inputText}
       InputRightElement={
-        <Pressable onPress={() => setInputText('')}>
+        <Pressable onPress={() => handleInput('')}>
           <Icon as={<Feather name="x" />} size="md" color="black" mr="4" />
         </Pressable>
       }
