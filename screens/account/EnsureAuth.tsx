@@ -46,7 +46,7 @@ const EnsureAuth = () => {
       }
       setInitializing(false);
     };
-    auth.onAuthStateChanged(updateUserStatus);
+return auth.onAuthStateChanged(updateUserStatus);
   }, [setSignedIn]);
 
   if (initializing)
