@@ -1,12 +1,31 @@
-import { Input, Pressable, Icon } from 'native-base';
-import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
+import { Icon, Input, Pressable } from 'native-base';
+import { useState } from 'react';
+import { DebounceSession } from '../../utils/utils';
 
-const SearchBar = () => {
+type QueryHandler = {
+  onChangeQuery: (newQuery: string) => void;
+  onChangeQueryDebounceSession?: DebounceSession;
+};
+type Props = {
+  queryHandler?: QueryHandler;
+};
+const SearchBar = ({ queryHandler }: Props) => {
   const [inputText, setInputText] = useState('');
 
   const handleInput = (input: string) => {
     setInputText(input);
+
+    // If the user wants to debounce, do it. Otherwise set immediately
+    if (queryHandler !== undefined) {
+      if (queryHandler.onChangeQueryDebounceSession) {
+        queryHandler.onChangeQueryDebounceSession.trigger(() =>
+          queryHandler.onChangeQuery(input)
+        );
+      } else {
+        queryHandler.onChangeQuery(input);
+      }
+    }
   };
 
   return (
@@ -25,6 +44,8 @@ const SearchBar = () => {
       }
       focusOutlineColor="purple.500"
       backgroundColor="white"
+      autoCorrect={false}
+      autoComplete="off"
     />
   );
 };
