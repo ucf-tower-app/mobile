@@ -24,7 +24,7 @@ const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [author, setAuthor] = useState<User | undefined>(undefined);
-  const [mediaList, setMediaList] = useState<Array<MediaType> | undefined>(
+  const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
   );
   const [textContent, setTextContent] = useState<string>('');
@@ -38,7 +38,7 @@ const Post = ({ post }: Props) => {
       post.getAuthor().then(setAuthor);
       post.getTextContent().then(setTextContent);
 
-      const newMediaList: Array<MediaType> = [];
+      const newMediaList: MediaType[] = [];
       if (await post.hasVideoContent()) {
         newMediaList.push({
           imageUrl: await post.getVideoThumbnailUrl(),

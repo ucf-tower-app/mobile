@@ -10,4 +10,5 @@ export type ParamList = {
   LeaderboardRanking: undefined;
   UserTag: undefined;
   Post: undefined;
+  SearchableRoutes: undefined;
 };

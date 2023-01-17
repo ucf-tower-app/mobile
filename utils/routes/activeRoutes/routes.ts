@@ -1,15 +1,15 @@
 // Route metadata for the activeRoutes tab
+import ActiveRoutes from '../../../screens/activeRoutes/ActiveRoutes';
 import { Name } from './names';
-import { View } from 'react-native';
 
 export type Route = {
   name: Name;
   component: any;
 };
 
-export const routes: Array<Route> = [
+export const routes: Route[] = [
   {
     name: 'ActiveRoutes',
-    component: View,
+    component: ActiveRoutes,
   },
 ];

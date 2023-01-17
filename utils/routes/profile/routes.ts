@@ -1,13 +1,13 @@
 // Route metadata for the profile tab
-import { Name } from './names';
 import { View } from 'react-native';
+import { Name } from './names';
 
 export type Route = {
   name: Name;
   component: any;
 };
 
-export const routes: Array<Route> = [
+export const routes: Route[] = [
   {
     name: 'Profile',
     component: View,

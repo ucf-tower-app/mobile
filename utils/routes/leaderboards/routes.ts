@@ -1,17 +1,17 @@
 // Route metadata for the likes tab
-import { Name } from './names';
-import Leaderboards from '../../../screens/leaderboards/Leaderboards';
 import AllTimeLeaderboard from '../../../screens/leaderboards/AllTimeLeaderboard';
-import MonthlyLeaderboard from '../../../screens/leaderboards/MonthlyLeaderboard';
 import FriendsLeaderboard from '../../../screens/leaderboards/FriendsLeaderboard';
+import Leaderboards from '../../../screens/leaderboards/Leaderboards';
 import LeaderboardUserProfile from '../../../screens/leaderboards/LeaderboardUserProfile';
+import MonthlyLeaderboard from '../../../screens/leaderboards/MonthlyLeaderboard';
+import { Name } from './names';
 
 export type Route = {
   name: Name;
   component: any;
 };
 
-export const routes: Array<Route> = [
+export const routes: Route[] = [
   {
     name: 'Leaderboards',
     component: Leaderboards,

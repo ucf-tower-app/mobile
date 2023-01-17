@@ -22,13 +22,38 @@ export const tagMocks = [
   new TagMock('solid', 'desc'),
 ];
 export const routeMock = new RouteMock(
-  'Mocked route',
+  'Cool beans',
   '5.9',
   setterMock,
   forumMock,
   [],
   tagMocks
 );
+export const routeMock2 = new RouteMock(
+  'Slime In the Ice Machine',
+  'V2',
+  setterMock,
+  forumMock,
+  [],
+  tagMocks
+);
+export const routeMock3 = new RouteMock(
+  'Another one',
+  'V4',
+  setterMock,
+  forumMock,
+  [],
+  tagMocks
+);
+export const routeMock4 = new RouteMock(
+  'How did we get here?',
+  '5.10+',
+  setterMock,
+  forumMock,
+  [],
+  tagMocks
+);
+export const routeMocks = [routeMock, routeMock2, routeMock3, routeMock4];
 export const profilePic = new LazyStaticImage(
   'mock/path',
   'https://wallpaperaccess.com/full/317501.jpg'
