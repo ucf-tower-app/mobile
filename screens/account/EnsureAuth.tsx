@@ -7,8 +7,8 @@ import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import { auth } from '../../xplat/Firebase';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
-import { signedInState } from '../../utils/atoms';
-import { useRecoilState } from 'recoil';
+import { signedInState, userState } from '../../utils/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 // Style for tab bar
 const tabBarStyle = {
@@ -30,6 +30,7 @@ const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
 const EnsureAuth = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [signedIn, setSignedIn] = useRecoilState(signedInState);
+  const setUser = useSetRecoilState(userState);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(
     auth.currentUser?.emailVerified ?? false
   );
@@ -37,6 +38,7 @@ const EnsureAuth = () => {
   // Listen to firebase authentication changes
   useEffect(() => {
     const updateUserStatus = (user: any) => {
+      setUser(user);
       if (user !== null) {
         setSignedIn(true);
         setIsEmailVerified(user.emailVerified);
@@ -46,8 +48,8 @@ const EnsureAuth = () => {
       }
       setInitializing(false);
     };
-return auth.onAuthStateChanged(updateUserStatus);
-  }, [setSignedIn]);
+    return auth.onAuthStateChanged(updateUserStatus);
+  }, [setSignedIn, setUser]);
 
   if (initializing)
     return (
