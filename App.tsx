@@ -5,6 +5,7 @@ import { extendTheme, NativeBaseProvider } from 'native-base';
 import 'react-native-gesture-handler';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 import { routes as rootStackRoutes } from './utils/routes/root/routes';
+import { RecoilRoot } from 'recoil';
 
 const theme = extendTheme({
   colors: {
@@ -28,18 +29,20 @@ export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
       <StatusBar style="auto" />
-      <NavigationContainer>
-        <RootStack.Navigator initialRouteName="Tabs">
-          {rootStackRoutes.map((route) => (
-            <RootStack.Screen
-              name={route.name}
-              component={route.component}
-              key={route.name}
-              options={{ headerShown: route.name === 'Tabs' ? false : true }}
-            />
-          ))}
-        </RootStack.Navigator>
-      </NavigationContainer>
+      <RecoilRoot>
+        <NavigationContainer>
+          <RootStack.Navigator initialRouteName="Tabs">
+            {rootStackRoutes.map((route) => (
+              <RootStack.Screen
+                name={route.name}
+                component={route.component}
+                key={route.name}
+                options={{ headerShown: route.name === 'Tabs' ? false : true }}
+              />
+            ))}
+          </RootStack.Navigator>
+        </NavigationContainer>
+      </RecoilRoot>
     </NativeBaseProvider>
   );
 }

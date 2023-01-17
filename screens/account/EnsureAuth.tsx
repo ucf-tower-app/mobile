@@ -34,19 +34,20 @@ const EnsureAuth = () => {
     auth.currentUser?.emailVerified ?? false
   );
 
-  const updateUserStatus = (user: any) => {
-    if (user !== null) {
-      setSignedIn(true);
-      setIsEmailVerified(user.emailVerified);
-    } else {
-      setSignedIn(false);
-      setIsEmailVerified(false);
-    }
-    setInitializing(false);
-  };
-
   // Listen to firebase authentication changes
-  useEffect(() => auth.onAuthStateChanged(updateUserStatus), []);
+  useEffect(() => {
+    const updateUserStatus = (user: any) => {
+      if (user !== null) {
+        setSignedIn(true);
+        setIsEmailVerified(user.emailVerified);
+      } else {
+        setSignedIn(false);
+        setIsEmailVerified(false);
+      }
+      setInitializing(false);
+    };
+    auth.onAuthStateChanged(updateUserStatus);
+  }, [setSignedIn]);
 
   if (initializing)
     return (
