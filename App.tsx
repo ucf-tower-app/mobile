@@ -2,7 +2,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { extendTheme, NativeBaseProvider } from 'native-base';
+import { StyleSheet } from 'react-native';
 import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 import { routes as rootStackRoutes } from './utils/routes/root/routes';
 import { RecoilRoot } from 'recoil';
@@ -27,22 +29,30 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 // Construct tabs and their subtrees
 export default function App() {
   return (
-    <NativeBaseProvider theme={theme}>
-      <StatusBar style="auto" />
-      <RecoilRoot>
-        <NavigationContainer>
-          <RootStack.Navigator initialRouteName="Tabs">
-            {rootStackRoutes.map((route) => (
-              <RootStack.Screen
-                name={route.name}
-                component={route.component}
-                key={route.name}
-                options={{ headerShown: route.name === 'Tabs' ? false : true }}
-              />
-            ))}
-          </RootStack.Navigator>
-        </NavigationContainer>
-      </RecoilRoot>
-    </NativeBaseProvider>
+    <GestureHandlerRootView style={styles.gestureHandler}>
+      <NativeBaseProvider theme={theme}>
+        <StatusBar style="auto" />
+        <RecoilRoot>
+          <NavigationContainer>
+            <RootStack.Navigator initialRouteName="Tabs">
+              {rootStackRoutes.map((route) => (
+                <RootStack.Screen
+                  name={route.name}
+                  component={route.component}
+                  key={route.name}
+                  options={{ headerShown: route.name === 'Tabs' ? false : true }}
+                />
+              ))}
+            </RootStack.Navigator>
+          </NavigationContainer>
+        </RecoilRoot>
+      </NativeBaseProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  gestureHandler: {
+    flex: 1,
+  },
+});
