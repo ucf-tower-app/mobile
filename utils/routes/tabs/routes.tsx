@@ -1,10 +1,5 @@
 // Route metadata for tabs
-import {
-  AntDesign,
-  Feather,
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon } from 'native-base';
 import HeaderMenu from '../../../components/header/HeaderMenu';
@@ -51,7 +46,7 @@ const buildStack = (tabName: TabName, Stack: any) => {
   };
 };
 
-export const routes: Array<Route> = [
+export const routes: Route[] = [
   {
     name: 'HomeTab',
     focusedIcon: (
@@ -86,10 +81,14 @@ export const routes: Array<Route> = [
   {
     name: 'ActiveRoutesTab',
     focusedIcon: (
-      <Icon as={<AntDesign name="questioncircle" />} color="black" size="xl" />
+      <Icon as={<Ionicons name="analytics" />} color="black" size="xl" />
     ),
     unfocusedIcon: (
-      <Icon as={<AntDesign name="questioncircleo" />} color="black" size="xl" />
+      <Icon
+        as={<Ionicons name="analytics-outline" />}
+        color="black"
+        size="xl"
+      />
     ),
     stack: buildStack(
       'ActiveRoutesTab',

@@ -11,5 +11,6 @@ export const names = [
   'LeaderboardRanking',
   'UserTag',
   'Post',
+  'SearchableRoutes',
 ] as const;
-export type Name = typeof names[number];
+export type Name = (typeof names)[number];

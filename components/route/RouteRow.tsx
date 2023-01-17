@@ -4,8 +4,8 @@ import {
   HStack,
   Image,
   Text,
-  VStack,
   useColorModeValue,
+  VStack,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Route } from '../../xplat/types/route';
@@ -24,6 +24,8 @@ const RouteRow = ({ route }: Props) => {
   // Fetch all relevant data and update the state accordingly.
   useEffect(() => {
     const fetchData = async () => {
+      await route.getData();
+
       route.getName().then(setName);
       route.getRating().then((rating) => {
         let descriptionBuilder = rating;
@@ -43,7 +45,7 @@ const RouteRow = ({ route }: Props) => {
   }, [route]);
 
   return (
-    <HStack h={20} pl={2} my={3} backgroundColor={baseBgColor}>
+    <HStack h={20} pl={2} backgroundColor={baseBgColor}>
       <Center w="20%">
         <Image
           size={16}

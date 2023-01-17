@@ -8,7 +8,7 @@ export type Route = {
   component: any;
 };
 
-export const routes: Array<Route> = [
+export const routes: Route[] = [
   {
     name: 'Tabs',
     component: EnsureAuth,

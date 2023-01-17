@@ -5,7 +5,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import Media, { MediaType } from './Media';
 
 type Props = {
-  mediaList: Array<MediaType>;
+  mediaList: MediaType[];
 };
 const MediaCarousel = ({ mediaList }: Props) => {
   const primaryColor = useColorModeValue(
@@ -20,7 +20,7 @@ const MediaCarousel = ({ mediaList }: Props) => {
   const width = Dimensions.get('window').width;
   const [height, setHeight] = useState<number>(200);
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
-  const [data, setData] = useState<Array<number>>([]);
+  const [data, setData] = useState<number[]>([]);
 
   useEffect(() => {
     setData([...mediaList.keys()]);
