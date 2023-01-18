@@ -15,20 +15,18 @@ const AuthProvider = ({ children }: Props) => {
   const setIsSignedIn = useSetRecoilState(isSignedInAtom);
   const setIsEmailVerified = useSetRecoilState(isEmailVerifiedAtom);
 
-  useEffect(
-    () =>
-      auth.onAuthStateChanged((user) => {
-        if (user !== null) {
-          setIsSignedIn(true);
-          setIsEmailVerified(user.emailVerified);
-        } else {
-          setIsSignedIn(false);
-          setIsEmailVerified(false);
-        }
-        setIsInitializing(false);
-      }),
-    [setIsEmailVerified, setIsInitializing, setIsSignedIn]
-  );
+  useEffect(() => {
+    return auth.onAuthStateChanged(async (user) => {
+      if (user !== null) {
+        setIsSignedIn(true);
+        setIsEmailVerified(user.emailVerified);
+      } else {
+        setIsSignedIn(false);
+        setIsEmailVerified(false);
+      }
+      setIsInitializing(false);
+    });
+  }, [setIsEmailVerified, setIsInitializing, setIsSignedIn]);
 
   return <>{children}</>;
 };
