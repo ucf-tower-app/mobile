@@ -3,6 +3,7 @@ import { ParamList as LeaderboardsTabParamList } from './routes/leaderboards/par
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { ParamList as TabParamList } from './routes/tabs/paramList';
 import { ParamList as RootStackParamList } from './routes/root/paramList';
+import { ParamList as ProfileTabParamList } from './routes/profile/paramList';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type LeaderboardsScreenNavigationProp<
@@ -14,6 +15,15 @@ export type LeaderboardsScreenNavigationProp<
     NativeStackScreenProps<RootStackParamList>
   >
 >;
+
+export type ProfileScreenNavigationProp<T extends keyof ProfileTabParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<ProfileTabParamList, T>,
+    CompositeScreenProps<
+      BottomTabScreenProps<TabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
+  >;
 
 declare global {
   namespace ReactNavigation {
