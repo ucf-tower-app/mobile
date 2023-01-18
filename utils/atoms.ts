@@ -1,8 +1,23 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
+import { getCurrentUser } from '../xplat/api';
 
 export const isInitializingAtom = atom({
   key: 'isInitializing',
   default: true,
+});
+
+export const userAtom = selector({
+  key: 'user',
+  get: async ({ get }) => {
+    const signedIn = get(isSignedInAtom);
+
+    if (signedIn === true) {
+      let user = await getCurrentUser();
+      return user;
+    } else {
+      return null;
+    }
+  },
 });
 
 export const isSignedInAtom = atom({

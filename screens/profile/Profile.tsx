@@ -1,11 +1,21 @@
 import type { ProfileScreenNavigationProp } from '../../utils/types';
 import ProfileBanner from '../../components/profile/ProfileBanner';
+import { View, VStack } from 'native-base';
+import { useRecoilValueLoadable } from 'recoil';
 import { userAtom } from '../../utils/atoms';
-import { useRecoilValue } from 'recoil';
-import { VStack } from 'native-base';
 
 const Profile = ({ navigation }: ProfileScreenNavigationProp<'Profile'>) => {
-  return <VStack space="sm" />;
+  const user = useRecoilValueLoadable(userAtom);
+
+  return (
+    <VStack space="sm">
+      {user.contents !== null && user.state === 'hasValue' ? (
+        <ProfileBanner user={user.contents} />
+      ) : (
+        <View />
+      )}
+    </VStack>
+  );
 };
 
 export default Profile;
