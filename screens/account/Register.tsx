@@ -10,7 +10,13 @@ import {
 } from 'native-base';
 import { useState } from 'react';
 import { Platform } from 'react-native';
-import { createUser, sendAuthEmail, signIn } from '../../xplat/api';
+import {
+  createUser,
+  sendAuthEmail,
+  signIn,
+  validDisplayname,
+  validUsername,
+} from '../../xplat/api';
 
 type RegisterFormData = {
   email: string;
@@ -37,24 +43,18 @@ const checkEmail = (email: string, errorData: RegisterErrorData) => {
   if (!emailRegex.test(email)) errorData.email = 'Invalid email';
 };
 
-const usernameRegex = /^[a-z]{5,15}$/;
 const checkUsername = (username: string, errorData: RegisterErrorData) => {
-  if (!usernameRegex.test(username))
+  if (!validUsername(username))
     errorData.username = 'Must be 5-15 lowercase characters';
 };
 
-const displayNameRegex = /^[a-zA-Z ]{5,30}$/;
 const checkDisplayName = (
   displayName: string,
   errorData: RegisterErrorData
 ) => {
-  if (
-    (displayName.length > 0 && displayName[0] === ' ') ||
-    (displayName.length > 1 && displayName[displayName.length - 1] === ' ')
-  )
-    errorData.displayName = 'Must begin and end with a letter';
-  if (!displayNameRegex.test(displayName))
-    errorData.displayName = 'Must be 5-30 letters or spaces';
+  if (!validDisplayname(displayName))
+    errorData.displayName =
+      'Must be 5-30 letters or spaces and have no spaces in front or back';
 };
 
 const checkPassword = (password: string, errorData: RegisterErrorData) => {
