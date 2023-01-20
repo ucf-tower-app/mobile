@@ -30,16 +30,14 @@ const SearchableRouteContainer = ({ routes }: Props) => {
         routes.map(async (route, index) => {
           // Here we build a corpus. This is the search text that we should query on
           // For now, we are simply asynchonously concatenating the name, rating, and all tags
+          const tags = await Promise.all(
+            (await route.getTags()).map((tag) => tag.getName())
+          );
           const corpus = (
-            await Promise.all([
-              route.getName(),
-              route.getRating(),
-              new Promise<string>(async (resolve) => {
-                resolve((await route.getTags()).join());
-              }),
-            ])
+            await Promise.all([route.getName(), route.getGradeDisplayString()])
           )
-            .join()
+            .concat(tags)
+            .join('$')
             .toLowerCase();
 
           if (corpus.includes(query)) newDisplayedRouteIndices.push(index);

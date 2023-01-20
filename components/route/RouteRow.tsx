@@ -27,8 +27,8 @@ const RouteRow = ({ route }: Props) => {
       await route.getData();
 
       route.getName().then(setName);
-      route.getRating().then((rating) => {
-        let descriptionBuilder = rating;
+      route.getGradeDisplayString().then((grade) => {
+        let descriptionBuilder = grade;
         route.getTags().then(async (tags) => {
           for (const tag of tags) {
             const tagName = await tag.getName();
