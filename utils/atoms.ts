@@ -1,11 +1,12 @@
 import { atom } from 'recoil';
+import { UserStatus } from '../xplat/types/common';
 
-export const isInitializingAtom = atom({
+export const isInitializingAtom = atom<boolean>({
   key: 'isInitializing',
   default: true,
 });
 
-export const isSignedInAtom = atom({
+export const isSignedInAtom = atom<boolean>({
   key: 'isSignedIn',
   default: false,
 });
@@ -16,7 +17,12 @@ export const isSignedInAtom = atom({
  * time that they open the application. Users that should be blocked
  * will be before they have time to do anything meaningful.
  **/
-export const isEmailVerifiedAtom = atom({
+export const isEmailVerifiedAtom = atom<boolean>({
   key: 'isEmailVerified',
   default: true,
+});
+
+export const userPermissionLevelAtom = atom<UserStatus | undefined>({
+  key: 'userPermissionLevel',
+  default: undefined,
 });

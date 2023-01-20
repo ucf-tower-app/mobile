@@ -4,7 +4,9 @@ import {
   isEmailVerifiedAtom,
   isInitializingAtom,
   isSignedInAtom,
+  userPermissionLevelAtom,
 } from '../../utils/atoms';
+import { getCurrentUser } from '../../xplat/api';
 import { auth } from '../../xplat/Firebase';
 
 type Props = {
@@ -14,20 +16,30 @@ const AuthProvider = ({ children }: Props) => {
   const setIsInitializing = useSetRecoilState(isInitializingAtom);
   const setIsSignedIn = useSetRecoilState(isSignedInAtom);
   const setIsEmailVerified = useSetRecoilState(isEmailVerifiedAtom);
+  const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
 
   useEffect(
     () =>
-      auth.onAuthStateChanged((user) => {
+      auth.onAuthStateChanged(async (user) => {
         if (user !== null) {
           setIsSignedIn(true);
           setIsEmailVerified(user.emailVerified);
+
+          const lazyUser = await getCurrentUser();
+          setUserPermissionLevel(await lazyUser.getStatus());
         } else {
           setIsSignedIn(false);
           setIsEmailVerified(false);
+          setUserPermissionLevel(undefined);
         }
         setIsInitializing(false);
       }),
-    [setIsEmailVerified, setIsInitializing, setIsSignedIn]
+    [
+      setIsEmailVerified,
+      setIsInitializing,
+      setIsSignedIn,
+      setUserPermissionLevel,
+    ]
   );
 
   return <>{children}</>;
