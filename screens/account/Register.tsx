@@ -37,26 +37,28 @@ const checkEmail = (email: string, errorData: RegisterErrorData) => {
   if (!emailRegex.test(email)) errorData.email = 'Invalid email';
 };
 
-const usernameRegex = /^[a-zA-Z0-9]+[._-]?[a-zA-Z0-9]*$/;
+const usernameRegex = /^[a-z]{5,15}$/;
 const checkUsername = (username: string, errorData: RegisterErrorData) => {
-  if (username.length < 5) errorData.username = 'Must be at least 5 characters';
-  else if (username.length > 15)
-    errorData.username = 'Must be at most 15 characters';
-  else if (!usernameRegex.test(username))
-    errorData.username =
-      'Must begin with a letter and contain at most one dot, underscore, or dash';
+  if (!usernameRegex.test(username))
+    errorData.username = 'Must be 5-15 lowercase characters';
 };
 
+const displayNameRegex = /^[a-zA-Z ]{5,30}$/;
 const checkDisplayName = (
   displayName: string,
   errorData: RegisterErrorData
 ) => {
-  if (displayName.length < 5)
-    errorData.displayName = 'Must be at least 5 characters';
+  if (
+    (displayName.length > 0 && displayName[0] === ' ') ||
+    (displayName.length > 1 && displayName[displayName.length - 1] === ' ')
+  )
+    errorData.displayName = 'Must begin and end with a letter';
+  if (!displayNameRegex.test(displayName))
+    errorData.displayName = 'Must be 5-30 letters or spaces';
 };
 
 const checkPassword = (password: string, errorData: RegisterErrorData) => {
-  if (password.length < 8) errorData.password = 'Must be at least 8 characers';
+  if (password.length < 8) errorData.password = 'Must be at least 8 characters';
 };
 
 type Props = {
