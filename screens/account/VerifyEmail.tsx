@@ -1,16 +1,23 @@
 import { Button, Center, Heading, Text, VStack } from 'native-base';
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { isEmailVerifiedAtom } from '../../utils/atoms';
+import {
+  isEmailVerifiedAtom,
+  userPermissionLevelAtom,
+} from '../../utils/atoms';
 import { sendAuthEmail, startWaitForVerificationPoll } from '../../xplat/api';
 import { auth } from '../../xplat/Firebase';
 
 const VerifyEmail = () => {
   const setIsEmailVerified = useSetRecoilState(isEmailVerifiedAtom);
+  const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
 
   useEffect(() => {
-    startWaitForVerificationPoll(() => setIsEmailVerified(true));
-  }, [setIsEmailVerified]);
+    startWaitForVerificationPoll((user) => {
+      setIsEmailVerified(true);
+      user.getStatus().then(setUserPermissionLevel);
+    });
+  }, [setIsEmailVerified, setUserPermissionLevel]);
 
   return (
     <Center>

@@ -1,7 +1,7 @@
 import { ForumMock } from '../xplat/types/forum';
 import { LazyStaticVideo } from '../xplat/types/media';
 import { PostMock } from '../xplat/types/post';
-import { RouteMock } from '../xplat/types/route';
+import { RouteClassifier, RouteMock, RouteType } from '../xplat/types/route';
 import { TagMock } from '../xplat/types/tag';
 import { LazyStaticImage, UserStatus } from '../xplat/types/types';
 import { UserMock } from '../xplat/types/user';
@@ -23,7 +23,7 @@ export const tagMocks = [
 ];
 export const routeMock = new RouteMock(
   'Cool beans',
-  '5.9',
+  new RouteClassifier(60, RouteType.Toprope),
   setterMock,
   forumMock,
   [],
@@ -31,7 +31,7 @@ export const routeMock = new RouteMock(
 );
 export const routeMock2 = new RouteMock(
   'Slime In the Ice Machine',
-  'V2',
+  new RouteClassifier(5, RouteType.Boulder),
   setterMock,
   forumMock,
   [],
@@ -39,7 +39,7 @@ export const routeMock2 = new RouteMock(
 );
 export const routeMock3 = new RouteMock(
   'Another one',
-  'V4',
+  new RouteClassifier(2, RouteType.Boulder),
   setterMock,
   forumMock,
   [],
@@ -47,7 +47,7 @@ export const routeMock3 = new RouteMock(
 );
 export const routeMock4 = new RouteMock(
   'How did we get here?',
-  '5.10+',
+  new RouteClassifier(61, RouteType.Toprope),
   setterMock,
   forumMock,
   [],
