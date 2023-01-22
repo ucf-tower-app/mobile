@@ -10,7 +10,13 @@ import {
 } from 'native-base';
 import { useState } from 'react';
 import { Platform } from 'react-native';
-import { createUser, sendAuthEmail, signIn } from '../../xplat/api';
+import {
+  createUser,
+  sendAuthEmail,
+  signIn,
+  validDisplayname,
+  validUsername,
+} from '../../xplat/api';
 
 type RegisterFormData = {
   email: string;
@@ -37,26 +43,22 @@ const checkEmail = (email: string, errorData: RegisterErrorData) => {
   if (!emailRegex.test(email)) errorData.email = 'Invalid email';
 };
 
-const usernameRegex = /^[a-zA-Z0-9]+[._-]?[a-zA-Z0-9]*$/;
 const checkUsername = (username: string, errorData: RegisterErrorData) => {
-  if (username.length < 5) errorData.username = 'Must be at least 5 characters';
-  else if (username.length > 15)
-    errorData.username = 'Must be at most 15 characters';
-  else if (!usernameRegex.test(username))
-    errorData.username =
-      'Must begin with a letter and contain at most one dot, underscore, or dash';
+  if (!validUsername(username))
+    errorData.username = 'Must be 5-15 lowercase characters';
 };
 
 const checkDisplayName = (
   displayName: string,
   errorData: RegisterErrorData
 ) => {
-  if (displayName.length < 5)
-    errorData.displayName = 'Must be at least 5 characters';
+  if (!validDisplayname(displayName))
+    errorData.displayName =
+      'Must be 5-30 letters or spaces and have no spaces in front or back';
 };
 
 const checkPassword = (password: string, errorData: RegisterErrorData) => {
-  if (password.length < 8) errorData.password = 'Must be at least 8 characers';
+  if (password.length < 8) errorData.password = 'Must be at least 8 characters';
 };
 
 type Props = {
