@@ -27,7 +27,11 @@ const RouteRow = ({ route }: Props) => {
       await route.getData();
 
       route.getName().then(setName);
-      route.getThumbnailUrl().then(setThumbnailUrl);
+      route.hasThumbnail().then((hasThumbnail) => {
+        if (hasThumbnail) {
+          route.getThumbnailUrl().then(setThumbnailUrl);
+        }
+      });
       route.getGradeDisplayString().then((grade) => {
         let descriptionBuilder = grade;
         route.getTags().then(async (tags) => {
