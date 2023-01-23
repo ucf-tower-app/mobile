@@ -17,7 +17,7 @@ const RouteRow = ({ route }: Props) => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
-    undefined
+    'https://wallpaperaccess.com/full/317501.jpg'
   );
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -27,6 +27,7 @@ const RouteRow = ({ route }: Props) => {
       await route.getData();
 
       route.getName().then(setName);
+      route.getThumbnailUrl().then(setThumbnailUrl);
       route.getGradeDisplayString().then((grade) => {
         let descriptionBuilder = grade;
         route.getTags().then(async (tags) => {
@@ -37,8 +38,6 @@ const RouteRow = ({ route }: Props) => {
           setDescription(descriptionBuilder);
         });
       });
-
-      setThumbnailUrl('https://wallpaperaccess.com/full/317501.jpg');
     };
 
     fetchData();
