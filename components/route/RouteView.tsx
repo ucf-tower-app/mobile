@@ -129,6 +129,7 @@ const RouteView = ({ route }: Props) => {
                 rating={rating}
                 onChange={() => {}}
                 starStyle={styles.star}
+                animationConfig={{ scale: 1 }}
               />
             </VStack>
           </HStack>
