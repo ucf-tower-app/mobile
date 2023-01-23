@@ -1,4 +1,5 @@
 // Route metadata for the activeRoutes tab
+import RouteView from '../../../components/route/RouteView';
 import ActiveRoutes from '../../../screens/activeRoutes/ActiveRoutes';
 import { Name } from './names';
 

@@ -13,7 +13,7 @@ import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
 
 // TODO
-const navigateToProfile = () => {};
+const navigateToProfile = () => { };
 
 type Size = 'sm' | 'lg';
 const sizedStyles = {
