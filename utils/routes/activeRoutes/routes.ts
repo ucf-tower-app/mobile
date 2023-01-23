@@ -12,4 +12,8 @@ export const routes: Route[] = [
     name: 'ActiveRoutes',
     component: ActiveRoutes,
   },
+  {
+    name: 'RouteView',
+    component: RouteView,
+  },
 ];

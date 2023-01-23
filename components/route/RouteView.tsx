@@ -1,7 +1,6 @@
 import { ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Box,
   Text,
   Flex,
   Heading,
@@ -14,18 +13,18 @@ import {
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
+import { useRecoilState } from 'recoil';
+import { focusedRouteAtom } from '../../utils/atoms';
 import { getCurrentUser } from '../../xplat/api';
-import { Route, RouteStatus } from '../../xplat/types/route';
+import { RouteStatus } from '../../xplat/types/route';
 import { User } from '../../xplat/types/user';
 import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
-type Props = {
-  route: Route;
-};
-const RouteView = ({ route }: Props) => {
+const RouteView = () => {
+  const [route] = useRecoilState(focusedRouteAtom);
   const [name, setName] = useState<string>('');
   const [grade, setGrade] = useState<string>('');
   const [likes, setLikes] = useState<User[]>([]);
@@ -46,6 +45,7 @@ const RouteView = ({ route }: Props) => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const onToggleIsLiked = async () => {
+    if (route === undefined) return;
     setIsLiked(!isLiked);
     if (!isLiked) {
       route.addLike(await getCurrentUser());
@@ -58,6 +58,7 @@ const RouteView = ({ route }: Props) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (route === undefined) return;
       await route.getData();
 
       route.getName().then(setName);
@@ -127,7 +128,7 @@ const RouteView = ({ route }: Props) => {
               </Text>
               <StarRating
                 rating={rating}
-                onChange={() => {}}
+                onChange={() => { }}
                 starStyle={styles.star}
                 animationConfig={{ scale: 1 }}
               />
