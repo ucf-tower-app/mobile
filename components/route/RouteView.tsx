@@ -9,6 +9,7 @@ import {
   Divider,
   HStack,
   VStack,
+  Box,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
@@ -116,12 +117,14 @@ const RouteView = () => {
             {stringifiedTags}
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={6}>
-            <VStack justifyContent="flex-start" flexGrow="unset">
-              <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
-                Setter
-              </Text>
-              <UserTag user={setter} />
-            </VStack>
+            {setter !== undefined ? (
+              <VStack justifyContent="flex-start" flexGrow="unset">
+                <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
+                  Setter
+                </Text>
+                <UserTag user={setter} />
+              </VStack>
+            ) : null}
             <VStack justifyContent="flex-start" flexGrow="unset">
               <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                 Rating
@@ -144,9 +147,15 @@ const RouteView = () => {
             mx={4}
             mt={4}
           >
-            <Text fontSize="lg" italic bold>
-              {RouteStatus[status]}
-            </Text>
+            <Box>
+              <Text fontSize="lg" italic bold>
+                {RouteStatus[status]}
+              </Text>
+              {rope !== undefined ? (
+                <Text fontSize="md">Rope {rope}</Text>
+              ) : null}
+            </Box>
+
             {/*
 
               TODO: Add a button to send the route
