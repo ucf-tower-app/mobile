@@ -11,4 +11,5 @@ export type ParamList = {
   UserTag: undefined;
   Post: undefined;
   SearchableRoutes: undefined;
+  routeView: undefined;
 };

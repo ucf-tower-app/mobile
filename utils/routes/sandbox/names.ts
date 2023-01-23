@@ -12,5 +12,6 @@ export const names = [
   'UserTag',
   'Post',
   'SearchableRoutes',
+  'RouteView',
 ] as const;
 export type Name = (typeof names)[number];

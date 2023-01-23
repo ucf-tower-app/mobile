@@ -10,7 +10,7 @@ import AuthProvider from './components/util/AuthProvider';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 import { routes as rootStackRoutes } from './utils/routes/root/routes';
 
-const theme = extendTheme({
+export const theme = extendTheme({
   colors: {
     lightMode: {
       base: '#fafafa',
