@@ -10,6 +10,7 @@ import {
   HStack,
   VStack,
   Box,
+  Button,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
@@ -21,11 +22,14 @@ import { RouteStatus } from '../../xplat/types/route';
 import { User } from '../../xplat/types/user';
 import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
+import RatingModal from './RatingModal';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
 const RouteView = () => {
   const [route] = useRecoilState(focusedRouteAtom);
+
+  // Guaranteed to exist
   const [name, setName] = useState<string>('');
   const [grade, setGrade] = useState<string>('');
   const [likes, setLikes] = useState<User[]>([]);
@@ -33,7 +37,7 @@ const RouteView = () => {
   const [status, setStatus] = useState<RouteStatus>(RouteStatus.Active);
   const [description, setDescription] = useState<string>('');
 
-  // Potentially undefined data in the Route object
+  // Potentially undefined
   const [setter, setSetter] = useState<User | undefined>(undefined);
   // TODO: Replace with a more fitting placeholder image once procured.
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(
@@ -41,9 +45,16 @@ const RouteView = () => {
   );
   const [rope, setRope] = useState<number | undefined>(undefined);
 
-  // TODO: Replace with actual rating once implemented in the backend.
-  const [rating, setRating] = useState<number>(4.5);
+  // TODO: Replace with backend query when available
+  const [rating] = useState<number>(4.5);
+  const [userHasRated, setUserHasRated] = useState<boolean>(false);
+  const [isRating, setIsRating] = useState<boolean>(false);
+
   const [isLiked, setIsLiked] = useState<boolean>(false);
+
+  // TODO: Replace with backend query when available
+  const [userHasSent, setUserHasSent] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
   const onToggleIsLiked = async () => {
     if (route === undefined) return;
@@ -53,6 +64,21 @@ const RouteView = () => {
     } else {
       route.removeLike(await getCurrentUser());
     }
+  };
+
+  const send = () => {
+    setIsSending(true);
+
+    // TODO: Tell xplat that this user has sent the route
+
+    setTimeout(() => {
+      setIsSending(false);
+      setUserHasSent(true);
+    }, 1000);
+  };
+
+  const post = () => {
+    // TODO: impl
   };
 
   const backgroundHex = useToken('colors', 'lightMode.base');
@@ -96,81 +122,116 @@ const RouteView = () => {
   }, [route]);
 
   return (
-    <ScrollView w="full" h="full" bg={backgroundHex}>
-      <ImageBackground
-        style={styles.thumbnail}
-        resizeMode={ResizeMode.COVER}
-        source={{ uri: thumbnailUrl }}
-      >
-        <LinearGradient
-          style={styles.gradient}
-          colors={[backgroundHex + '00', backgroundHex]}
-        />
-        <Flex direction="column" h="full" mt={4}>
-          <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
-            <Heading size="2xl">{name}</Heading>
-            <Heading size="2xl" color="grey">
-              {grade}
-            </Heading>
-          </HStack>
-          <Text fontSize="2xl" color="grey" mx={4}>
-            {stringifiedTags}
-          </Text>
-          <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={6}>
-            {setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
-                <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
-                  Setter
-                </Text>
-                <UserTag user={setter} />
-              </VStack>
-            ) : null}
-            <VStack justifyContent="flex-start" flexGrow="unset">
-              <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
-                Rating
-              </Text>
-              <StarRating
-                rating={rating}
-                onChange={() => { }}
-                starStyle={styles.star}
-                animationConfig={{ scale: 1 }}
-              />
-            </VStack>
-          </HStack>
-          <Text fontSize="lg" mx={4} mt={6}>
-            {description}
-          </Text>
-          <HStack
-            flexWrap="wrap"
-            justifyContent="space-between"
-            alignItems="flex-end"
-            mx={4}
-            mt={4}
-          >
-            <Box>
-              <Text fontSize="lg" italic bold>
-                {RouteStatus[status]}
-              </Text>
-              {rope !== undefined ? (
-                <Text fontSize="md">Rope {rope}</Text>
+    <>
+      <RatingModal
+        isOpen={isRating}
+        close={() => {
+          setIsRating(false);
+          setUserHasRated(true);
+        }}
+      />
+      <ScrollView w="full" h="full" bg={backgroundHex}>
+        <ImageBackground
+          style={styles.thumbnail}
+          resizeMode={ResizeMode.COVER}
+          source={{ uri: thumbnailUrl }}
+        >
+          <LinearGradient
+            style={styles.gradient}
+            colors={[backgroundHex + '00', backgroundHex]}
+          />
+          <Flex direction="column" h="full" mt={4}>
+            <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
+              <Heading size="2xl">{name}</Heading>
+              <Heading size="2xl" color="grey">
+                {grade}
+              </Heading>
+            </HStack>
+            <Text fontSize="2xl" color="grey" mx={4}>
+              {stringifiedTags}
+            </Text>
+            <HStack
+              flexWrap="wrap"
+              justifyContent="space-between"
+              mx={4}
+              mt={2}
+            >
+              {setter !== undefined ? (
+                <VStack justifyContent="flex-start" flexGrow="unset">
+                  <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
+                    Setter
+                  </Text>
+                  <UserTag user={setter} />
+                </VStack>
               ) : null}
-            </Box>
-
-            {/*
-
-              TODO: Add a button to send the route
-
-            */}
-            <LikeButton
-              isLiked={isLiked}
-              onToggleLike={onToggleIsLiked}
-              numLikes={likes.length}
-            />
-          </HStack>
-          <Divider my={4} />
-        </Flex>
-      </ImageBackground>
-    </ScrollView>
+              <VStack
+                justifyContent="flex-start"
+                alignItems="flex-start"
+                flexGrow="unset"
+              >
+                <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
+                  Rating
+                </Text>
+                <StarRating
+                  rating={rating}
+                  onChange={() => { }}
+                  starStyle={styles.star}
+                  animationConfig={{ scale: 1 }}
+                />
+                {!userHasRated ? (
+                  <Button
+                    variant="link"
+                    py={1}
+                    px={0}
+                    onPress={() => setIsRating(true)}
+                    isLoading={isRating}
+                  >
+                    Rate this route
+                  </Button>
+                ) : null}
+              </VStack>
+            </HStack>
+            <Text fontSize="lg" mx={4} mt={2}>
+              {description}
+            </Text>
+            <HStack
+              flexWrap="wrap"
+              justifyContent="space-between"
+              alignItems="flex-end"
+              mx={4}
+              mt={4}
+            >
+              <Box>
+                <Text fontSize="lg" italic bold>
+                  {RouteStatus[status]}
+                </Text>
+                {rope !== undefined ? (
+                  <Text fontSize="md">Rope {rope}</Text>
+                ) : null}
+              </Box>
+              <LikeButton
+                isLiked={isLiked}
+                onToggleLike={onToggleIsLiked}
+                numLikes={likes.length}
+              />
+            </HStack>
+            <Button
+              mx={4}
+              mt={4}
+              onPress={send}
+              isDisabled={userHasSent}
+              isLoading={isSending}
+            >
+              {userHasSent ? 'Sent!' : 'Send it!'}
+            </Button>
+            <Button mx={4} mt={4} onPress={post}>
+              Post to this route
+            </Button>
+            <Divider mt={4} />
+          </Flex>
+        </ImageBackground>
+      </ScrollView>
+    </>
   );
 };
 
