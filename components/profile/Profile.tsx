@@ -38,7 +38,7 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const [boulderGrade, setBoulderGrade] = useState<string>('');
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
-  const [posts, setPosts] = useState<PostObj[]>();
+  const [posts, setPosts] = useState<PostObj[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const signedInUser = useRecoilValue(userAtom);
 
