@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 import { useRecoilState } from 'recoil';
-import { focusedRouteAtom } from '../../utils/atoms';
+import { focusedRouteAtom, userAtom } from '../../utils/atoms';
 import { getCurrentUser } from '../../xplat/api';
 import { RouteStatus } from '../../xplat/types/route';
 import { User } from '../../xplat/types/user';
@@ -28,6 +28,7 @@ const FORCED_THUMBNAIL_HEIGHT = 200;
 
 const RouteView = () => {
   const [route] = useRecoilState(focusedRouteAtom);
+  const [user] = useRecoilState(userAtom);
 
   // Guaranteed to exist
   const [name, setName] = useState<string>('');
@@ -57,12 +58,12 @@ const RouteView = () => {
   const [isSending, setIsSending] = useState<boolean>(false);
 
   const onToggleIsLiked = async () => {
-    if (route === undefined) return;
+    if (route === undefined || user === null) return;
     setIsLiked(!isLiked);
     if (!isLiked) {
-      route.addLike(await getCurrentUser());
+      route.addLike(user);
     } else {
-      route.removeLike(await getCurrentUser());
+      route.removeLike(user);
     }
   };
 
@@ -115,11 +116,13 @@ const RouteView = () => {
         if (hasRope) route.getRope().then(setRope);
       });
 
-      route.likedBy(await getCurrentUser()).then(setIsLiked);
+      if (user !== null) {
+        route.likedBy(user).then(setIsLiked);
+      }
     };
 
     fetchData();
-  }, [route]);
+  }, [route, user]);
 
   return (
     <>
