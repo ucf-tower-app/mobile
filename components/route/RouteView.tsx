@@ -52,10 +52,8 @@ const RouteView = () => {
   const [isRating, setIsRating] = useState<boolean>(false);
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
-
-  // TODO: Replace with backend query when available
   const [userHasSent, setUserHasSent] = useState<boolean>(false);
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(true);
 
   const onToggleIsLiked = async () => {
     if (route === undefined || user === null) return;
@@ -67,15 +65,13 @@ const RouteView = () => {
     }
   };
 
-  const send = () => {
-    setIsSending(true);
-
-    // TODO: Tell xplat that this user has sent the route
-
-    setTimeout(() => {
-      setIsSending(false);
+  const send = async () => {
+    if (route !== undefined && user !== null) {
+      setIsSending(true);
+      await route.FUCKINSENDIT(user);
       setUserHasSent(true);
-    }, 1000);
+      setIsSending(false);
+    }
   };
 
   const post = () => {
@@ -118,6 +114,14 @@ const RouteView = () => {
 
       if (user !== null) {
         route.likedBy(user).then(setIsLiked);
+        route
+          .getSendByUser(user)
+          .then((send) => {
+            if (send !== undefined) {
+              setUserHasSent(true);
+            }
+          })
+          .finally(() => setIsSending(false));
       }
     };
 
