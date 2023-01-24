@@ -21,6 +21,14 @@ import Feed from '../media/Feed';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 
+/**
+ * The profile component displays the profile banner, a statbox,
+ * a button to see followers and the post's the user has posted.
+ *
+ * If the prop profileIsMine is true then there will be button
+ * to edit the profile. If it's false then it will be a follow
+ * button.
+ */
 type Props = {
   profileIsMine: boolean;
   userOfProfile: User;
