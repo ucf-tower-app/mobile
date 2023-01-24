@@ -1,5 +1,7 @@
 // Route metadata for the profile tab
-import { View } from 'react-native';
+import Followers from '../../../screens/profile/Followers';
+import ProfileWrapper from '../../../screens/profile/ProfileWrapper';
+import Sends from '../../../screens/profile/Sends';
 import { Name } from './names';
 
 export type Route = {
@@ -10,6 +12,14 @@ export type Route = {
 export const routes: Route[] = [
   {
     name: 'Profile',
-    component: View,
+    component: ProfileWrapper,
+  },
+  {
+    name: 'Sends',
+    component: Sends,
+  },
+  {
+    name: 'Followers',
+    component: Followers,
   },
 ];
