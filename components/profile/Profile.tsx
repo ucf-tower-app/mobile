@@ -18,18 +18,21 @@ import { Ionicons } from '@expo/vector-icons';
 import Tintable from '../../components/util/Tintable';
 import { Pressable } from 'native-base';
 import Feed from '../media/Feed';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 
 type Props = {
-  user: User;
   profileIsMine: boolean;
-  otherUser?: User;
+  userOfProfile: User;
+  navigate: Function;
 };
-const Profile = ({ user, profileIsMine, otherUser }: Props) => {
+const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const [boulderGrade, setBoulderGrade] = useState<string>('');
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
   const [posts, setPosts] = useState<PostObj[]>();
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const signedInUser = useRecoilValue(userAtom);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
@@ -40,19 +43,19 @@ const Profile = ({ user, profileIsMine, otherUser }: Props) => {
   // TODO: Use APIs to set stats
   useEffect(() => {
     const getPosts = async () => {
-      await user.getPosts().then(setPosts);
+      await userOfProfile.getPosts().then(setPosts);
     };
     getPosts();
-  }, [user]);
+  }, [userOfProfile]);
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
       //TODO: Edit Profile
     } else if (isFollowing) {
-      //TODO: Unfollow otherUser
+      //TODO: Unfollow userOfProfile
     } else {
-      if (otherUser !== undefined) {
-        await user.followUser(otherUser);
+      if (userOfProfile !== undefined && signedInUser !== null) {
+        await signedInUser.followUser(userOfProfile);
         setIsFollowing(true);
       }
     }
@@ -63,7 +66,7 @@ const Profile = ({ user, profileIsMine, otherUser }: Props) => {
       <VStack space="xs">
         <Box>
           <Box p="5">
-            <ProfileBanner user={user} />
+            <ProfileBanner user={userOfProfile} />
           </Box>
           <Center>
             <HStack space="md">
@@ -82,7 +85,7 @@ const Profile = ({ user, profileIsMine, otherUser }: Props) => {
                   : 'Follow'}
               </Button>
               <Center>
-                <Pressable>
+                <Pressable onPress={() => navigate('Followers')}>
                   {({ isHovered, isPressed }) => {
                     return (
                       <Box>

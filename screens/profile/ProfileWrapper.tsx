@@ -1,25 +1,20 @@
 import type { ProfileScreenNavigationProp } from '../../utils/types';
 import Profile from '../../components/profile/Profile';
-import { User } from '../../xplat/types/user';
-import { useState } from 'react';
-import { getCurrentUser } from '../../xplat/api';
-import { useEffect } from 'react';
 import LoadingProfile from '../../components/profile/LoadingProfile';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 
 const ProfileWrapper = ({
   navigation,
 }: ProfileScreenNavigationProp<'Profile'>) => {
-  const [user, setUser] = useState<User>();
+  const user = useRecoilValue(userAtom);
 
-  useEffect(() => {
-    const getUser = async () => {
-      await getCurrentUser().then(setUser);
-    };
-    getUser();
-  }, []);
-
-  return user !== undefined ? (
-    <Profile user={user} profileIsMine={true} />
+  return user !== null ? (
+    <Profile
+      userOfProfile={user}
+      profileIsMine={true}
+      navigate={navigation.navigate}
+    />
   ) : (
     <LoadingProfile />
   );
