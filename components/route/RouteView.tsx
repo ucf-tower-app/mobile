@@ -161,7 +161,7 @@ const RouteView = () => {
                   <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                     Setter
                   </Text>
-                  <UserTag user={setter} />
+                  <UserTag user={setter} size="sm" />
                 </VStack>
               ) : null}
               <VStack
