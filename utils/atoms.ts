@@ -1,9 +1,16 @@
 import { atom } from 'recoil';
+import { User } from '../xplat/types/user';
 import { UserStatus } from '../xplat/types/common';
 
 export const isInitializingAtom = atom<boolean>({
   key: 'isInitializing',
   default: true,
+});
+
+export const userAtom = atom<User | null>({
+  key: 'user',
+  default: null,
+  dangerouslyAllowMutability: true,
 });
 
 export const isSignedInAtom = atom<boolean>({
