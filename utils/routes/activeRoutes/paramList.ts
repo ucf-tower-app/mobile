@@ -1,1 +1,4 @@
-export type ParamList = { ActiveRoutes: undefined };
+export type ParamList = {
+  ActiveRoutes: undefined;
+  RouteView: undefined;
+};

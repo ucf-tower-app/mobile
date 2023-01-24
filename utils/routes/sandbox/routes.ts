@@ -5,6 +5,7 @@ import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWr
 import PostWrapper from '../../../screens/sandbox/PostWrapper';
 import ProfileBannerWrapper from '../../../screens/sandbox/ProfileBannerWrapper';
 import RouteRowWrapper from '../../../screens/sandbox/RouteRowWrapper';
+import RouteViewWrapper from '../../../screens/sandbox/RouteViewWrapper';
 import Sandbox from '../../../screens/sandbox/Sandbox';
 import SearchableRoutesWrapper from '../../../screens/sandbox/SearchableRoutesWrapper';
 import SearchBarWrapper from '../../../screens/sandbox/SearchBarWrapper';
@@ -66,5 +67,9 @@ export const routes: Route[] = [
   {
     name: 'SearchableRoutes',
     component: SearchableRoutesWrapper,
+  },
+  {
+    name: 'RouteView',
+    component: RouteViewWrapper,
   },
 ];

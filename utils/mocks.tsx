@@ -1,11 +1,20 @@
 import { ForumMock } from '../xplat/types/forum';
 import { LazyStaticVideo } from '../xplat/types/media';
 import { PostMock } from '../xplat/types/post';
-import { RouteClassifier, RouteMock, RouteType } from '../xplat/types/route';
+import {
+  RouteClassifier,
+  RouteMock,
+  RouteStatus,
+  RouteType,
+} from '../xplat/types/route';
 import { TagMock } from '../xplat/types/tag';
 import { LazyStaticImage, UserStatus } from '../xplat/types/types';
 import { UserMock } from '../xplat/types/user';
 
+export const profilePic = new LazyStaticImage(
+  'mock/path',
+  'https://wallpaperaccess.com/full/317501.jpg'
+);
 export const setterMock = new UserMock(
   'mockymock',
   'setter@setter.com',
@@ -14,7 +23,8 @@ export const setterMock = new UserMock(
   UserStatus.Employee,
   [],
   [],
-  []
+  [],
+  profilePic
 );
 export const forumMock = new ForumMock([]);
 export const tagMocks = [
@@ -24,40 +34,43 @@ export const tagMocks = [
 export const routeMock = new RouteMock(
   'Cool beans',
   new RouteClassifier(60, RouteType.Toprope),
-  setterMock,
   forumMock,
   [],
-  tagMocks
+  tagMocks,
+  RouteStatus.Active,
+  'This route is pretty awesome. Dynamic movements with some technique near the top. Short climbers beware!',
+  setterMock,
+  profilePic,
+  5
 );
 export const routeMock2 = new RouteMock(
   'Slime In the Ice Machine',
   new RouteClassifier(5, RouteType.Boulder),
-  setterMock,
   forumMock,
   [],
-  tagMocks
+  tagMocks,
+  RouteStatus.Active,
+  'This seems to be required, but I think that it shouldnt...'
 );
 export const routeMock3 = new RouteMock(
   'Another one',
   new RouteClassifier(2, RouteType.Boulder),
-  setterMock,
   forumMock,
   [],
-  tagMocks
+  tagMocks,
+  RouteStatus.Active,
+  'Another desc'
 );
 export const routeMock4 = new RouteMock(
   'How did we get here?',
   new RouteClassifier(61, RouteType.Toprope),
-  setterMock,
   forumMock,
   [],
-  tagMocks
+  tagMocks,
+  RouteStatus.Active,
+  'Another one!'
 );
 export const routeMocks = [routeMock, routeMock2, routeMock3, routeMock4];
-export const profilePic = new LazyStaticImage(
-  'mock/path',
-  'https://wallpaperaccess.com/full/317501.jpg'
-);
 export const videoMock = new LazyStaticVideo(
   'mock/path',
   'mock/path',

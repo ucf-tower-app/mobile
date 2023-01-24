@@ -6,4 +6,4 @@ export const names = [
   'Leaderboards',
   'LeaderboardUserProfile',
 ] as const;
-export type Name = typeof names[number];
+export type Name = (typeof names)[number];

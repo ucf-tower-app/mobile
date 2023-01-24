@@ -7,4 +7,4 @@ export const names = [
   'ProfileTab',
   'SandboxTab',
 ] as const;
-export type Name = typeof names[number];
+export type Name = (typeof names)[number];
