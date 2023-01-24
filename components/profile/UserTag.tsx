@@ -15,9 +15,15 @@ import Tintable from '../util/Tintable';
 // TODO
 const navigateToProfile = () => { };
 
-type Size = 'sm' | 'lg';
+type Size = 'sm' | 'md' | 'lg';
 const sizedStyles = {
   sm: {
+    avatarSize: 8,
+    preloadTextWidth: 18,
+    displayNameSize: 'sm',
+    usernameSize: 'xs',
+  },
+  md: {
     avatarSize: 12,
     preloadTextWidth: 24,
     displayNameSize: 'md',
@@ -35,7 +41,7 @@ type Props = {
   user: User | undefined;
   size?: Size;
 };
-const UserTag = ({ user, size = 'sm' }: Props) => {
+const UserTag = ({ user, size = 'md' }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
