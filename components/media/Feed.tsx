@@ -1,4 +1,4 @@
-import { ScrollView, VStack, Center, Divider } from 'native-base';
+import { ScrollView, VStack, Center, Divider, Spinner } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { PostCursorMerger, QueryCursor } from '../../xplat/types/queryCursors';
@@ -76,6 +76,11 @@ const Feed = ({ postCursor }: Props) => {
           {posts?.forEach((post) => {
             padifyPost(<Post post={post} />);
           })}
+          {!isOutOfPosts ? (
+            <Center>
+              <Spinner size="lg" />
+            </Center>
+          ) : null}
         </VStack>
       </Center>
     </ScrollView>
