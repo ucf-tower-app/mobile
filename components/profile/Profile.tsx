@@ -38,7 +38,6 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const [boulderGrade, setBoulderGrade] = useState<string>('');
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
-  const [posts, setPosts] = useState<PostObj[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const signedInUser = useRecoilValue(userAtom);
 
@@ -47,14 +46,6 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
     'lightMode.secondary',
     'darkMode.secondary'
   );
-
-  // TODO: Use APIs to set stats
-  useEffect(() => {
-    const getPosts = async () => {
-      await userOfProfile.getPosts().then(setPosts);
-    };
-    getPosts();
-  }, [userOfProfile]);
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
@@ -89,8 +80,8 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
                 {profileIsMine
                   ? 'Edit Profile'
                   : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                    ? 'Unfollow'
+                    : 'Follow'}
               </Button>
               <Center>
                 <Pressable onPress={() => navigate('Followers')}>
@@ -136,7 +127,7 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
             />
           </HStack>
         </Center>
-        <Feed posts={posts} />
+        <Feed postCursor={userOfProfile.getPostsCursor()} />
       </VStack>
     </ScrollView>
   );
