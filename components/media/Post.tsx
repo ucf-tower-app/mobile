@@ -32,7 +32,6 @@ const Post = ({ post }: Props) => {
   useEffect(() => {
     const getData = async () => {
       if (post === undefined) return;
-
       await post.getData();
 
       post.getAuthor().then(setAuthor);
