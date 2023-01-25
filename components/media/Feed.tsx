@@ -30,6 +30,8 @@ const Feed = ({ postCursor }: Props) => {
       while (newPosts.length < 5) {
         const newPost = await postCursor.pollNext();
         if (newPost === undefined) {
+          // Logs out of posts at 0
+          console.log(`Out of posts! at ${newPosts.length}`);
           setIsOutOfPosts(true);
           break;
         }
@@ -69,6 +71,7 @@ const Feed = ({ postCursor }: Props) => {
           loadNextPost();
         }
       }}
+      scrollEventThrottle={200}
     >
       <Center>
         <Divider />

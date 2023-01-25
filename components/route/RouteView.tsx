@@ -11,18 +11,21 @@ import {
   VStack,
   Box,
   Button,
+  Center,
+  Spinner,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 import { useRecoilState } from 'recoil';
 import { focusedRouteAtom, userAtom } from '../../utils/atoms';
-import { getCurrentUser } from '../../xplat/api';
 import { RouteStatus } from '../../xplat/types/route';
 import { User } from '../../xplat/types/user';
 import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
 import RatingModal from './RatingModal';
+import Feed from '../media/Feed';
+import { Forum } from '../../xplat/types/forum';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -31,6 +34,7 @@ const RouteView = () => {
   const [user] = useRecoilState(userAtom);
 
   // Guaranteed to exist
+  const [forum, setForum] = useState<Forum | undefined>(undefined);
   const [name, setName] = useState<string>('');
   const [grade, setGrade] = useState<string>('');
   const [likes, setLikes] = useState<User[]>([]);
@@ -85,6 +89,12 @@ const RouteView = () => {
       if (route === undefined) return;
       await route.getData();
 
+      route.getForum().then(async (forum) => {
+        // Logs 10 posts
+        await forum.getData();
+        console.log(forum.posts?.length);
+        setForum(forum);
+      });
       route.getName().then(setName);
       route.getGradeDisplayString().then(setGrade);
       route.getLikes().then(setLikes);
@@ -236,6 +246,13 @@ const RouteView = () => {
             </Button>
             <Divider mt={4} />
           </Flex>
+          {forum !== undefined ? (
+            <Feed postCursor={forum.getPostsCursor()} />
+          ) : (
+            <Center>
+              <Spinner size="lg" />
+            </Center>
+          )}
         </ImageBackground>
       </ScrollView>
     </>
