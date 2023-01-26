@@ -35,12 +35,13 @@ type Props = {
   navigate: Function;
 };
 const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
-  const [boulderGrade, setBoulderGrade] = useState<string>('');
-  const [topRopeGrade, setTopRopeGrade] = useState<string>('');
-  const [numOfSends, setNumOfSends] = useState<string>('');
+  // const [boulderGrade, setBoulderGrade] = useState<string>('');
+  // const [topRopeGrade, setTopRopeGrade] = useState<string>('');
+  // const [numOfSends, setNumOfSends] = useState<string>('');
   const [posts, setPosts] = useState<PostObj[]>([]);
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const signedInUser = useRecoilValue(userAtom);
+  // TODO: Update default to check if signedInUser is following userOfProfile
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
@@ -50,19 +51,20 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
 
   // TODO: Use APIs to set stats
   useEffect(() => {
-    const getPosts = async () => {
+    const getData = async () => {
       await userOfProfile.getPosts().then(setPosts);
     };
-    getPosts();
+    getData();
   }, [userOfProfile]);
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
       //TODO: Edit Profile
-    } else if (isFollowing) {
-      //TODO: Unfollow userOfProfile
+    } else if (isFollowing && signedInUser !== undefined) {
+      await signedInUser.unfollowUser(userOfProfile);
+      setIsFollowing(false);
     } else {
-      if (userOfProfile !== undefined && signedInUser !== null) {
+      if (userOfProfile !== undefined && signedInUser !== undefined) {
         await signedInUser.followUser(userOfProfile);
         setIsFollowing(true);
       }
@@ -93,7 +95,11 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
                   : 'Follow'}
               </Button>
               <Center>
-                <Pressable onPress={() => navigate('Followers')}>
+                <Pressable
+                  onPress={() =>
+                    navigate('Follows', { username: userOfProfile.username })
+                  }
+                >
                   {({ isHovered, isPressed }) => {
                     return (
                       <Box>

@@ -4,20 +4,20 @@ import LoadingProfile from '../../components/profile/LoadingProfile';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 
-const ProfileWrapper = ({
+const MyProfile = ({
   navigation,
-}: ProfileScreenNavigationProp<'Profile'>) => {
-  const user = useRecoilValue(userAtom);
+}: ProfileScreenNavigationProp<'MyProfile'>) => {
+  const signedInUser = useRecoilValue(userAtom);
 
-  return user !== null ? (
+  return signedInUser !== undefined ? (
     <Profile
-      userOfProfile={user}
+      userOfProfile={signedInUser}
       profileIsMine={true}
-      navigate={navigation.navigate}
+      navigate={navigation.push}
     />
   ) : (
     <LoadingProfile />
   );
 };
 
-export default ProfileWrapper;
+export default MyProfile;
