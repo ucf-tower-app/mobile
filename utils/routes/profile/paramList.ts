@@ -1,5 +1,10 @@
 export type ParamList = {
-  Profile: undefined;
+  MyProfile: undefined;
+  UserProfile: {
+    username: string;
+  };
   Sends: undefined;
-  Followers: undefined;
+  Follow: {
+    username: string;
+  };
 };
