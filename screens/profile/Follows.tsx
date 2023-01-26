@@ -11,33 +11,40 @@ import { useState, useEffect } from 'react';
 import { ProfileScreenNavigationProp } from '../../utils/types';
 import UserRow from '../../components/profile/UserRow';
 import SearchBar from '../../components/searchbar/SearchBar';
-import { User } from '../../xplat/types/types';
+import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
 import { getUserByUsername } from '../../xplat/api';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
+import FollowList from '../../components/profile/FollowList';
 
 const Follows = ({
   route,
   navigation,
-}: ProfileScreenNavigationProp<'Follow'>) => {
+}: ProfileScreenNavigationProp<'Follows'>) => {
   const username = route.params.username;
   const [user, setUser] = useState<User | undefined>(undefined);
   const [followers, setFollowers] = useState<User[]>([]);
   const [following, setFollowing] = useState<User[]>([]);
   const [viewFollowers, setViewFollowers] = useState<boolean>(true);
   const signedInUser = useRecoilValue(userAtom);
+  const [followingCursor, setFollowingCursor] = useState<
+    ArrayCursor<User> | undefined
+  >(undefined);
+  const [followersCursor, setFollowersCursor] = useState<
+    QueryCursor<User> | undefined
+  >(undefined);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  // This will cause an infinite rerender
   useEffect(() => {
     const getData = async () => {
       await getUserByUsername(username).then(setUser);
-      await user?.getFollowers().then(console.log);
-      await user?.getFollowing().then(console.log);
+      const cursor = user?.getFollowersCursor();
+      setFollowersCursor(cursor);
+      await user?.getFollowingCursor().then(setFollowingCursor);
     };
     getData();
     console.log('Followers screen');
-  }, [username, user, followers, following]);
+  }, [username]);
 
   const navigationFunction = () => {
     if (signedInUser?.username === user?.username) {
@@ -67,20 +74,7 @@ const Follows = ({
           </Button>
         </HStack>
       </VStack>
-
-      <FlatList
-        px="3"
-        w="full"
-        data={viewFollowers ? followers : following}
-        renderItem={({ item }) => (
-          <Box py="3">
-            <UserRow user={item} navigate={navigationFunction} />
-          </Box>
-        )}
-        keyExtractor={(item, index) =>
-          item.docRef ? item.docRef.id : index.toString()
-        }
-      />
+      <FollowList userCursor={followingCursor} />
     </Center>
   );
 };
