@@ -77,6 +77,39 @@ export const videoMock = new LazyStaticVideo(
   'https://i.insider.com/602ee9ced3ad27001837f2ac?width=2000&format=jpeg&auto=webp',
   'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
 );
+export const userMock2 = new UserMock(
+  'bruh',
+  'myboy@mail.com',
+  'HAHA',
+  'AYO MY BOI',
+  UserStatus.Verified,
+  [],
+  [],
+  [],
+  profilePic
+);
+export const userMock3 = new UserMock(
+  'user3',
+  'fakeuser3@mail.com',
+  'AYOOOO',
+  'Who is you',
+  UserStatus.Verified,
+  [],
+  [],
+  [],
+  profilePic
+);
+export const userMock4 = new UserMock(
+  'im fakee',
+  'faker@mail.com',
+  'So much code',
+  'Last of us',
+  UserStatus.Verified,
+  [],
+  [],
+  [],
+  profilePic
+);
 export const userMock = new UserMock(
   'mockitymock',
   'fakeemail@mail.com',
@@ -84,8 +117,8 @@ export const userMock = new UserMock(
   'Being mocked is my personality',
   UserStatus.Verified,
   [],
-  [],
-  [],
+  [userMock2, userMock3],
+  [userMock4],
   profilePic
 );
 export const postMock = new PostMock(
