@@ -26,6 +26,12 @@ const isCloseToBottom = ({
   );
 };
 
+/**
+ * A feed of posts. The posts are pulled in strides of POST_STRIDE from the
+ * postsCursor, and the callee can provide an optional component to place on top.
+ * New feed items are only loaded when the user is within 20 pixels of the bottom of
+ * the screen.
+ */
 type Props = {
   postsCursor: QueryCursor<PostObj> | PostCursorMerger;
   topComponent?: JSX.Element;
