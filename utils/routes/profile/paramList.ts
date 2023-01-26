@@ -4,7 +4,7 @@ export type ParamList = {
     username: string;
   };
   Sends: undefined;
-  Follow: {
+  Follows: {
     username: string;
   };
 };

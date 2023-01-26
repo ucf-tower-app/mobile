@@ -1,5 +1,5 @@
 // Route metadata for the profile tab
-import Follow from '../../../screens/profile/Follow';
+import Follows from '../../../screens/profile/Follows';
 import MyProfile from '../../../screens/profile/MyProfile';
 import UserProfile from '../../../screens/profile/UserProfile';
 import Sends from '../../../screens/profile/Sends';
@@ -20,8 +20,8 @@ export const routes: Route[] = [
     component: Sends,
   },
   {
-    name: 'Follow',
-    component: Follow,
+    name: 'Follows',
+    component: Follows,
   },
   {
     name: 'UserProfile',
