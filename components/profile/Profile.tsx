@@ -86,8 +86,8 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                ? 'Unfollow'
+                : 'Follow'}
             </Button>
             <Center>
               <Pressable onPress={() => navigate('Followers')}>

@@ -182,7 +182,7 @@ const RouteView = () => {
               </Text>
               <StarRating
                 rating={rating}
-                onChange={() => { }}
+                onChange={() => {}}
                 starStyle={styles.star}
                 animationConfig={{ scale: 1 }}
               />
