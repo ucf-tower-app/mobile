@@ -33,7 +33,7 @@ const AuthProvider = ({ children }: Props) => {
           setIsSignedIn(false);
           setIsEmailVerified(false);
           setUserPermissionLevel(undefined);
-          setUser(null);
+          setUser(undefined);
         }
         setIsInitializing(false);
       }),
