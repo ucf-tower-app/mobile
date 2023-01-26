@@ -12,7 +12,7 @@ const UserRow = ({ user, endComponent, navigate }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
-    <Pressable onPress={() => navigate}>
+    <Pressable onPress={() => navigate()}>
       {({ isHovered, isPressed }) => {
         return (
           <Box bg={baseBgColor}>

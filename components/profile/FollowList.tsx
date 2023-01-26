@@ -12,7 +12,7 @@ import { QueryCursor } from '../../xplat/types/queryCursors';
 import { ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
 
-const POST_STRIDE = 3;
+const USER_STRIDE = 3;
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -33,7 +33,7 @@ const isCloseToBottom = ({
  * the screen.
  */
 type Props = {
-  userCursor: QueryCursor<User> | ArrayCursor<User> | undefined;
+  userCursor: QueryCursor<User> | ArrayCursor<User>;
   topComponent?: JSX.Element;
 };
 const FollowList = ({ userCursor, topComponent }: Props) => {
@@ -41,12 +41,11 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
   const [isOutOfUsers, setIsOutOfUsers] = useState<boolean>(false);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-  console.log('in user list');
 
-  const loadNextUsers = async () => {
+  const loadNextUsers = async (base: User[], isOutOfUsers: boolean) => {
     if (isOutOfUsers) return;
     const newUsers = [];
-    while (newUsers.length < POST_STRIDE) {
+    while (newUsers.length < USER_STRIDE) {
       const newUser = await userCursor?.pollNext();
       if (newUser === undefined) {
         setIsOutOfUsers(true);
@@ -54,12 +53,13 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       }
       newUsers.push(newUser);
     }
-    setUsers([...users, ...newUsers]);
+    setUsers([...base, ...newUsers]);
   };
 
   useEffect(() => {
-    console.log('in use effect');
-    loadNextUsers();
+    setUsers([]);
+    setIsOutOfUsers(false);
+    loadNextUsers([], false);
   }, [userCursor]);
 
   return (
@@ -68,7 +68,7 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       bg={baseBgColor}
       onScroll={({ nativeEvent }) => {
         if (!isOutOfUsers && isCloseToBottom(nativeEvent)) {
-          loadNextUsers();
+          loadNextUsers(users, isOutOfUsers);
         }
       }}
       scrollEventThrottle={1000}
@@ -76,11 +76,14 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       <Center w="full">
         {topComponent}
         <VStack w="full">
-          {users?.map((user, index) => {
+          {users?.map((user) => {
             return (
-              <VStack key={user.docRef!.id} pt={4}>
+              <VStack key={user.docRef!.id} pb={3} pt={7}>
                 <Box py="3">
-                  <UserRow user={user} navigate={console.log} />
+                  <UserRow
+                    user={user}
+                    navigate={() => console.log('navigated')}
+                  />
                 </Box>
               </VStack>
             );
