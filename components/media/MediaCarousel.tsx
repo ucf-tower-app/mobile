@@ -28,7 +28,7 @@ const MediaCarousel = ({ mediaList }: Props) => {
     ImageRN.getSize(mediaList[0].imageUrl, (imageWidth, imageHeight) => {
       const aspectRatio = imageWidth / imageHeight;
       const calculatedHeight = width / aspectRatio;
-      setHeight(calculatedHeight);
+      setHeight(Math.min(calculatedHeight, 350));
     });
   }, [mediaList, width]);
 
