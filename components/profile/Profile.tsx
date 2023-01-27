@@ -10,15 +10,17 @@ import {
   Divider,
 } from 'native-base';
 import { User } from '../../xplat/types/user';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import StatBox from '../../components/profile/StatBox';
+import { Post as PostObj } from '../../xplat/types/post';
 import { Ionicons } from '@expo/vector-icons';
 import Tintable from '../../components/util/Tintable';
 import { Pressable } from 'native-base';
 import Feed from '../media/Feed';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
-import { Post as PostObj, QueryCursor } from '../../xplat/types/types';
+import { QueryCursor } from '../../xplat/types/queryCursors';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -37,12 +39,12 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const [boulderGrade, setBoulderGrade] = useState<string>('');
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
+  const signedInUser = useRecoilValue(userAtom);
+  // TODO: Update default to check if signedInUser is following userOfProfile
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [postsCursor, setPostsCursor] = useState<
     QueryCursor<PostObj> | undefined
   >(undefined);
-
-  const signedInUser = useRecoilValue(userAtom);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
@@ -50,6 +52,7 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
     'darkMode.secondary'
   );
 
+  // TODO: Use APIs to set stats
   useEffect(() => {
     setPostsCursor(userOfProfile.getPostsCursor());
   }, [userOfProfile]);
@@ -57,10 +60,11 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const handleButtonPress = async () => {
     if (profileIsMine) {
       //TODO: Edit Profile
-    } else if (isFollowing) {
-      //TODO: Unfollow userOfProfile
+    } else if (isFollowing && signedInUser !== undefined) {
+      await signedInUser.unfollowUser(userOfProfile);
+      setIsFollowing(false);
     } else {
-      if (userOfProfile !== undefined && signedInUser !== null) {
+      if (userOfProfile !== undefined && signedInUser !== undefined) {
         await signedInUser.followUser(userOfProfile);
         setIsFollowing(true);
       }
@@ -86,11 +90,15 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                ? 'Unfollow'
+                : 'Follow'}
             </Button>
             <Center>
-              <Pressable onPress={() => navigate('Followers')}>
+              <Pressable
+                onPress={() =>
+                  navigate('Follows', { username: userOfProfile.username })
+                }
+              >
                 {({ isHovered, isPressed }) => {
                   return (
                     <Box>

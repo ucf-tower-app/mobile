@@ -3,18 +3,16 @@ import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
 import UserTag from './UserTag';
 
-// TODO
-const navigateToProfile = () => {};
-
 type Props = {
   user: User | undefined;
   endComponent?: JSX.Element;
+  navigate: Function;
 };
-const UserRow = ({ user, endComponent }: Props) => {
+const UserRow = ({ user, endComponent, navigate }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
-    <Pressable onPress={navigateToProfile}>
+    <Pressable onPress={() => navigate()}>
       {({ isHovered, isPressed }) => {
         return (
           <Box bg={baseBgColor}>
