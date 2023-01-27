@@ -11,8 +11,6 @@ import { ProfileScreenNavigationProp } from '../../utils/types';
 import SearchBar from '../../components/searchbar/SearchBar';
 import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
 import { getUserByUsername } from '../../xplat/api';
-import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
 import FollowList from '../../components/profile/FollowList';
 
 type UserTab = 'followers' | 'following';
@@ -28,7 +26,6 @@ const Follows = ({
     ArrayCursor<User> | QueryCursor<User> | undefined
   >(undefined);
 
-  const signedInUser = useRecoilValue(userAtom);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   useEffect(() => {
@@ -47,7 +44,7 @@ const Follows = ({
     updateCursor();
   }, [user, tabViewed]);
 
-  return (
+  const followsComponent = (
     <Center w="full" bgColor={baseBgColor} p="2">
       <VStack w="full">
         <SearchBar />
@@ -67,14 +64,19 @@ const Follows = ({
             Following
           </Button>
         </HStack>
-        {chosenCursor !== undefined ? (
-          <FollowList userCursor={chosenCursor} />
-        ) : (
-          <Center pt={4}>
-            <Spinner size="lg" />
-          </Center>
-        )}
       </VStack>
+    </Center>
+  );
+
+  return chosenCursor !== undefined ? (
+    <FollowList
+      userCursor={chosenCursor}
+      topComponent={followsComponent}
+      navigation={navigation}
+    />
+  ) : (
+    <Center pt={4}>
+      <Spinner size="lg" />
     </Center>
   );
 };

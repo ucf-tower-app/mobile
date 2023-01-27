@@ -5,14 +5,17 @@ import {
   Spinner,
   useColorModeValue,
   Box,
+  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 import { QueryCursor } from '../../xplat/types/queryCursors';
 import { ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
 
-const USER_STRIDE = 3;
+const USER_STRIDE = 5;
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -35,15 +38,17 @@ const isCloseToBottom = ({
 type Props = {
   userCursor: QueryCursor<User> | ArrayCursor<User>;
   topComponent?: JSX.Element;
+  navigation: any;
 };
-const FollowList = ({ userCursor, topComponent }: Props) => {
+const FollowList = ({ userCursor, topComponent, navigation }: Props) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isOutOfUsers, setIsOutOfUsers] = useState<boolean>(false);
+  const signedInUser = useRecoilValue(userAtom);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextUsers = async (base: User[], isOutOfUsers: boolean) => {
-    if (isOutOfUsers) return;
+  const loadNextUsers = async (base: User[], outOfUsers: boolean) => {
+    if (outOfUsers) return;
     const newUsers = [];
     while (newUsers.length < USER_STRIDE) {
       const newUser = await userCursor?.pollNext();
@@ -62,6 +67,17 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
     loadNextUsers([], false);
   }, [userCursor]);
 
+  const navigateToUserProfile = (
+    signedInUsername: string | undefined,
+    username: string | undefined
+  ) => {
+    if (signedInUsername !== undefined && signedInUsername === username) {
+      navigation.push('MyProfile');
+    } else {
+      navigation.push('UserProfile', { username: username });
+    }
+  };
+
   return (
     <ScrollView
       w="full"
@@ -76,14 +92,21 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       <Center w="full">
         {topComponent}
         <VStack w="full">
-          {users?.map((user) => {
+          {users.map((user) => {
             return (
-              <VStack key={user.docRef!.id} pb={3} pt={7}>
-                <Box py="3">
-                  <UserRow
-                    user={user}
-                    navigate={() => console.log('navigated')}
-                  />
+              <VStack key={user.docRef!.id} py="3">
+                <Box>
+                  <Box py="3">
+                    <UserRow
+                      user={user}
+                      navigate={() =>
+                        navigateToUserProfile(
+                          signedInUser?.username,
+                          user.username
+                        )
+                      }
+                    />
+                  </Box>
                 </Box>
               </VStack>
             );
