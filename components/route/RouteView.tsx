@@ -5,8 +5,6 @@ import {
   Flex,
   Heading,
   useToken,
-  ScrollView,
-  Divider,
   HStack,
   VStack,
   Box,
@@ -15,7 +13,7 @@ import {
   Spinner,
 } from 'native-base';
 import { useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, StyleSheet } from 'react-native';
+import { ImageBackground, StyleSheet } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 import { useRecoilState } from 'recoil';
 import { focusedRouteAtom, userAtom } from '../../utils/atoms';
@@ -23,16 +21,9 @@ import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
 import RatingModal from './RatingModal';
 import Feed from '../media/Feed';
-import {
-  RouteStatus,
-  User,
-  Forum,
-  QueryCursor,
-  Post,
-} from '../../xplat/types/types';
+import { RouteStatus, User, QueryCursor, Post } from '../../xplat/types/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
-const windowHeight = Dimensions.get('window').height;
 
 const RouteView = () => {
   const [route] = useRecoilState(focusedRouteAtom);
@@ -66,18 +57,24 @@ const RouteView = () => {
   const [userHasSent, setUserHasSent] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(true);
 
-  const onToggleIsLiked = async () => {
-    if (route === undefined || user === null) return;
-    setIsLiked(!isLiked);
-    if (!isLiked) {
+  const onSetIsLiked = async (newIsLiked: boolean) => {
+    if (route === undefined || user === undefined) return;
+
+    if (newIsLiked && !isLiked) {
       route.addLike(user);
-    } else {
+      setLikes([...likes, user]);
+      setIsLiked(true);
+    } else if (!newIsLiked && isLiked) {
       route.removeLike(user);
+      const newLikes = [...likes];
+      newLikes.pop();
+      setLikes(newLikes);
+      setIsLiked(false);
     }
   };
 
   const send = async () => {
-    if (route !== undefined && user !== null) {
+    if (route !== undefined && user !== undefined) {
       setIsSending(true);
       await route.FUCKINSENDIT(user);
       setUserHasSent(true);
@@ -126,7 +123,7 @@ const RouteView = () => {
         if (hasRope) route.getRope().then(setRope);
       });
 
-      if (user !== null) {
+      if (user !== undefined) {
         route.likedBy(user).then(setIsLiked);
         route
           .getSendByUser(user)
@@ -219,7 +216,7 @@ const RouteView = () => {
             </Box>
             <LikeButton
               isLiked={isLiked}
-              onToggleLike={onToggleIsLiked}
+              onSetLiked={onSetIsLiked}
               numLikes={likes.length}
             />
           </HStack>

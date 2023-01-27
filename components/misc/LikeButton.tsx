@@ -2,15 +2,19 @@ import { Flex, Icon, Text } from 'native-base';
 import { useEffect, useState } from 'react';
 import IconToggle from './IconToggle';
 import { Ionicons } from '@expo/vector-icons';
+import { DebounceSession } from '../../utils/utils';
 
 type Props = {
   isLiked: boolean;
-  onToggleLike: () => void;
+  onSetLiked: (isLiked: boolean) => void;
   numLikes: number;
 };
-const LikeButton = ({ isLiked, onToggleLike, numLikes }: Props) => {
+const LikeButton = ({ isLiked, onSetLiked, numLikes }: Props) => {
   const [isLikedLocal, setIsLikedLocal] = useState<boolean>(isLiked);
   const [numLikesLocal, setNumLikesLocal] = useState<number>(numLikes);
+  const [debounceSession] = useState<DebounceSession>(
+    new DebounceSession(1000)
+  );
 
   useEffect(() => {
     setIsLikedLocal(isLiked);
@@ -18,13 +22,15 @@ const LikeButton = ({ isLiked, onToggleLike, numLikes }: Props) => {
   }, [isLiked, numLikes]);
 
   const toggleIsLikedLocal = () => {
-    setIsLikedLocal(!isLikedLocal);
-    if (!isLikedLocal) {
+    const newIsLikedLocal = !isLikedLocal;
+    setIsLikedLocal(newIsLikedLocal);
+    if (newIsLikedLocal) {
       setNumLikesLocal(numLikesLocal + 1);
     } else {
       setNumLikesLocal(numLikesLocal - 1);
     }
-    onToggleLike();
+
+    debounceSession.trigger(() => onSetLiked(newIsLikedLocal));
   };
 
   return (
