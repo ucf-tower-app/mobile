@@ -1,12 +1,11 @@
+import {
+  convertBoulderStringToClassifier,
+  convertTopropeStringToClassifier,
+} from '../xplat/api';
 import { ForumMock } from '../xplat/types/forum';
 import { LazyStaticVideo } from '../xplat/types/media';
 import { PostMock } from '../xplat/types/post';
-import {
-  RouteClassifier,
-  RouteMock,
-  RouteStatus,
-  RouteType,
-} from '../xplat/types/route';
+import { RouteMock, RouteStatus } from '../xplat/types/route';
 import { TagMock } from '../xplat/types/tag';
 import { LazyStaticImage, UserStatus } from '../xplat/types/types';
 import { UserMock } from '../xplat/types/user';
@@ -33,7 +32,7 @@ export const tagMocks = [
 ];
 export const routeMock = new RouteMock(
   'Cool beans',
-  new RouteClassifier(60, RouteType.Toprope),
+  convertTopropeStringToClassifier('5.6+'),
   forumMock,
   [],
   tagMocks,
@@ -45,7 +44,7 @@ export const routeMock = new RouteMock(
 );
 export const routeMock2 = new RouteMock(
   'Slime In the Ice Machine',
-  new RouteClassifier(5, RouteType.Boulder),
+  convertBoulderStringToClassifier('V5'),
   forumMock,
   [],
   tagMocks,
@@ -54,7 +53,7 @@ export const routeMock2 = new RouteMock(
 );
 export const routeMock3 = new RouteMock(
   'Another one',
-  new RouteClassifier(2, RouteType.Boulder),
+  convertBoulderStringToClassifier('V8'),
   forumMock,
   [],
   tagMocks,
@@ -63,7 +62,7 @@ export const routeMock3 = new RouteMock(
 );
 export const routeMock4 = new RouteMock(
   'How did we get here?',
-  new RouteClassifier(61, RouteType.Toprope),
+  convertTopropeStringToClassifier('5.7-'),
   forumMock,
   [],
   tagMocks,

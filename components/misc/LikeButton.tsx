@@ -1,5 +1,5 @@
 import { Flex, Icon, Text } from 'native-base';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import IconToggle from './IconToggle';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,6 +11,11 @@ type Props = {
 const LikeButton = ({ isLiked, onToggleLike, numLikes }: Props) => {
   const [isLikedLocal, setIsLikedLocal] = useState<boolean>(isLiked);
   const [numLikesLocal, setNumLikesLocal] = useState<number>(numLikes);
+
+  useEffect(() => {
+    setIsLikedLocal(isLiked);
+    setNumLikesLocal(numLikes);
+  }, [isLiked, numLikes]);
 
   const toggleIsLikedLocal = () => {
     setIsLikedLocal(!isLikedLocal);

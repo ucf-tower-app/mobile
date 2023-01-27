@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 type Props = {
@@ -9,6 +9,10 @@ type Props = {
 };
 const IconToggle = ({ status, onToggle, onIcon, offIcon }: Props) => {
   const [statusLocal, setStatusLocal] = useState<boolean>(status);
+
+  useEffect(() => {
+    setStatusLocal(status);
+  }, [status]);
 
   const toggle = async () => {
     setStatusLocal(!statusLocal);
