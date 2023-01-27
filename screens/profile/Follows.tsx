@@ -15,6 +15,10 @@ import FollowList from '../../components/profile/FollowList';
 
 type UserTab = 'followers' | 'following';
 
+/**
+ * This screen displays the followers and following lists of
+ * a user.
+ */
 const Follows = ({
   route,
   navigation,

@@ -5,7 +5,6 @@ import {
   Spinner,
   useColorModeValue,
   Box,
-  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
@@ -30,10 +29,9 @@ const isCloseToBottom = ({
 };
 
 /**
- * A feed of posts. The posts are pulled in strides of POST_STRIDE from the
- * postsCursor, and the callee can provide an optional component to place on top.
- * New feed items are only loaded when the user is within 20 pixels of the bottom of
- * the screen.
+ * Similar to a feed of posts. This displays a list of users for a Follow
+ * list and is loaded with a stride of 5. Clicking a user will navigate
+ * to the user's profile.
  */
 type Props = {
   userCursor: QueryCursor<User> | ArrayCursor<User>;
