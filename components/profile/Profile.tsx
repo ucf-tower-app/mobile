@@ -21,6 +21,7 @@ import Feed from '../media/Feed';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { QueryCursor } from '../../xplat/types/queryCursors';
+import EditProfileModal from './EditProfileModal';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -40,12 +41,12 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
   const signedInUser = useRecoilValue(userAtom);
+  const [showModal, setShowModal] = useState(false);
   // TODO: Update default to check if signedInUser is following userOfProfile
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [postsCursor, setPostsCursor] = useState<
     QueryCursor<PostObj> | undefined
   >(undefined);
-
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
@@ -59,7 +60,7 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
-      //TODO: Edit Profile
+      setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
       await signedInUser.unfollowUser(userOfProfile);
       setIsFollowing(false);
@@ -71,8 +72,13 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
     }
   };
 
+  const onClose = () => {
+    setShowModal(false);
+  };
+
   const profileComponent = (
     <VStack space="xs" w="full" bg={baseBgColor}>
+      <EditProfileModal isOpen={showModal} onClose={onClose} />
       <Box>
         <Box p="5">
           <ProfileBanner user={userOfProfile} />
@@ -82,10 +88,10 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
             <Button
               variant="subtle"
               size="md"
-              bgColor={secondaryBgColor}
+              bg={secondaryBgColor}
               rounded="2xl"
               _text={{ color: 'black' }}
-              onPress={() => handleButtonPress}
+              onPress={handleButtonPress}
             >
               {profileIsMine
                 ? 'Edit Profile'
