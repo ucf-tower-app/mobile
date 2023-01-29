@@ -14,4 +14,5 @@ export type ParamList = {
   Post: undefined;
   SearchableRoutes: undefined;
   RouteView: undefined;
+  CreatePost: undefined;
 } & TabGlobalParamList;

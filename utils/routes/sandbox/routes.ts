@@ -1,4 +1,5 @@
 // Route metadata for the sandbox tab
+import CreatePost from '../../../screens/media/CreatePost';
 import LeaderboardCardWrapper from '../../../screens/sandbox/LeaderboardCardWrapper';
 import LeaderboardRankingWrapper from '../../../screens/sandbox/LeaderboardRankingWrapper';
 import LostAndFoundCardWrapper from '../../../screens/sandbox/LostAndFoundCardWrapper';
@@ -72,6 +73,10 @@ export const routes: Route[] = [
   {
     name: 'RouteView',
     component: RouteViewWrapper,
+  },
+  {
+    name: 'CreatePost',
+    component: CreatePost,
   },
   ...tabGlobalRoutes,
 ];
