@@ -8,9 +8,9 @@ export const isInitializingAtom = atom<boolean>({
   default: true,
 });
 
-export const userAtom = atom<User | null>({
+export const userAtom = atom<User | undefined>({
   key: 'user',
-  default: null,
+  default: undefined,
   dangerouslyAllowMutability: true,
 });
 

@@ -8,6 +8,7 @@ import {
   useColorModeValue,
   VStack,
   Pressable,
+  Box,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -22,7 +23,7 @@ const RouteRow = ({ route }: Props) => {
   const setFocusedRoute = useSetRecoilState(focusedRouteAtom);
 
   const [name, setName] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [descriptors, setDescriptors] = useState<string>('');
   const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
     'https://wallpaperaccess.com/full/317501.jpg'
   );
@@ -50,13 +51,13 @@ const RouteRow = ({ route }: Props) => {
         }
       });
       route.getGradeDisplayString().then((grade) => {
-        let descriptionBuilder = grade;
+        let descriptorsBuilder = grade;
         route.getTags().then(async (tags) => {
           for (const tag of tags) {
             const tagName = await tag.getName();
-            descriptionBuilder = descriptionBuilder + ', ' + tagName;
+            descriptorsBuilder = descriptorsBuilder + ', ' + tagName;
           }
-          setDescription(descriptionBuilder);
+          setDescriptors(descriptorsBuilder);
         });
       });
     };
@@ -66,28 +67,27 @@ const RouteRow = ({ route }: Props) => {
 
   return (
     <Pressable onPress={navigateToRoute}>
-      <HStack h={20} pl={2} backgroundColor={baseBgColor}>
-        <Center w="20%">
-          <Image
-            size={16}
-            borderRadius={5}
-            source={{ uri: thumbnailUrl }}
-            alt={name}
-          />
-        </Center>
-        <Center w="65%">
-          <VStack w="full" h="full" pl={2} pt={2}>
-            <Text fontSize="xl" fontWeight="bold">
-              {name}
-            </Text>
-            <Text fontSize="lg" color="grey">
-              {description}
-            </Text>
-          </VStack>
-        </Center>
-        <Center w="15%">
-          <ArrowForwardIcon size="5" />
-        </Center>
+      <HStack
+        p={2}
+        backgroundColor={baseBgColor}
+        justifyContent="flex-start"
+        alignItems="center"
+      >
+        <Image
+          size={16}
+          borderRadius={5}
+          source={{ uri: thumbnailUrl }}
+          alt={name}
+        />
+        <VStack pl={2} pt={2} maxW="70%">
+          <Text fontSize="xl" fontWeight="bold">
+            {name}
+          </Text>
+          <Text fontSize="lg" color="grey">
+            {descriptors}
+          </Text>
+        </VStack>
+        <ArrowForwardIcon size="5" ml="auto" mr={3} />
       </HStack>
     </Pressable>
   );
