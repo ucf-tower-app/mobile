@@ -16,62 +16,62 @@ import { Name } from './names';
 import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
 
 export type Route = {
-        name: Name;
-        component: any;
+  name: Name;
+  component: any;
 };
 
 export const routes: Route[] = [
-        {
-                name: 'Sandbox',
-                component: Sandbox,
-        },
-        {
-                name: 'RouteRow',
-                component: RouteRowWrapper,
-        },
-        {
-                name: 'ProfileBanner',
-                component: ProfileBannerWrapper,
-        },
-        {
-                name: 'StatBox',
-                component: StatBoxWrapper,
-        },
-        {
-                name: 'LostAndFoundCard',
-                component: LostAndFoundCardWrapper,
-        },
-        {
-                name: 'SearchBar',
-                component: SearchBarWrapper,
-        },
-        {
-                name: 'LeaderboardCard',
-                component: LeaderboardCardWrapper,
-        },
-        {
-                name: 'UserRow',
-                component: UserRowWrapper,
-        },
-        {
-                name: 'LeaderboardRanking',
-                component: LeaderboardRankingWrapper,
-        },
-        {
-                name: 'UserTag',
-                component: UserTagWrapper,
-        },
-        {
-                name: 'Post',
-                component: PostWrapper,
-        },
-        {
-                name: 'SearchableRoutes',
-                component: SearchableRoutesWrapper,
-        },
-        {
-                name: 'RouteView',
-                component: RouteViewWrapper,
-        },
-        ...tabGlobalRoutes,
+  {
+    name: 'Sandbox',
+    component: Sandbox,
+  },
+  {
+    name: 'RouteRow',
+    component: RouteRowWrapper,
+  },
+  {
+    name: 'ProfileBanner',
+    component: ProfileBannerWrapper,
+  },
+  {
+    name: 'StatBox',
+    component: StatBoxWrapper,
+  },
+  {
+    name: 'LostAndFoundCard',
+    component: LostAndFoundCardWrapper,
+  },
+  {
+    name: 'SearchBar',
+    component: SearchBarWrapper,
+  },
+  {
+    name: 'LeaderboardCard',
+    component: LeaderboardCardWrapper,
+  },
+  {
+    name: 'UserRow',
+    component: UserRowWrapper,
+  },
+  {
+    name: 'LeaderboardRanking',
+    component: LeaderboardRankingWrapper,
+  },
+  {
+    name: 'UserTag',
+    component: UserTagWrapper,
+  },
+  {
+    name: 'Post',
+    component: PostWrapper,
+  },
+  {
+    name: 'SearchableRoutes',
+    component: SearchableRoutesWrapper,
+  },
+  {
+    name: 'RouteView',
+    component: RouteViewWrapper,
+  },
+  ...tabGlobalRoutes,
 ];
