@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Avatar,
   Box,
@@ -11,9 +12,6 @@ import {
 import { useEffect, useState } from 'react';
 import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
-
-// TODO
-const navigateToProfile = () => {};
 
 type Size = 'sm' | 'md' | 'lg';
 const sizedStyles = {
@@ -42,6 +40,8 @@ type Props = {
   size?: Size;
 };
 const UserTag = ({ user, size = 'md' }: Props) => {
+  const navigation = useNavigation();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
@@ -61,6 +61,13 @@ const UserTag = ({ user, size = 'md' }: Props) => {
 
     fetchData();
   }, [user]);
+
+  const navigateToProfile = () => {
+    navigation.navigate('Tabs', {
+      screen: 'ProfileTab',
+      params: { screen: 'UserProfile', params: { username } },
+    });
+  };
 
   const isLoaded =
     user !== undefined &&
