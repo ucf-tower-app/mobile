@@ -7,7 +7,7 @@ import {
   isInitializingAtom,
   isSignedInAtom,
 } from '../../utils/atoms';
-import { ParamList as RootTabParamList } from '../../utils/routes/tabs/paramList';
+import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
@@ -18,7 +18,7 @@ const tabBarStyle = {
 };
 
 // Tabs used for bottom tray, stack for in-tab nav
-const Tabs = createMaterialBottomTabNavigator<RootTabParamList>();
+const Tabs = createMaterialBottomTabNavigator<TabParamList>();
 
 /**
  * [EnsureAuth] is a wrapper component for the main tab navigator.

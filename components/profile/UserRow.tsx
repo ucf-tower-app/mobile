@@ -1,4 +1,9 @@
+import { useNavigation } from '@react-navigation/native';
 import { Box, HStack, Pressable, useColorModeValue } from 'native-base';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
+import { navigateToUserProfile } from '../../utils/nav';
+import { TabGlobalNavigationProp } from '../../utils/types';
 import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
 import UserTag from './UserTag';
@@ -6,13 +11,28 @@ import UserTag from './UserTag';
 type Props = {
   user: User | undefined;
   endComponent?: JSX.Element;
-  navigate: Function;
 };
-const UserRow = ({ user, endComponent, navigate }: Props) => {
+const UserRow = ({ user, endComponent }: Props) => {
+  const navigation = useNavigation<TabGlobalNavigationProp>();
+
+  const signedInUser = useRecoilValue(userAtom);
+
+  const tryNavigate = async () => {
+    const [signedInUsername, targetProfileUsername] = await Promise.all([
+      signedInUser?.getUsername(),
+      user?.getUsername(),
+    ]);
+
+    if (targetProfileUsername === undefined || signedInUsername === undefined)
+      return;
+
+    navigateToUserProfile(signedInUsername, targetProfileUsername, navigation);
+  };
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
-    <Pressable onPress={() => navigate()}>
+    <Pressable onPress={tryNavigate}>
       {({ isHovered, isPressed }) => {
         return (
           <Box bg={baseBgColor}>

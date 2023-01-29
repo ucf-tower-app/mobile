@@ -1,30 +1,10 @@
 // Route metadata for the profile tab
-import Follows from '../../../screens/profile/Follows';
-import MyProfile from '../../../screens/profile/MyProfile';
-import UserProfile from '../../../screens/profile/UserProfile';
-import Sends from '../../../screens/profile/Sends';
 import { Name } from './names';
+import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
 
 export type Route = {
   name: Name;
   component: any;
 };
 
-export const routes: Route[] = [
-  {
-    name: 'MyProfile',
-    component: MyProfile,
-  },
-  {
-    name: 'Sends',
-    component: Sends,
-  },
-  {
-    name: 'Follows',
-    component: Follows,
-  },
-  {
-    name: 'UserProfile',
-    component: UserProfile,
-  },
-];
+export const routes: Route[] = [...tabGlobalRoutes];

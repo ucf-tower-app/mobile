@@ -5,6 +5,7 @@ import Leaderboards from '../../../screens/leaderboards/Leaderboards';
 import LeaderboardUserProfile from '../../../screens/leaderboards/LeaderboardUserProfile';
 import MonthlyLeaderboard from '../../../screens/leaderboards/MonthlyLeaderboard';
 import { Name } from './names';
+import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
 
 export type Route = {
   name: Name;
@@ -32,4 +33,5 @@ export const routes: Route[] = [
     name: 'LeaderboardUserProfile',
     component: LeaderboardUserProfile,
   },
+  ...tabGlobalRoutes,
 ];

@@ -7,7 +7,7 @@ import {
   VStack,
 } from 'native-base';
 import { useState, useEffect } from 'react';
-import { ProfileScreenNavigationProp } from '../../utils/types';
+import { TabGlobalScreenProps } from '../../utils/types';
 import SearchBar from '../../components/searchbar/SearchBar';
 import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
 import { getUserByUsername } from '../../xplat/api';
@@ -19,11 +19,9 @@ type UserTab = 'followers' | 'following';
  * This screen displays the followers and following lists of
  * a user.
  */
-const Follows = ({
-  route,
-  navigation,
-}: ProfileScreenNavigationProp<'Follows'>) => {
+const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
   const username = route.params.username;
+
   const [user, setUser] = useState<User | undefined>(undefined);
   const [tabViewed, setTabViewed] = useState<UserTab>('followers');
   const [chosenCursor, setChosenCursor] = useState<
@@ -73,11 +71,7 @@ const Follows = ({
   );
 
   return chosenCursor !== undefined ? (
-    <FollowList
-      userCursor={chosenCursor}
-      topComponent={followsComponent}
-      navigation={navigation}
-    />
+    <FollowList userCursor={chosenCursor} topComponent={followsComponent} />
   ) : (
     <Center pt={4}>
       <Spinner size="lg" />

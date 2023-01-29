@@ -1,10 +1,10 @@
 import { Center, Box, VStack } from 'native-base';
 import LeaderboardRanking from '../../components/leaderboard/LeaderboardRanking';
-import type { LeaderboardsScreenNavigationProp } from '../../utils/types';
+import type { LeaderboardsScreenProps } from '../../utils/types';
 
 const FriendsLeaderboard = ({
   navigation,
-}: LeaderboardsScreenNavigationProp<'FriendsLeaderboard'>) => {
+}: LeaderboardsScreenProps<'FriendsLeaderboard'>) => {
   return (
     <VStack>
       <Center>

@@ -1,32 +1,48 @@
-import { CompositeScreenProps } from '@react-navigation/native';
+import {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+} from '@react-navigation/native';
 import { ParamList as LeaderboardsTabParamList } from './routes/leaderboards/paramList';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabNavigationProp,
+  BottomTabScreenProps,
+} from '@react-navigation/bottom-tabs';
 import { ParamList as TabParamList } from './routes/tabs/paramList';
 import { ParamList as RootStackParamList } from './routes/root/paramList';
-import { ParamList as ProfileTabParamList } from './routes/profile/paramList';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import { ParamList as TabGlobalParamList } from './routes/tabGlobal/paramList';
 
-export type LeaderboardsScreenNavigationProp<
-  T extends keyof LeaderboardsTabParamList
-> = CompositeScreenProps<
-  NativeStackScreenProps<LeaderboardsTabParamList, T>,
+export type LeaderboardsScreenProps<T extends keyof LeaderboardsTabParamList> =
   CompositeScreenProps<
-    BottomTabScreenProps<TabParamList>,
-    NativeStackScreenProps<RootStackParamList>
-  >
->;
-
-export type ProfileScreenNavigationProp<T extends keyof ProfileTabParamList> =
-  CompositeScreenProps<
-    NativeStackScreenProps<ProfileTabParamList, T>,
+    NativeStackScreenProps<LeaderboardsTabParamList, T>,
     CompositeScreenProps<
       BottomTabScreenProps<TabParamList>,
       NativeStackScreenProps<RootStackParamList>
     >
   >;
 
+export type TabGlobalScreenProps<T extends keyof TabGlobalParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<TabGlobalParamList, T>,
+    CompositeScreenProps<
+      BottomTabScreenProps<TabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
+  >;
+
+export type TabGlobalNavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<TabGlobalParamList>,
+  CompositeNavigationProp<
+    BottomTabNavigationProp<TabParamList>,
+    NativeStackNavigationProp<RootStackParamList>
+  >
+>;
+
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
   }
 }
