@@ -9,13 +9,14 @@ import {
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { useEffect, useState } from 'react';
 import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { userAtom } from '../../utils/atoms';
 import { useRecoilValue } from 'recoil';
 import { navigateToUserProfile } from '../../utils/nav';
+import { useQuery } from 'react-query';
+import { buildUserFetcher } from '../../utils/queries';
 
 type Size = 'sm' | 'md' | 'lg';
 const sizedStyles = {
@@ -40,7 +41,7 @@ const sizedStyles = {
 };
 
 type Props = {
-  user: User | undefined;
+  user: User;
   size?: Size;
 };
 const UserTag = ({ user, size = 'md' }: Props) => {
@@ -50,38 +51,50 @@ const UserTag = ({ user, size = 'md' }: Props) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
-  const [displayName, setDisplayName] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
+  const { isLoading, isError, data, error } = useQuery(
+    user.docRef?.id!,
+    buildUserFetcher(user)
+  );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (user === undefined) return;
+  if (isLoading) {
+    return (
+      <Box rounded="full" bg={baseBgColor}>
+        <HStack alignItems="center" pr={3}>
+          <Skeleton
+            w={sizedStyles[size].avatarSize}
+            h={sizedStyles[size].avatarSize}
+            rounded="full"
+          />
+          <Skeleton.Text
+            fontSize={sizedStyles[size].displayNameSize}
+            lines={2}
+            pl={2}
+            w={sizedStyles[size].preloadTextWidth}
+          />
+        </HStack>
+      </Box>
+    );
+  }
 
-      await user.getData();
-
-      user.getAvatarUrl().then(setAvatarUrl);
-      user.getDisplayName().then(setDisplayName);
-      user.getUsername().then(setUsername);
-    };
-
-    fetchData();
-  }, [user]);
+  if (isError || data === undefined) {
+    console.error(error);
+    return null;
+  }
 
   const tryNavigate = async () => {
-    if (username === '') return;
-
+    // Can't navigate to an unfetched user
     const signedInUsername = await signedInUser?.getUsername();
     if (signedInUsername === undefined) return;
 
-    navigateToUserProfile(signedInUsername, username, navigation);
+    const targetProfileUsername = data.username;
+    if (targetProfileUsername !== undefined) {
+      navigateToUserProfile(
+        signedInUsername,
+        targetProfileUsername,
+        navigation
+      );
+    }
   };
-
-  const isLoaded =
-    user !== undefined &&
-    avatarUrl !== undefined &&
-    displayName !== undefined &&
-    username !== undefined;
 
   return (
     <Pressable onPress={tryNavigate}>
@@ -90,35 +103,21 @@ const UserTag = ({ user, size = 'md' }: Props) => {
           <Box rounded="full" bg={baseBgColor}>
             <Tintable tinted={isHovered || isPressed} rounded />
             <HStack alignItems="center" pr={3}>
-              <Skeleton
+              <Avatar
                 w={sizedStyles[size].avatarSize}
                 h={sizedStyles[size].avatarSize}
-                rounded="full"
-                isLoaded={isLoaded}
-              >
-                <Avatar
-                  w={sizedStyles[size].avatarSize}
-                  h={sizedStyles[size].avatarSize}
-                  source={{ uri: avatarUrl }}
-                />
-              </Skeleton>
+                source={{ uri: data.avatarUrl }}
+              />
               <VStack pl={2}>
-                <Skeleton.Text
+                <Text
                   fontSize={sizedStyles[size].displayNameSize}
-                  lines={2}
-                  w={sizedStyles[size].preloadTextWidth}
-                  isLoaded={isLoaded}
+                  fontWeight="bold"
                 >
-                  <Text
-                    fontSize={sizedStyles[size].displayNameSize}
-                    fontWeight="bold"
-                  >
-                    {displayName}
-                  </Text>
-                  <Text fontSize={sizedStyles[size].usernameSize} color="grey">
-                    @{username}
-                  </Text>
-                </Skeleton.Text>
+                  {data.displayName}
+                </Text>
+                <Text fontSize={sizedStyles[size].usernameSize} color="grey">
+                  @{data.username}
+                </Text>
               </VStack>
             </HStack>
           </Box>
