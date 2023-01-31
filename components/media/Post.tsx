@@ -56,6 +56,8 @@ const Post = ({ post }: Props) => {
   const isTextContentLoaded = textContent !== '';
   const isMediaLoaded = mediaList !== undefined;
 
+  if (author === undefined) return null;
+
   return (
     <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
       <Box pl={2}>
