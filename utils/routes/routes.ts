@@ -47,7 +47,7 @@ export const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
     routes: searchRoutes,
   },
   ProfileTab: {
-    initialRouteName: 'Profile',
+    initialRouteName: 'MyProfile',
     routes: profileRoutes,
   },
   SandboxTab: {

@@ -8,8 +8,6 @@ import {
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
 import { QueryCursor } from '../../xplat/types/queryCursors';
 import { ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
@@ -36,12 +34,10 @@ const isCloseToBottom = ({
 type Props = {
   userCursor: QueryCursor<User> | ArrayCursor<User>;
   topComponent?: JSX.Element;
-  navigation: any;
 };
-const FollowList = ({ userCursor, topComponent, navigation }: Props) => {
+const FollowList = ({ userCursor, topComponent }: Props) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isOutOfUsers, setIsOutOfUsers] = useState<boolean>(false);
-  const signedInUser = useRecoilValue(userAtom);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -65,17 +61,6 @@ const FollowList = ({ userCursor, topComponent, navigation }: Props) => {
     loadNextUsers([], false);
   }, [userCursor]);
 
-  const navigateToUserProfile = (
-    signedInUsername: string | undefined,
-    username: string | undefined
-  ) => {
-    if (signedInUsername !== undefined && signedInUsername === username) {
-      navigation.push('MyProfile');
-    } else {
-      navigation.push('UserProfile', { username: username });
-    }
-  };
-
   return (
     <ScrollView
       w="full"
@@ -93,18 +78,8 @@ const FollowList = ({ userCursor, topComponent, navigation }: Props) => {
           {users.map((user) => {
             return (
               <VStack key={user.docRef!.id} py="3">
-                <Box>
-                  <Box py="3">
-                    <UserRow
-                      user={user}
-                      navigate={() =>
-                        navigateToUserProfile(
-                          signedInUser?.username,
-                          user.username
-                        )
-                      }
-                    />
-                  </Box>
+                <Box py="3">
+                  <UserRow user={user} />
                 </Box>
               </VStack>
             );

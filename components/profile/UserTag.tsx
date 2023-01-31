@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Avatar,
   Box,
@@ -11,9 +12,10 @@ import {
 import { useEffect, useState } from 'react';
 import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
-
-// TODO
-const navigateToProfile = () => {};
+import { TabGlobalNavigationProp } from '../../utils/types';
+import { userAtom } from '../../utils/atoms';
+import { useRecoilValue } from 'recoil';
+import { navigateToUserProfile } from '../../utils/nav';
 
 type Size = 'sm' | 'md' | 'lg';
 const sizedStyles = {
@@ -42,6 +44,10 @@ type Props = {
   size?: Size;
 };
 const UserTag = ({ user, size = 'md' }: Props) => {
+  const navigation = useNavigation<TabGlobalNavigationProp>();
+
+  const signedInUser = useRecoilValue(userAtom);
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
@@ -62,6 +68,15 @@ const UserTag = ({ user, size = 'md' }: Props) => {
     fetchData();
   }, [user]);
 
+  const tryNavigate = async () => {
+    if (username === '') return;
+
+    const signedInUsername = await signedInUser?.getUsername();
+    if (signedInUsername === undefined) return;
+
+    navigateToUserProfile(signedInUsername, username, navigation);
+  };
+
   const isLoaded =
     user !== undefined &&
     avatarUrl !== undefined &&
@@ -69,7 +84,7 @@ const UserTag = ({ user, size = 'md' }: Props) => {
     username !== undefined;
 
   return (
-    <Pressable onPress={navigateToProfile}>
+    <Pressable onPress={tryNavigate}>
       {({ isHovered, isPressed }) => {
         return (
           <Box rounded="full" bg={baseBgColor}>

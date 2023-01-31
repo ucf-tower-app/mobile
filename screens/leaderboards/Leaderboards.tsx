@@ -1,10 +1,10 @@
 import { Center, Pressable, VStack } from 'native-base';
 import LeaderboardCard from '../../components/leaderboard/LeaderboardCard';
-import type { LeaderboardsScreenNavigationProp } from '../../utils/types';
+import type { LeaderboardsScreenProps } from '../../utils/types';
 
 const Leaderboards = ({
   navigation,
-}: LeaderboardsScreenNavigationProp<'Leaderboards'>) => {
+}: LeaderboardsScreenProps<'Leaderboards'>) => {
   return (
     <Center>
       <VStack space={3}>

@@ -22,6 +22,8 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { QueryCursor } from '../../xplat/types/queryCursors';
 import EditProfileModal from './EditProfileModal';
+import { useNavigation } from '@react-navigation/native';
+import { TabGlobalNavigationProp } from '../../utils/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -34,9 +36,10 @@ import EditProfileModal from './EditProfileModal';
 type Props = {
   profileIsMine: boolean;
   userOfProfile: User;
-  navigate: Function;
 };
-const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
+const Profile = ({ profileIsMine, userOfProfile }: Props) => {
+  const navigation = useNavigation<TabGlobalNavigationProp>();
+
   const [boulderGrade, setBoulderGrade] = useState<string>('');
   const [topRopeGrade, setTopRopeGrade] = useState<string>('');
   const [numOfSends, setNumOfSends] = useState<string>('');
@@ -96,14 +99,16 @@ const Profile = ({ profileIsMine, userOfProfile, navigate }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                ? 'Unfollow'
-                : 'Follow'}
+                  ? 'Unfollow'
+                  : 'Follow'}
             </Button>
             <Center>
               <Pressable
-                onPress={() =>
-                  navigate('Follows', { username: userOfProfile.username })
-                }
+                onPress={async () => {
+                  navigation.push('Follows', {
+                    username: await userOfProfile.getUsername(),
+                  });
+                }}
               >
                 {({ isHovered, isPressed }) => {
                   return (

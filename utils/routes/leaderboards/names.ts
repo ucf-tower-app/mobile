@@ -1,3 +1,5 @@
+import { Name as TabGlobalName } from '../tabGlobal/names';
+
 // All valid route names for likes tab
 export const names = [
   'AllTimeLeaderboard',
@@ -6,4 +8,4 @@ export const names = [
   'Leaderboards',
   'LeaderboardUserProfile',
 ] as const;
-export type Name = (typeof names)[number];
+export type Name = (typeof names)[number] | TabGlobalName;

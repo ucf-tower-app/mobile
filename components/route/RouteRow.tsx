@@ -1,14 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import {
   ArrowForwardIcon,
-  Center,
   HStack,
   Image,
   Text,
   useColorModeValue,
   VStack,
   Pressable,
-  Box,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';

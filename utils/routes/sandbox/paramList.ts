@@ -1,3 +1,5 @@
+import { ParamList as TabGlobalParamList } from '../tabGlobal/paramList';
+
 export type ParamList = {
   Sandbox: undefined;
   RouteRow: undefined;
@@ -13,4 +15,4 @@ export type ParamList = {
   SearchableRoutes: undefined;
   RouteView: undefined;
   CreatePost: undefined;
-};
+} & TabGlobalParamList;

@@ -14,6 +14,7 @@ import StatBoxWrapper from '../../../screens/sandbox/StatBoxWrapper';
 import UserRowWrapper from '../../../screens/sandbox/UserRowWrapper';
 import UserTagWrapper from '../../../screens/sandbox/UserTagWrapper';
 import { Name } from './names';
+import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
 
 export type Route = {
   name: Name;
@@ -77,4 +78,5 @@ export const routes: Route[] = [
     name: 'CreatePost',
     component: CreatePost,
   },
+  ...tabGlobalRoutes,
 ];
