@@ -162,7 +162,7 @@ const RouteView = () => {
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
+              <VStack justifyContent="flex-start" flexGrow={0}>
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
@@ -172,14 +172,14 @@ const RouteView = () => {
             <VStack
               justifyContent="flex-start"
               alignItems="flex-start"
-              flexGrow="unset"
+              flexGrow={0}
             >
               <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                 Rating
               </Text>
               <StarRating
                 rating={rating}
-                onChange={() => {}}
+                onChange={() => { }}
                 starStyle={styles.star}
                 animationConfig={{ scale: 1 }}
               />
