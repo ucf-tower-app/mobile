@@ -1,12 +1,12 @@
 import {
-  ScrollView,
-  VStack,
   Center,
   Divider,
+  ScrollView,
   Spinner,
+  VStack,
   useColorModeValue,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { PostCursorMerger, QueryCursor } from '../../xplat/types/queryCursors';
 import { Post as PostObj } from '../../xplat/types/types';
@@ -42,7 +42,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextPosts = async () => {
+  const loadNextPosts = useCallback(async () => {
     if (isOutOfPosts) return;
     const newPosts = [];
     while (newPosts.length < POST_STRIDE) {
@@ -54,11 +54,11 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
       newPosts.push(newPost);
     }
     setPosts([...posts, ...newPosts]);
-  };
+  }, [isOutOfPosts, posts, postsCursor]);
 
   useEffect(() => {
     loadNextPosts();
-  }, [postsCursor]);
+  }, [loadNextPosts]);
 
   return (
     <ScrollView
@@ -77,7 +77,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
           {posts?.map((post, index) => {
             return (
               <VStack key={post.docRef!.id} pt={4}>
-                <Post post={post} key={post.docRef!.id} />
+                <Post post={post} />
                 {index < posts.length - 1 ? <Divider /> : null}
               </VStack>
             );

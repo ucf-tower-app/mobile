@@ -1,7 +1,5 @@
 import { atom } from 'recoil';
-import { User } from '../xplat/types/user';
-import { UserStatus } from '../xplat/types/common';
-import { Route } from '../xplat/types/route';
+import { Route, User, UserStatus } from '../xplat/types/types';
 
 export const isInitializingAtom = atom<boolean>({
   key: 'isInitializing',

@@ -1,29 +1,29 @@
-import ProfileBanner from '../../components/profile/ProfileBanner';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import {
-  HStack,
-  Center,
-  VStack,
-  useColorModeValue,
   Box,
   Button,
-  Icon,
+  Center,
   Divider,
+  HStack,
+  Icon,
+  Pressable,
+  VStack,
+  useColorModeValue,
 } from 'native-base';
-import { User } from '../../xplat/types/user';
 import { useState } from 'react';
-import { useEffect } from 'react';
-import StatBox from '../../components/profile/StatBox';
-import { Post as PostObj } from '../../xplat/types/post';
-import { Ionicons } from '@expo/vector-icons';
-import Tintable from '../../components/util/Tintable';
-import { Pressable } from 'native-base';
-import Feed from '../media/Feed';
+import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
+import ProfileBanner from '../../components/profile/ProfileBanner';
+import StatBox from '../../components/profile/StatBox';
+import Tintable from '../../components/util/Tintable';
 import { userAtom } from '../../utils/atoms';
-import { QueryCursor } from '../../xplat/types/queryCursors';
-import EditProfileModal from './EditProfileModal';
-import { useNavigation } from '@react-navigation/native';
+import { buildUserFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
+import { Post, QueryCursor, User, containsRef } from '../../xplat/types/types';
+import Feed from '../media/Feed';
+import EditProfileModal from './EditProfileModal';
+import LoadingProfile from './LoadingProfile';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -39,27 +39,40 @@ type Props = {
 };
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
-
-  const [boulderGrade, setBoulderGrade] = useState<string>('');
-  const [topRopeGrade, setTopRopeGrade] = useState<string>('');
-  const [numOfSends, setNumOfSends] = useState<string>('');
   const signedInUser = useRecoilValue(userAtom);
-  const [showModal, setShowModal] = useState(false);
-  // TODO: Update default to check if signedInUser is following userOfProfile
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [postsCursor, setPostsCursor] = useState<
-    QueryCursor<PostObj> | undefined
-  >(undefined);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
     'darkMode.secondary'
   );
+  const [showModal, setShowModal] = useState(false);
+
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [postsCursor, setPostsCursor] = useState<
+    QueryCursor<Post> | undefined
+  >();
+
+  const { isLoading, isError, data, error } = useQuery(
+    userOfProfile.docRef?.id!,
+    buildUserFetcher(userOfProfile),
+    {
+      onSuccess: (data) => {
+        setPostsCursor(userOfProfile.getPostsCursor());
+        if (signedInUser)
+          setIsFollowing(
+            containsRef(data.followingList, signedInUser) ?? false
+          );
+      },
+    }
+  );
+
+  if (isLoading) return <LoadingProfile />;
+  if (isError || data === undefined) {
+    console.error(error);
+    return null;
+  }
 
   // TODO: Use APIs to set stats
-  useEffect(() => {
-    setPostsCursor(userOfProfile.getPostsCursor());
-  }, [userOfProfile]);
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
@@ -99,8 +112,8 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                ? 'Unfollow'
+                : 'Follow'}
             </Button>
             <Center>
               <Pressable
@@ -131,21 +144,21 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
         <HStack space="md">
           <StatBox
             stat="Boulder"
-            value="V5"
+            value={data.bestBoulder ? data.bestBoulder?.displayString : 'None'}
             onPress={() => {
               return;
             }}
           />
           <StatBox
             stat="Top-Rope"
-            value="V2"
+            value={data.bestToprope ? data.bestToprope?.displayString : 'None'}
             onPress={() => {
               return;
             }}
           />
           <StatBox
             stat="Sends"
-            value="23"
+            value={data.totalSends.toString()}
             onPress={() => {
               return;
             }}
