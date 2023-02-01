@@ -6,7 +6,7 @@ import {
   useColorModeValue,
   Box,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { QueryCursor, ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
@@ -40,25 +40,28 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextUsers = async (base: User[], outOfUsers: boolean) => {
-    if (outOfUsers) return;
-    const newUsers = [];
-    while (newUsers.length < USER_STRIDE) {
-      const newUser = await userCursor?.pollNext();
-      if (newUser === undefined) {
-        setIsOutOfUsers(true);
-        break;
+  const loadNextUsers = useCallback(
+    async (base: User[], outOfUsers: boolean) => {
+      if (outOfUsers) return;
+      const newUsers = [];
+      while (newUsers.length < USER_STRIDE) {
+        const newUser = await userCursor?.pollNext();
+        if (newUser === undefined) {
+          setIsOutOfUsers(true);
+          break;
+        }
+        newUsers.push(newUser);
       }
-      newUsers.push(newUser);
-    }
-    setUsers([...base, ...newUsers]);
-  };
+      setUsers([...base, ...newUsers]);
+    },
+    [userCursor]
+  );
 
   useEffect(() => {
     setUsers([]);
     setIsOutOfUsers(false);
     loadNextUsers([], false);
-  }, [userCursor]);
+  }, [loadNextUsers]);
 
   return (
     <ScrollView

@@ -38,9 +38,9 @@ type Props = {
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
-  const [boulderGrade, setBoulderGrade] = useState<string>('');
-  const [topRopeGrade, setTopRopeGrade] = useState<string>('');
-  const [numOfSends, setNumOfSends] = useState<string>('');
+  const [_boulderGrade, _setBoulderGrade] = useState<string>('');
+  const [_topRopeGrade, _setTopRopeGrade] = useState<string>('');
+  const [_numOfSends, _setNumOfSends] = useState<string>('');
   const signedInUser = useRecoilValue(userAtom);
   const [showModal, setShowModal] = useState(false);
   // TODO: Update default to check if signedInUser is following userOfProfile

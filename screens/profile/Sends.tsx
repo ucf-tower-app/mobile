@@ -5,7 +5,7 @@ import { Send } from '../../xplat/types/send';
 import { View } from 'native-base';
 
 const Sends = (user: User) => {
-  const [sends, setSends] = useState<Send[]>();
+  const [_sends, setSends] = useState<Send[]>();
 
   useEffect(() => {
     const getSends = async () => {
