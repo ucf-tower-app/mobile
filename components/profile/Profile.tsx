@@ -94,7 +94,11 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
 
   const profileComponent = (
     <VStack space="xs" w="full" bg={baseBgColor}>
-      <EditProfileModal isOpen={showModal} onClose={onClose} />
+      <EditProfileModal
+        isOpen={showModal}
+        onClose={onClose}
+        fetchedUser={data}
+      />
       <Box>
         <Box p="5">
           <ProfileBanner user={userOfProfile} />
