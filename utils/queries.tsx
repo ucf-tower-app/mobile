@@ -22,7 +22,7 @@ export interface FetchedUser {
   postsCursor: Cursor<Post>;
   followersCursor: Cursor<User>;
   followingCursor: Cursor<User>;
-  __userObject: User;
+  userObject: User;
 }
 export const buildUserFetcher = (user: User) => {
   return async () => {
@@ -41,7 +41,7 @@ export const buildUserFetcher = (user: User) => {
       postsCursor: await user.getPostsCursor(),
       followersCursor: await user.getFollowersCursor(),
       followingCursor: await user.getFollowingCursor(),
-      __userObject: user,
+      userObject: user,
     } as FetchedUser;
   };
 };
