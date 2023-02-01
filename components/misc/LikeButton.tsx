@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import IconToggle from './IconToggle';
 import { Ionicons } from '@expo/vector-icons';
 import { DebounceSession } from '../../utils/utils';
-import { User } from '../../xplat/types/types';
+import { containsRef, User } from '../../xplat/types/types';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 
@@ -22,9 +22,7 @@ const LikeButton = ({ likes, onSetIsLiked }: Props) => {
 
   useEffect(() => {
     if (user === undefined) return;
-    const _userIsInLikes = likes.some(
-      (like) => like.docRef!.id === user.docRef!.id
-    );
+    const _userIsInLikes = containsRef(likes, user) ?? false;
     setUserIsInLikes(_userIsInLikes);
     setIsLiked(_userIsInLikes);
   }, [likes, user]);
