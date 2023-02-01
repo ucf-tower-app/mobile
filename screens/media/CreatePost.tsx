@@ -48,19 +48,18 @@ const CreatePost = () => {
 
   // Build the preview post whenever relevant state changes
   useEffect(() => {
-    if (user === null) return;
+    if (user === undefined) return;
     setPreviewPost(
       new PostMock(
         user,
         new Date(Date.now()),
         textContent,
         [],
-        [],
         imageContent,
         videoContent
       )
     );
-  }, [textContent, videoContent, imageContent]);
+  }, [textContent, videoContent, imageContent, user]);
 
   // Opens up a video picker and updates state
   const pickVideo = async () => {
@@ -118,6 +117,8 @@ const CreatePost = () => {
 
   // Builds the blobs and sends it to the backend
   const post = async () => {
+    if (user === undefined) return;
+
     try {
       setIsProcessingPost(true);
 
@@ -144,7 +145,7 @@ const CreatePost = () => {
       navigation.navigate('Tabs', {
         screen: 'ProfileTab',
         params: {
-          screen: 'Profile',
+          screen: 'MyProfile',
         },
       });
     }
@@ -228,7 +229,7 @@ const CreatePost = () => {
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        <Post post={previewPost} />
+        {previewPost !== undefined ? <Post post={previewPost} /> : null}
       </Box>
     </Box>
   );

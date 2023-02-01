@@ -11,7 +11,7 @@ const RatingModal = ({ isOpen, close }: Props) => {
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const submitRating = (rating: number) => {
+  const submitRating = (_rating: number) => {
     setIsLoading(true);
     // TODO: Submit the rating to xplat
 

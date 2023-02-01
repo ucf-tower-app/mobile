@@ -6,7 +6,7 @@ import {
   Spinner,
   useColorModeValue,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import {
   PostCursorMerger,
@@ -45,7 +45,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextPosts = async () => {
+  const loadNextPosts = useCallback(async () => {
     if (isOutOfPosts) return;
     const newPosts = [];
     while (newPosts.length < POST_STRIDE) {
@@ -57,11 +57,11 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
       newPosts.push(newPost);
     }
     setPosts([...posts, ...newPosts]);
-  };
+  }, [isOutOfPosts, posts, postsCursor]);
 
   useEffect(() => {
     loadNextPosts();
-  }, [postsCursor]);
+  }, [loadNextPosts]);
 
   return (
     <ScrollView

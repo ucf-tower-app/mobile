@@ -1,5 +1,5 @@
 import { ResizeMode, Video } from 'expo-av';
-import { Flex } from 'native-base';
+import { Flex, Box, Spinner } from 'native-base';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import VideoThumbnail from './VideoThumbnail';
@@ -17,6 +17,7 @@ const VideoWithThumbnail = ({
   height,
 }: Props) => {
   const [tappedThumbnail, setTappedThumbnail] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return tappedThumbnail ? (
     <Flex w={width} h={height} justifyContent="center" alignItems="center">
@@ -27,12 +28,29 @@ const VideoWithThumbnail = ({
         isLooping
         shouldPlay
         style={styles.video}
+        onLoad={() => setIsLoading(false)}
       />
+      {isLoading ? (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Spinner size="lg" />
+        </Box>
+      ) : null}
     </Flex>
   ) : (
     <VideoThumbnail
       thumbnailUrl={thumbnailUrl}
-      onPress={() => setTappedThumbnail(true)}
+      onPress={() => {
+        setTappedThumbnail(true);
+        setIsLoading(true);
+      }}
       width={width}
       height={height}
     />
