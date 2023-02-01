@@ -3,41 +3,44 @@ import { useEffect, useState } from 'react';
 import IconToggle from './IconToggle';
 import { Ionicons } from '@expo/vector-icons';
 import { DebounceSession } from '../../utils/utils';
+import { containsRef, User } from '../../xplat/types/types';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 
 type Props = {
-  isLiked: boolean;
-  onSetLiked: (isLiked: boolean) => void;
-  numLikes: number;
+  likes: User[];
+  onSetIsLiked: (isLiked: boolean) => void;
 };
-const LikeButton = ({ isLiked, onSetLiked, numLikes }: Props) => {
-  const [isLikedLocal, setIsLikedLocal] = useState<boolean>(isLiked);
-  const [numLikesLocal, setNumLikesLocal] = useState<number>(numLikes);
+const LikeButton = ({ likes, onSetIsLiked }: Props) => {
+  const user = useRecoilValue(userAtom);
+
+  const [userIsInLikes, setUserIsInLikes] = useState<boolean>(false);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
   const [debounceSession] = useState<DebounceSession>(
     new DebounceSession(1000)
   );
 
   useEffect(() => {
-    setIsLikedLocal(isLiked);
-    setNumLikesLocal(numLikes);
-  }, [isLiked, numLikes]);
+    if (user === undefined) return;
+    const _userIsInLikes = containsRef(likes, user) ?? false;
+    setUserIsInLikes(_userIsInLikes);
+    setIsLiked(_userIsInLikes);
+  }, [likes, user]);
 
   const toggleIsLikedLocal = () => {
-    const newIsLikedLocal = !isLikedLocal;
-    setIsLikedLocal(newIsLikedLocal);
-    if (newIsLikedLocal) {
-      setNumLikesLocal(numLikesLocal + 1);
-    } else {
-      setNumLikesLocal(numLikesLocal - 1);
-    }
-
-    debounceSession.trigger(() => onSetLiked(newIsLikedLocal));
+    const newIsLikedLocal = !isLiked;
+    setIsLiked(newIsLikedLocal);
+    debounceSession.trigger(() => onSetIsLiked(newIsLikedLocal));
   };
 
+  let numLikes = likes.length;
+  if (userIsInLikes && !isLiked) numLikes--;
+  else if (!userIsInLikes && isLiked) numLikes++;
   return (
     <Flex flexDirection="row" alignItems="center" justifyContent="center">
-      <Text mr={1}>{numLikesLocal}</Text>
+      <Text mr={1}>{numLikes}</Text>
       <IconToggle
-        status={isLikedLocal}
+        status={isLiked}
         onToggle={toggleIsLikedLocal}
         onIcon={<Icon as={Ionicons} name="heart" size={5} color="red.500" />}
         offIcon={

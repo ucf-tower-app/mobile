@@ -16,8 +16,11 @@ import { userAtom } from '../../utils/atoms';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import Post from '../../components/media/Post';
-import { PostMock } from '../../xplat/types/post';
-import { LazyStaticImage, LazyStaticVideo } from '../../xplat/types/media';
+import {
+  PostMock,
+  LazyStaticImage,
+  LazyStaticVideo,
+} from '../../xplat/types/types';
 import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
 import { useNavigation } from '@react-navigation/native';
@@ -45,19 +48,18 @@ const CreatePost = () => {
 
   // Build the preview post whenever relevant state changes
   useEffect(() => {
-    if (user === null) return;
+    if (user === undefined) return;
     setPreviewPost(
       new PostMock(
         user,
         new Date(Date.now()),
         textContent,
         [],
-        [],
         imageContent,
         videoContent
       )
     );
-  }, [textContent, videoContent, imageContent]);
+  }, [textContent, videoContent, imageContent, user]);
 
   // Opens up a video picker and updates state
   const pickVideo = async () => {
@@ -115,6 +117,8 @@ const CreatePost = () => {
 
   // Builds the blobs and sends it to the backend
   const post = async () => {
+    if (user === undefined) return;
+
     try {
       setIsProcessingPost(true);
 
@@ -126,9 +130,9 @@ const CreatePost = () => {
       const videoBlob =
         videoContent !== undefined
           ? {
-            video: await (await fetch(videoContent.videoUrl!)).blob(),
-            thumbnail: await (await fetch(videoContent.thumbnailUrl!)).blob(),
-          }
+              video: await (await fetch(videoContent.videoUrl!)).blob(),
+              thumbnail: await (await fetch(videoContent.thumbnailUrl!)).blob(),
+            }
           : undefined;
 
       const imageBlobs = await Promise.all(
@@ -141,7 +145,7 @@ const CreatePost = () => {
       navigation.navigate('Tabs', {
         screen: 'ProfileTab',
         params: {
-          screen: 'Profile',
+          screen: 'MyProfile',
         },
       });
     }
@@ -225,7 +229,7 @@ const CreatePost = () => {
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        <Post post={previewPost} />
+        {previewPost !== undefined ? <Post post={previewPost} /> : null}
       </Box>
     </Box>
   );

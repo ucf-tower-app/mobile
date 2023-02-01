@@ -9,18 +9,16 @@ import {
   Icon,
   Divider,
 } from 'native-base';
-import { User } from '../../xplat/types/user';
+import { User, Post as PostObj, QueryCursor } from '../../xplat/types/types';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import StatBox from '../../components/profile/StatBox';
-import { Post as PostObj } from '../../xplat/types/post';
 import { Ionicons } from '@expo/vector-icons';
 import Tintable from '../../components/util/Tintable';
 import { Pressable } from 'native-base';
 import Feed from '../media/Feed';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
-import { QueryCursor } from '../../xplat/types/queryCursors';
 import EditProfileModal from './EditProfileModal';
 import { useNavigation } from '@react-navigation/native';
 import { TabGlobalNavigationProp } from '../../utils/types';
@@ -40,9 +38,9 @@ type Props = {
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
-  const [boulderGrade, setBoulderGrade] = useState<string>('');
-  const [topRopeGrade, setTopRopeGrade] = useState<string>('');
-  const [numOfSends, setNumOfSends] = useState<string>('');
+  const [_boulderGrade, _setBoulderGrade] = useState<string>('');
+  const [_topRopeGrade, _setTopRopeGrade] = useState<string>('');
+  const [_numOfSends, _setNumOfSends] = useState<string>('');
   const signedInUser = useRecoilValue(userAtom);
   const [showModal, setShowModal] = useState(false);
   // TODO: Update default to check if signedInUser is following userOfProfile
@@ -99,8 +97,8 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                ? 'Unfollow'
+                : 'Follow'}
             </Button>
             <Center>
               <Pressable

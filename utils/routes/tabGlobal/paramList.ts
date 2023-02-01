@@ -7,4 +7,7 @@ export type ParamList = {
     username: string;
   };
   MyProfile: undefined;
+  RouteView: {
+    routeDocRefId: string;
+  };
 };

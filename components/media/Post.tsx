@@ -1,10 +1,25 @@
 import { Box, Skeleton, Text, useColorModeValue, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
-import { Post as PostObj } from '../../xplat/types/post';
-import { User } from '../../xplat/types/user';
-import UserTag from '../profile/UserTag';
+import { useQuery } from 'react-query';
+import { buildPostFetcher } from '../../utils/queries';
+import { Post as PostObj } from '../../xplat/types/types';
+import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
+
+const PostSkeleton = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
+      <Box pl={2}>
+        <UserTagSkeleton />
+      </Box>
+      <Skeleton.Text p={2} lines={2} />
+      <Skeleton w="full" pt={2} h={40} />
+    </VStack>
+  );
+};
 
 /**
  * A Post is a modular component that displays all relevant information about a user's post
@@ -18,63 +33,60 @@ import MediaCarousel from './MediaCarousel';
  * in order to render the actual post rather than its skeleton
  */
 type Props = {
-  post: PostObj | undefined;
+  post: PostObj;
 };
 const Post = ({ post }: Props) => {
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-
-  const [author, setAuthor] = useState<User | undefined>(undefined);
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
   );
-  const [textContent, setTextContent] = useState<string>('');
+
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  const { isLoading, isError, data, error } = useQuery(
+    post.docRef!.id,
+    buildPostFetcher(post),
+    {
+      staleTime: 600000,
+    }
+  );
 
   useEffect(() => {
-    const getData = async () => {
-      if (post === undefined) return;
-      await post.getData();
+    if (data === undefined) return;
+    const newMediaList: MediaType[] = [];
+    if (data.videoContent !== undefined) {
+      newMediaList.push({
+        videoUrl: data.videoContent.videoUrl,
+        imageUrl: data.videoContent.thumbnailUrl,
+      });
+    }
+    data.imageContentUrls.forEach((url) =>
+      newMediaList.push({ imageUrl: url })
+    );
+    setMediaList(newMediaList);
+  }, [data]);
 
-      post.getAuthor().then(setAuthor);
-      post.getTextContent().then(setTextContent);
+  if (isLoading) {
+    return <PostSkeleton />;
+  }
 
-      const newMediaList: MediaType[] = [];
-      if (await post.hasVideoContent()) {
-        newMediaList.push({
-          imageUrl: await post.getVideoThumbnailUrl(),
-          videoUrl: await post.getVideoUrl(),
-        });
-      }
-      (await post.getImageContentUrls()).forEach((url) =>
-        newMediaList.push({ imageUrl: url })
-      );
-      setMediaList(newMediaList);
-    };
-
-    getData();
-  }, [post]);
-
-  const isTextContentLoaded = textContent !== '';
-  const isMediaLoaded = mediaList !== undefined;
-
-  if (author === undefined) return null;
+  if (isError || data === undefined) {
+    console.error(error);
+    return null;
+  }
 
   return (
     <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
       <Box pl={2}>
-        <UserTag user={author} />
+        <UserTag user={data.author} />
       </Box>
-      <Skeleton.Text p={2} lines={2} isLoaded={isTextContentLoaded}>
-        <Box p={2}>
-          <Text>{textContent}</Text>
+      <Box p={2}>
+        <Text>{data.textContent}</Text>
+      </Box>
+      {mediaList === undefined ? null : (
+        <Box w="full" pt={2}>
+          <MediaCarousel mediaList={mediaList} />
         </Box>
-      </Skeleton.Text>
-      <Skeleton w="full" pt={2} h={40} isLoaded={isMediaLoaded}>
-        {mediaList === undefined ? null : (
-          <Box w="full" pt={2}>
-            <MediaCarousel mediaList={mediaList} />
-          </Box>
-        )}
-      </Skeleton>
+      )}
     </VStack>
   );
 };
