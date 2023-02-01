@@ -23,12 +23,18 @@ import Feed from '../../components/media/Feed';
 import { RouteStatus, QueryCursor, Post } from '../../xplat/types/types';
 import { useQuery } from 'react-query';
 import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
-import { TabGlobalScreenProps } from '../../utils/types';
+import {
+  TabGlobalNavigationProp,
+  TabGlobalScreenProps,
+} from '../../utils/types';
+import { useNavigation } from '@react-navigation/native';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
 const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const routeDocRefId = route.params.routeDocRefId;
+
+  const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const [user] = useRecoilState(userAtom);
 
@@ -95,7 +101,9 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const post = () => {
-    // TODO: impl
+    navigation.push('CreatePost', {
+      routeName: data.name,
+    });
   };
 
   const routeViewComponent = (

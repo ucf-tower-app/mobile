@@ -26,13 +26,16 @@ import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
 import { useNavigation } from '@react-navigation/native';
 import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
+import { TabGlobalScreenProps } from '../../utils/types';
 
 /**
  * The CreatePost screen is responsible for handling post creation from
  * several entry points. The only difference between entry points is whether
  * or not the Route field is pre-loaded.
  */
-const CreatePost = () => {
+const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
+  const routeName = route.params.routeName;
+
   const navigation = useNavigation();
   const user = useRecoilValue(userAtom);
 
@@ -46,7 +49,9 @@ const CreatePost = () => {
   const [isPickingVideo, setIsPickingVideo] = useState<boolean>(false);
   const [imageContent, setImageContent] = useState<LazyStaticImage[]>([]);
   const [isPickingImages, setIsPickingImages] = useState<boolean>(false);
-  const [route, setRoute] = useState<Route | undefined>(undefined);
+  const [selectedRoute, setSelectedRoute] = useState<Route | undefined>(
+    undefined
+  );
   const [isProcessingPost, setIsProcessingPost] = useState<boolean>(false);
   const [previewPost, setPreviewPost] = useState<PostMock | undefined>(
     undefined
@@ -147,7 +152,7 @@ const CreatePost = () => {
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
-      const forum = await route?.getForum();
+      const forum = await selectedRoute?.getForum();
 
       createPost(user, textContent, forum, imageBlobs, videoBlob);
     } finally {
@@ -236,7 +241,10 @@ const CreatePost = () => {
                 Route
               </FormControl.Label>
               <Box flexGrow={1}>
-                <ActiveRoutesDropdown onSelectRoute={setRoute} />
+                <ActiveRoutesDropdown
+                  onSelectRoute={setSelectedRoute}
+                  preSelectedRouteName={routeName}
+                />
               </Box>
             </HStack>
           </FormControl>
