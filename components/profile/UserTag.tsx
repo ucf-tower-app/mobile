@@ -76,7 +76,7 @@ const UserTag = ({ user, size = 'md' }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { isLoading, isError, data, error } = useQuery(
-    user.docRef?.id!,
+    user.getId(),
     buildUserFetcher(user)
   );
 

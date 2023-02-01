@@ -26,7 +26,7 @@ const RouteRow = ({ route }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { isLoading, isError, data, error } = useQuery(
-    route.docRef!.id,
+    route.getId(),
     buildRouteFetcher(route),
     {
       staleTime: 600000,
@@ -64,7 +64,7 @@ const RouteRow = ({ route }: Props) => {
   return (
     <Pressable
       onPress={() =>
-        navigation.push('RouteView', { routeDocRefId: route.docRef!.id })
+        navigation.push('RouteView', { routeDocRefId: route.getId() })
       }
     >
       <HStack

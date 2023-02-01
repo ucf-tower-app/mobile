@@ -78,7 +78,7 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
         <VStack w="full">
           {users.map((user) => {
             return (
-              <VStack key={user.docRef!.id} py="3">
+              <VStack key={user.getId()} py="3">
                 <UserRow user={user} />
               </VStack>
             );

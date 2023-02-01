@@ -75,7 +75,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
         <VStack w="full">
           {posts?.map((post, index) => {
             return (
-              <VStack key={post.docRef!.id} pt={4}>
+              <VStack key={post.getId()} pt={4}>
                 <Post post={post} />
                 {index < posts.length - 1 ? <Divider /> : null}
               </VStack>

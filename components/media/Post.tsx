@@ -43,7 +43,7 @@ const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { isLoading, isError, data, error } = useQuery(
-    post.docRef!.id,
+    post.getId(),
     buildPostFetcher(post),
     {
       staleTime: 600000,

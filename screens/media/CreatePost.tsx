@@ -20,11 +20,18 @@ import {
   PostMock,
   LazyStaticImage,
   LazyStaticVideo,
+  Route,
 } from '../../xplat/types/types';
 import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
 import { useNavigation } from '@react-navigation/native';
+import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 
+/**
+ * The CreatePost screen is responsible for handling post creation from
+ * several entry points. The only difference between entry points is whether
+ * or not the Route field is pre-loaded.
+ */
 const CreatePost = () => {
   const navigation = useNavigation();
   const user = useRecoilValue(userAtom);
@@ -39,6 +46,7 @@ const CreatePost = () => {
   const [isPickingVideo, setIsPickingVideo] = useState<boolean>(false);
   const [imageContent, setImageContent] = useState<LazyStaticImage[]>([]);
   const [isPickingImages, setIsPickingImages] = useState<boolean>(false);
+  const [route, setRoute] = useState<Route | undefined>(undefined);
   const [isProcessingPost, setIsProcessingPost] = useState<boolean>(false);
   const [previewPost, setPreviewPost] = useState<PostMock | undefined>(
     undefined
@@ -139,7 +147,9 @@ const CreatePost = () => {
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
-      createPost(user, textContent, undefined, imageBlobs, videoBlob);
+      const forum = await route?.getForum();
+
+      createPost(user, textContent, forum, imageBlobs, videoBlob);
     } finally {
       setIsProcessingPost(false);
       navigation.navigate('Tabs', {
@@ -204,13 +214,31 @@ const CreatePost = () => {
           </FormControl>
 
           <FormControl px={2} pb={2}>
-            <Input
-              multiline
-              placeholder="Find the right words"
-              onChangeText={(newText) =>
-                textDebounceSession.trigger(() => setTextContent(newText))
-              }
-            />
+            <HStack>
+              <FormControl.Label w={12} mr={2}>
+                Body
+              </FormControl.Label>
+              <Box flexGrow={1}>
+                <Input
+                  multiline
+                  placeholder="Find the right words"
+                  onChangeText={(newText) =>
+                    textDebounceSession.trigger(() => setTextContent(newText))
+                  }
+                />
+              </Box>
+            </HStack>
+          </FormControl>
+
+          <FormControl px={2} pb={2}>
+            <HStack>
+              <FormControl.Label w={12} mr={2}>
+                Route
+              </FormControl.Label>
+              <Box flexGrow={1}>
+                <ActiveRoutesDropdown onSelectRoute={setRoute} />
+              </Box>
+            </HStack>
           </FormControl>
 
           <Button
