@@ -1,6 +1,6 @@
 import { Avatar, Heading, Text, useColorModeValue, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
-import { User } from '../../xplat/types/user';
+import { User } from '../../xplat/types/types';
 
 type Props = {
   user: User;

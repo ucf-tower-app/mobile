@@ -1,18 +1,14 @@
 import {
-  ScrollView,
-  VStack,
   Center,
   Divider,
+  ScrollView,
   Spinner,
+  VStack,
   useColorModeValue,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import {
-  PostCursorMerger,
-  QueryCursor,
-  Post as PostObj,
-} from '../../xplat/types/types';
+import { Cursor, Post as PostObj } from '../../xplat/types/types';
 import Post from './Post';
 
 const POST_STRIDE = 3;
@@ -36,7 +32,7 @@ const isCloseToBottom = ({
  * the screen.
  */
 type Props = {
-  postsCursor: QueryCursor<PostObj> | PostCursorMerger;
+  postsCursor: Cursor<PostObj>;
   topComponent?: JSX.Element;
 };
 const Feed = ({ postsCursor, topComponent }: Props) => {
@@ -49,12 +45,12 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
     if (isOutOfPosts) return;
     const newPosts = [];
     while (newPosts.length < POST_STRIDE) {
-      const newPost = await postsCursor.pollNext();
-      if (newPost === undefined) {
+      if (await postsCursor.hasNext()) {
+        newPosts.push(await postsCursor.pollNext());
+      } else {
         setIsOutOfPosts(true);
         break;
       }
-      newPosts.push(newPost);
     }
     setPosts([...posts, ...newPosts]);
   }, [isOutOfPosts, posts, postsCursor]);
@@ -80,7 +76,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
           {posts?.map((post, index) => {
             return (
               <VStack key={post.docRef!.id} pt={4}>
-                <Post post={post} key={post.docRef!.id} />
+                <Post post={post} />
                 {index < posts.length - 1 ? <Divider /> : null}
               </VStack>
             );

@@ -1,21 +1,32 @@
-import { getRouteById } from '../xplat/api';
+import { getRouteById, getUserById } from '../xplat/api';
 import {
+  Cursor,
   Forum,
   Post,
   Route,
+  RouteClassifier,
   RouteStatus,
+  RouteType,
   User,
   UserStatus,
 } from '../xplat/types/types';
 
-type FetchedUser = {
+export interface FetchedUser {
   username: string;
   email: string;
   displayName: string;
   bio: string;
   status: UserStatus;
   avatarUrl: string;
-};
+  followingList: User[];
+  bestBoulder: RouteClassifier | undefined;
+  bestToprope: RouteClassifier | undefined;
+  totalSends: number;
+  postsCursor: Cursor<Post>;
+  followersCursor: Cursor<User>;
+  followingCursor: Cursor<User>;
+  userObject: User;
+}
 export const buildUserFetcher = (user: User) => {
   return async () => {
     await user.getData();
@@ -26,8 +37,19 @@ export const buildUserFetcher = (user: User) => {
       bio: await user.getBio(),
       status: await user.getStatus(),
       avatarUrl: await user.getAvatarUrl(),
+      followingList: user.following ?? [],
+      bestBoulder: await user.getBestSendClassifier(RouteType.Boulder),
+      bestToprope: await user.getBestSendClassifier(RouteType.Toprope),
+      totalSends: await user.getTotalSends(),
+      postsCursor: user.getPostsCursor(),
+      followersCursor: user.getFollowersCursor(),
+      followingCursor: await user.getFollowingCursor(),
+      userObject: user,
     } as FetchedUser;
   };
+};
+export const buildUserFetcherFromDocRefId = (docRefId: string) => {
+  return buildUserFetcher(getUserById(docRefId));
 };
 
 type FetchedRoute = {

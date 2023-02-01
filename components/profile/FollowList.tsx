@@ -1,10 +1,9 @@
 import {
-  ScrollView,
-  VStack,
   Center,
+  ScrollView,
   Spinner,
+  VStack,
   useColorModeValue,
-  Box,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
@@ -45,12 +44,12 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       if (outOfUsers) return;
       const newUsers = [];
       while (newUsers.length < USER_STRIDE) {
-        const newUser = await userCursor?.pollNext();
-        if (newUser === undefined) {
+        if (await userCursor.hasNext())
+          newUsers.push(await userCursor.pollNext());
+        else {
           setIsOutOfUsers(true);
           break;
         }
-        newUsers.push(newUser);
       }
       setUsers([...base, ...newUsers]);
     },
@@ -80,9 +79,7 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
           {users.map((user) => {
             return (
               <VStack key={user.docRef!.id} py="3">
-                <Box py="3">
-                  <UserRow user={user} />
-                </Box>
+                <UserRow user={user} />
               </VStack>
             );
           })}
