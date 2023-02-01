@@ -33,7 +33,7 @@ function EditProfileModal({ isOpen, onClose }: Props) {
     oldAvatarUrl: '',
     newAvatarUrl: '',
   });
-  const [signedInUser, setSignedInUser] = useRecoilState(userAtom);
+  const [signedInUser, _setSignedInUser] = useRecoilState(userAtom);
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
 

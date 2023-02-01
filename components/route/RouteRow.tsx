@@ -7,64 +7,66 @@ import {
   useColorModeValue,
   VStack,
   Pressable,
+  Skeleton,
 } from 'native-base';
 import { useEffect, useState } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { focusedRouteAtom } from '../../utils/atoms';
-import { Route } from '../../xplat/types/route';
+import { useQuery } from 'react-query';
+import { buildRouteFetcher } from '../../utils/queries';
+import { TabGlobalNavigationProp } from '../../utils/types';
+import { Route } from '../../xplat/types/types';
 
 type Props = {
   route: Route;
 };
 const RouteRow = ({ route }: Props) => {
-  const navigation = useNavigation();
-  const setFocusedRoute = useSetRecoilState(focusedRouteAtom);
+  const navigation = useNavigation<TabGlobalNavigationProp>();
 
-  const [name, setName] = useState<string>('');
   const [descriptors, setDescriptors] = useState<string>('');
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(
-    'https://wallpaperaccess.com/full/317501.jpg'
-  );
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const navigateToRoute = () => {
-    setFocusedRoute(route);
-    navigation.navigate('Tabs', {
-      screen: 'ActiveRoutesTab',
-      params: {
-        screen: 'RouteView',
-      },
-    });
-  };
+  const { isLoading, isError, data, error } = useQuery(
+    route.docRef!.id,
+    buildRouteFetcher(route),
+    {
+      staleTime: 600000,
+    }
+  );
 
   // Fetch all relevant data and update the state accordingly.
   useEffect(() => {
-    const fetchData = async () => {
-      await route.getData();
+    if (data === undefined) return;
+    let newDescriptors = data.grade;
+    if (data.stringifiedTags !== '')
+      newDescriptors += ', ' + data.stringifiedTags;
+    setDescriptors(newDescriptors);
+  }, [data]);
 
-      route.getName().then(setName);
-      route.hasThumbnail().then((hasThumbnail) => {
-        if (hasThumbnail) {
-          route.getThumbnailUrl().then(setThumbnailUrl);
-        }
-      });
-      route.getGradeDisplayString().then((grade) => {
-        let descriptorsBuilder = grade;
-        route.getTags().then(async (tags) => {
-          for (const tag of tags) {
-            const tagName = await tag.getName();
-            descriptorsBuilder = descriptorsBuilder + ', ' + tagName;
-          }
-          setDescriptors(descriptorsBuilder);
-        });
-      });
-    };
+  if (isLoading) {
+    return (
+      <HStack
+        p={2}
+        backgroundColor={baseBgColor}
+        justifyContent="flex-start"
+        alignItems="center"
+      >
+        <Skeleton size={16} borderRadius={5} />
+        <Skeleton.Text pl={2} pt={2} lines={2} />
+      </HStack>
+    );
+  }
 
-    fetchData();
-  }, [route]);
+  if (isError || data === undefined) {
+    console.error(error);
+    return null;
+  }
 
   return (
-    <Pressable onPress={navigateToRoute}>
+    <Pressable
+      onPress={() =>
+        navigation.push('RouteView', { routeDocRefId: route.docRef!.id })
+      }
+    >
       <HStack
         p={2}
         backgroundColor={baseBgColor}
@@ -74,12 +76,12 @@ const RouteRow = ({ route }: Props) => {
         <Image
           size={16}
           borderRadius={5}
-          source={{ uri: thumbnailUrl }}
-          alt={name}
+          source={{ uri: data.thumbnailUrl }}
+          alt={data.name}
         />
         <VStack pl={2} pt={2} maxW="70%">
           <Text fontSize="xl" fontWeight="bold">
-            {name}
+            {data.name}
           </Text>
           <Text fontSize="lg" color="grey">
             {descriptors}

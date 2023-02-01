@@ -7,9 +7,9 @@ import {
   Divider,
   HStack,
   Icon,
-  Pressable,
   VStack,
   useColorModeValue,
+  Pressable,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -40,6 +40,7 @@ type Props = {
 
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
+
   const signedInUser = useRecoilValue(userAtom);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(

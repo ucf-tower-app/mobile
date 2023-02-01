@@ -7,8 +7,7 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { QueryCursor } from '../../xplat/types/queryCursors';
-import { ArrayCursor, User } from '../../xplat/types/types';
+import { QueryCursor, ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
 
 const USER_STRIDE = 5;
@@ -61,7 +60,7 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
     setUsers([]);
     setIsOutOfUsers(false);
     loadNextUsers([], false);
-  }, [loadNextUsers, userCursor]);
+  }, [loadNextUsers]);
 
   return (
     <ScrollView

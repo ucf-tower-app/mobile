@@ -43,6 +43,6 @@ export type TabGlobalNavigationProp = CompositeNavigationProp<
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList { }
+    interface RootParamList extends RootStackParamList {}
   }
 }

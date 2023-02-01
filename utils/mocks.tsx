@@ -2,13 +2,17 @@ import {
   convertBoulderStringToClassifier,
   convertTopropeStringToClassifier,
 } from '../xplat/api';
-import { ForumMock } from '../xplat/types/forum';
-import { LazyStaticVideo } from '../xplat/types/media';
-import { PostMock } from '../xplat/types/post';
-import { RouteMock, RouteStatus } from '../xplat/types/route';
-import { TagMock } from '../xplat/types/tag';
-import { LazyStaticImage, UserStatus } from '../xplat/types/types';
-import { UserMock } from '../xplat/types/user';
+import {
+  ForumMock,
+  LazyStaticVideo,
+  LazyStaticImage,
+  PostMock,
+  RouteMock,
+  RouteStatus,
+  TagMock,
+  UserStatus,
+  UserMock,
+} from '../xplat/types/types';
 
 export const profilePic = new LazyStaticImage(
   'mock/path',
