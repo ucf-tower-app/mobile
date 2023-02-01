@@ -6,12 +6,13 @@ import {
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { useState, useEffect } from 'react';
-import { TabGlobalScreenProps } from '../../utils/types';
-import SearchBar from '../../components/searchbar/SearchBar';
-import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
-import { getUserByUsername } from '../../xplat/api';
+import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import FollowList from '../../components/profile/FollowList';
+import SearchBar from '../../components/searchbar/SearchBar';
+import { buildUserFetcherFromDocRefId } from '../../utils/queries';
+import { TabGlobalScreenProps } from '../../utils/types';
+import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
 
 type UserTab = 'followers' | 'following';
 
@@ -20,7 +21,7 @@ type UserTab = 'followers' | 'following';
  * a user.
  */
 const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
-  const username = route.params.username;
+  const userDocRefId = route.params.userDocRefId;
 
   const [user, setUser] = useState<User | undefined>(undefined);
   const [tabViewed, setTabViewed] = useState<UserTab>('followers');
@@ -30,9 +31,17 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
+  const { isError, data, error } = useQuery(
+    userDocRefId,
+    buildUserFetcherFromDocRefId(userDocRefId),
+    {
+      staleTime: 600000,
+    }
+  );
+
   useEffect(() => {
-    getUserByUsername(username).then(setUser);
-  }, [username]);
+    if (data) setUser(data.__userObject);
+  }, [data]);
 
   useEffect(() => {
     const updateCursor = async () => {
@@ -45,6 +54,11 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
     };
     updateCursor();
   }, [user, tabViewed]);
+
+  if (isError) {
+    console.error(error);
+    return null;
+  }
 
   const followsComponent = (
     <Center w="full" bgColor={baseBgColor} p="2">

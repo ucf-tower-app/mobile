@@ -8,8 +8,7 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { PostCursorMerger, QueryCursor } from '../../xplat/types/queryCursors';
-import { Post as PostObj } from '../../xplat/types/types';
+import { Cursor, Post as PostObj } from '../../xplat/types/types';
 import Post from './Post';
 
 const POST_STRIDE = 3;
@@ -33,7 +32,7 @@ const isCloseToBottom = ({
  * the screen.
  */
 type Props = {
-  postsCursor: QueryCursor<PostObj> | PostCursorMerger;
+  postsCursor: Cursor<PostObj>;
   topComponent?: JSX.Element;
 };
 const Feed = ({ postsCursor, topComponent }: Props) => {

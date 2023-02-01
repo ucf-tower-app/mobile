@@ -11,7 +11,7 @@ import {
   VStack,
   useColorModeValue,
 } from 'native-base';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import ProfileBanner from '../../components/profile/ProfileBanner';
@@ -20,7 +20,7 @@ import Tintable from '../../components/util/Tintable';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Post, QueryCursor, User, containsRef } from '../../xplat/types/types';
+import { Cursor, Post, User, containsRef } from '../../xplat/types/types';
 import Feed from '../media/Feed';
 import EditProfileModal from './EditProfileModal';
 import LoadingProfile from './LoadingProfile';
@@ -37,7 +37,9 @@ type Props = {
   profileIsMine: boolean;
   userOfProfile: User;
 };
+
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
+  console.log('Render a profile');
   const navigation = useNavigation<TabGlobalNavigationProp>();
   const signedInUser = useRecoilValue(userAtom);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -48,23 +50,25 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const [showModal, setShowModal] = useState(false);
 
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [postsCursor, setPostsCursor] = useState<
-    QueryCursor<Post> | undefined
-  >();
+  const [postsCursor, setPostsCursor] = useState<Cursor<Post> | undefined>();
 
   const { isLoading, isError, data, error } = useQuery(
-    userOfProfile.docRef?.id!,
+    userOfProfile.docRef!.id,
     buildUserFetcher(userOfProfile),
     {
-      onSuccess: (data) => {
-        setPostsCursor(userOfProfile.getPostsCursor());
-        if (signedInUser)
-          setIsFollowing(
-            containsRef(data.followingList, signedInUser) ?? false
-          );
-      },
+      staleTime: 600000,
     }
   );
+
+  useEffect(() => {
+    console.log('Use effect');
+    if (data) {
+      console.log('We got data!');
+      setPostsCursor(data.postsCursor);
+      if (signedInUser)
+        setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
+    }
+  }, [data, signedInUser]);
 
   if (isLoading) return <LoadingProfile />;
   if (isError || data === undefined) {
@@ -119,7 +123,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
               <Pressable
                 onPress={async () => {
                   navigation.push('Follows', {
-                    username: await userOfProfile.getUsername(),
+                    userDocRefId: userOfProfile.docRef?.id!,
                   });
                 }}
               >
