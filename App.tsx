@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { extendTheme, NativeBaseProvider } from 'native-base';
-import { StyleSheet } from 'react-native';
+import { LogBox, StyleSheet } from 'react-native';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -29,6 +29,7 @@ export const theme = extendTheme({
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const queryClient = new QueryClient();
+LogBox.ignoreLogs(['Require cycle:', 'AsyncStorage has been extracted']);
 
 // Construct tabs and their subtrees
 export default function App() {
