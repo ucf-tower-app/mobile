@@ -1,7 +1,5 @@
 import { atom } from 'recoil';
-import { User } from '../xplat/types/user';
-import { UserStatus } from '../xplat/types/common';
-import { Route } from '../xplat/types/route';
+import { User, UserStatus } from '../xplat/types/types';
 
 export const isInitializingAtom = atom<boolean>({
   key: 'isInitializing',
@@ -33,15 +31,4 @@ export const isEmailVerifiedAtom = atom<boolean>({
 export const userPermissionLevelAtom = atom<UserStatus | undefined>({
   key: 'userPermissionLevel',
   default: undefined,
-});
-
-/**
- * Classes are not serializable, but we need to access a Route as
- * a parameter for a screen in navigation. The solution is to store
- * a focused Route in global state, and pull it out when the screen loads
- */
-export const focusedRouteAtom = atom<Route | undefined>({
-  key: 'focusedRoute',
-  default: undefined,
-  dangerouslyAllowMutability: true,
 });

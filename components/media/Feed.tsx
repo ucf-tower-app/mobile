@@ -8,8 +8,11 @@ import {
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { PostCursorMerger, QueryCursor } from '../../xplat/types/queryCursors';
-import { Post as PostObj } from '../../xplat/types/types';
+import {
+  PostCursorMerger,
+  QueryCursor,
+  Post as PostObj,
+} from '../../xplat/types/types';
 import Post from './Post';
 
 const POST_STRIDE = 3;

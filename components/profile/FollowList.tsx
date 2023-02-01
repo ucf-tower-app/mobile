@@ -8,8 +8,7 @@ import {
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { QueryCursor } from '../../xplat/types/queryCursors';
-import { ArrayCursor, User } from '../../xplat/types/types';
+import { QueryCursor, ArrayCursor, User } from '../../xplat/types/types';
 import UserRow from './UserRow';
 
 const USER_STRIDE = 5;

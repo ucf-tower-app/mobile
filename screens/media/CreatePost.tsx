@@ -16,8 +16,11 @@ import { userAtom } from '../../utils/atoms';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import Post from '../../components/media/Post';
-import { PostMock } from '../../xplat/types/post';
-import { LazyStaticImage, LazyStaticVideo } from '../../xplat/types/media';
+import {
+  PostMock,
+  LazyStaticImage,
+  LazyStaticVideo,
+} from '../../xplat/types/types';
 import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
 import { useNavigation } from '@react-navigation/native';
@@ -126,9 +129,9 @@ const CreatePost = () => {
       const videoBlob =
         videoContent !== undefined
           ? {
-            video: await (await fetch(videoContent.videoUrl!)).blob(),
-            thumbnail: await (await fetch(videoContent.thumbnailUrl!)).blob(),
-          }
+              video: await (await fetch(videoContent.videoUrl!)).blob(),
+              thumbnail: await (await fetch(videoContent.thumbnailUrl!)).blob(),
+            }
           : undefined;
 
       const imageBlobs = await Promise.all(

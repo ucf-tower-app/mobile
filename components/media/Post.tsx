@@ -1,7 +1,6 @@
 import { Box, Skeleton, Text, useColorModeValue, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
-import { Post as PostObj } from '../../xplat/types/post';
-import { User } from '../../xplat/types/user';
+import { Post as PostObj, User } from '../../xplat/types/types';
 import UserTag from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';

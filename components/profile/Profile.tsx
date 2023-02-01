@@ -9,18 +9,16 @@ import {
   Icon,
   Divider,
 } from 'native-base';
-import { User } from '../../xplat/types/user';
+import { User, Post as PostObj, QueryCursor } from '../../xplat/types/types';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import StatBox from '../../components/profile/StatBox';
-import { Post as PostObj } from '../../xplat/types/post';
 import { Ionicons } from '@expo/vector-icons';
 import Tintable from '../../components/util/Tintable';
 import { Pressable } from 'native-base';
 import Feed from '../media/Feed';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
-import { QueryCursor } from '../../xplat/types/queryCursors';
 import EditProfileModal from './EditProfileModal';
 import { useNavigation } from '@react-navigation/native';
 import { TabGlobalNavigationProp } from '../../utils/types';
@@ -99,8 +97,8 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
               {profileIsMine
                 ? 'Edit Profile'
                 : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
+                ? 'Unfollow'
+                : 'Follow'}
             </Button>
             <Center>
               <Pressable
