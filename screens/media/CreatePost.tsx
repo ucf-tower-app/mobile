@@ -157,6 +157,8 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
       createPost(user, textContent, forum, imageBlobs, videoBlob);
     } finally {
       setIsProcessingPost(false);
+      // Leave the "Posting" screen
+      navigation.goBack();
       navigation.navigate('Tabs', {
         screen: 'ProfileTab',
         params: {
