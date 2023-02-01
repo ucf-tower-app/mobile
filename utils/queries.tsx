@@ -1,5 +1,12 @@
 import { getRouteById } from '../xplat/api';
-import { Route, RouteStatus, User, UserStatus } from '../xplat/types/types';
+import {
+  Forum,
+  Post,
+  Route,
+  RouteStatus,
+  User,
+  UserStatus,
+} from '../xplat/types/types';
 
 type FetchedUser = {
   username: string;
@@ -70,4 +77,42 @@ export const buildRouteFetcher = (route: Route) => {
 };
 export const buildRouteFetcherFromDocRefId = (docRefId: string) => {
   return buildRouteFetcher(getRouteById(docRefId));
+};
+
+type FetchedPost = {
+  author: User;
+  timestamp: Date;
+  textContent: string;
+  likes: User[];
+  imageContentUrls: string[];
+
+  forum: Forum | undefined;
+  videoContent:
+    | {
+        videoUrl: string;
+        thumbnailUrl: string;
+      }
+    | undefined;
+
+  postObject: Post;
+};
+export const buildPostFetcher = (post: Post) => {
+  return async () => {
+    await post.getData();
+    return {
+      author: await post.getAuthor(),
+      timestamp: await post.getTimestamp(),
+      textContent: await post.getTextContent(),
+      likes: await post.getLikes(),
+      imageContentUrls: await post.getImageContentUrls(),
+      forum: (await post.hasForum()) ? await post.getForum() : undefined,
+      videoContent: (await post.hasVideoContent())
+        ? {
+            videoUrl: await post.getVideoUrl(),
+            thumbnailUrl: await post.getVideoThumbnailUrl(),
+          }
+        : undefined,
+      postObject: post,
+    } as FetchedPost;
+  };
 };

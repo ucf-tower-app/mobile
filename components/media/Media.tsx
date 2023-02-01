@@ -1,5 +1,6 @@
 import { ResizeMode } from 'expo-av';
-import { Image } from 'native-base';
+import { Image, Box, Spinner } from 'native-base';
+import { useState } from 'react';
 import VideoWithThumbnail from './VideoWithThumbnail';
 
 // If videoURL is defined then it is a video
@@ -13,14 +14,32 @@ type Props = {
   height: number;
 };
 const Media = ({ media, width, height }: Props) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   return media.videoUrl === undefined ? (
-    <Image
-      w={width}
-      h={height}
-      resizeMode={ResizeMode.COVER}
-      source={{ uri: media.imageUrl }}
-      alt="Post image content"
-    />
+    <Box>
+      <Image
+        w={width}
+        h={height}
+        resizeMode={ResizeMode.COVER}
+        source={{ uri: media.imageUrl }}
+        onLoad={() => setIsLoading(false)}
+        alt="Post image content"
+      />
+      {isLoading ? (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Spinner size="lg" />
+        </Box>
+      ) : null}
+    </Box>
   ) : (
     <VideoWithThumbnail
       thumbnailUrl={media.imageUrl}

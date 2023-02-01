@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Box, Icon, IconButton, Image } from 'native-base';
-import React from 'react';
+import { Box, Icon, IconButton, Image, Spinner } from 'native-base';
+import React, { useState } from 'react';
 
 type Props = {
   thumbnailUrl: string;
@@ -9,6 +9,8 @@ type Props = {
   height: number;
 };
 const VideoThumbnail = ({ thumbnailUrl, onPress, width, height }: Props) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   return (
     <Box>
       <Image
@@ -16,6 +18,7 @@ const VideoThumbnail = ({ thumbnailUrl, onPress, width, height }: Props) => {
         w={width}
         h={height}
         alt="Pressable thumbnail"
+        onLoad={() => setIsLoading(false)}
       />
       <Box
         position="absolute"
@@ -26,23 +29,27 @@ const VideoThumbnail = ({ thumbnailUrl, onPress, width, height }: Props) => {
         justifyContent="center"
         alignItems="center"
       >
-        <IconButton
-          icon={
-            <Icon
-              as={<Ionicons name="play-circle" />}
-              color="white"
-              opacity={75}
-              size="6xl"
-            />
-          }
-          onPress={onPress}
-          _pressed={{
-            bg: '#0000',
-            _icon: {
-              color: '#fff9',
-            },
-          }}
-        />
+        {isLoading ? (
+          <Spinner size="lg" />
+        ) : (
+          <IconButton
+            icon={
+              <Icon
+                as={<Ionicons name="play-circle" />}
+                color="white"
+                opacity={75}
+                size="6xl"
+              />
+            }
+            onPress={onPress}
+            _pressed={{
+              bg: '#0000',
+              _icon: {
+                color: '#fff9',
+              },
+            }}
+          />
+        )}
       </Box>
     </Box>
   );
