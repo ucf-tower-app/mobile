@@ -45,12 +45,12 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
       if (outOfUsers) return;
       const newUsers = [];
       while (newUsers.length < USER_STRIDE) {
-        const newUser = await userCursor?.pollNext();
-        if (newUser === undefined) {
+        if (await userCursor.hasNext())
+          newUsers.push(await userCursor.pollNext());
+        else {
           setIsOutOfUsers(true);
           break;
         }
-        newUsers.push(newUser);
       }
       setUsers([...base, ...newUsers]);
     },

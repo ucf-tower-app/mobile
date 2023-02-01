@@ -45,12 +45,12 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
     if (isOutOfPosts) return;
     const newPosts = [];
     while (newPosts.length < POST_STRIDE) {
-      const newPost = await postsCursor.pollNext();
-      if (newPost === undefined) {
+      if (await postsCursor.hasNext()) {
+        newPosts.push(await postsCursor.pollNext());
+      } else {
         setIsOutOfPosts(true);
         break;
       }
-      newPosts.push(newPost);
     }
     setPosts([...posts, ...newPosts]);
   }, [isOutOfPosts, posts, postsCursor]);

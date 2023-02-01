@@ -11,19 +11,19 @@ import {
   VStack,
   useColorModeValue,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import ProfileBanner from '../../components/profile/ProfileBanner';
-import StatBox from '../../components/profile/StatBox';
-import Tintable from '../../components/util/Tintable';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { Cursor, Post, User, containsRef } from '../../xplat/types/types';
 import Feed from '../media/Feed';
+import Tintable from '../util/Tintable';
 import EditProfileModal from './EditProfileModal';
 import LoadingProfile from './LoadingProfile';
+import ProfileBanner from './ProfileBanner';
+import StatBox from './StatBox';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -39,7 +39,6 @@ type Props = {
 };
 
 const Profile = ({ profileIsMine, userOfProfile }: Props) => {
-  console.log('Render a profile');
   const navigation = useNavigation<TabGlobalNavigationProp>();
   const signedInUser = useRecoilValue(userAtom);
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -61,13 +60,10 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   );
 
   useEffect(() => {
-    console.log('Use effect');
-    if (data) {
-      console.log('We got data!');
-      setPostsCursor(data.postsCursor);
-      if (signedInUser)
-        setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
-    }
+    if (!data) return;
+    setPostsCursor(data.postsCursor);
+    if (signedInUser)
+      setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
   }, [data, signedInUser]);
 
   if (isLoading) return <LoadingProfile />;

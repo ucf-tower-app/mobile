@@ -1,12 +1,12 @@
 import {
-  FormControl,
-  Input,
-  Modal,
+  Box,
   Button,
   Center,
+  FormControl,
   HStack,
+  Input,
+  Modal,
   useColorModeValue,
-  Box,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
