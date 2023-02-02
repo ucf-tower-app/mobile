@@ -8,10 +8,12 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { Cursor, Post as PostObj } from '../../xplat/types/types';
+import { useInfiniteQuery } from 'react-query';
+import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
+import { Cursor, Post as PostObj } from '../../xplat/types';
 import Post from './Post';
 
-const POST_STRIDE = 3;
+// const POST_STRIDE = 3;
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -34,37 +36,33 @@ const isCloseToBottom = ({
 type Props = {
   postsCursor: Cursor<PostObj>;
   topComponent?: JSX.Element;
+  userDocRefId: string;
 };
-const Feed = ({ postsCursor, topComponent }: Props) => {
+const Feed = ({ topComponent, userDocRefId }: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
-  const [isOutOfPosts, setIsOutOfPosts] = useState<boolean>(false);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextPosts = useCallback(async () => {
-    if (isOutOfPosts) return;
-    const newPosts = [];
-    while (newPosts.length < POST_STRIDE) {
-      if (await postsCursor.hasNext()) {
-        newPosts.push(await postsCursor.pollNext());
-      } else {
-        setIsOutOfPosts(true);
-        break;
-      }
-    }
-    setPosts([...posts, ...newPosts]);
-  }, [isOutOfPosts, posts, postsCursor]);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(getIQParams_UserPosts(userDocRefId));
 
   useEffect(() => {
-    loadNextPosts();
-  }, [loadNextPosts]);
+    if (data)
+      setPosts(data.pages.flatMap((page) => constructPageData(PostObj, page)));
+  }, [data]);
+
+  const loadNextPosts = useCallback(async () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      await fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
     <ScrollView
       w="full"
       bg={baseBgColor}
       onScroll={({ nativeEvent }) => {
-        if (!isOutOfPosts && isCloseToBottom(nativeEvent)) {
+        if (hasNextPage && isCloseToBottom(nativeEvent)) {
           loadNextPosts();
         }
       }}
@@ -81,7 +79,7 @@ const Feed = ({ postsCursor, topComponent }: Props) => {
               </VStack>
             );
           })}
-          {!isOutOfPosts ? (
+          {hasNextPage ? (
             <Center pt={4}>
               <Spinner size="lg" />
             </Center>

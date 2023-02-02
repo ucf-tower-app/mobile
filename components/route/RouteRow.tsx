@@ -1,19 +1,19 @@
 import { useNavigation } from '@react-navigation/native';
 import {
-  ArrowForwardIcon,
-  HStack,
-  Image,
-  Pressable,
-  Skeleton,
-  Text,
-  VStack,
-  useColorModeValue,
+	ArrowForwardIcon,
+	HStack,
+	Image,
+	Pressable,
+	Skeleton,
+	Text,
+	VStack,
+	useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { buildRouteFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Route } from '../../xplat/types/types';
+import { Route } from '../../xplat/types';
 
 type Props = {
   route: Route;

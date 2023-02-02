@@ -1,10 +1,10 @@
 import {
-  Button,
-  Center,
-  HStack,
-  Spinner,
-  useColorModeValue,
-  VStack,
+	Button,
+	Center,
+	HStack,
+	Spinner,
+	useColorModeValue,
+	VStack,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -12,7 +12,7 @@ import FollowList from '../../components/profile/FollowList';
 import SearchBar from '../../components/searchbar/SearchBar';
 import { buildUserFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
+import { ArrayCursor, QueryCursor, User } from '../../xplat/types';
 
 type UserTab = 'followers' | 'following';
 

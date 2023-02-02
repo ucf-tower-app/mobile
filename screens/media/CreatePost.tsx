@@ -1,29 +1,29 @@
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 import {
-  Button,
-  FormControl,
-  Input,
-  useColorModeValue,
-  VStack,
-  HStack,
-  Heading,
-  Divider,
-  Box,
-  ScrollView,
+	Box,
+	Button,
+	Divider,
+	FormControl,
+	HStack,
+	Heading,
+	Input,
+	ScrollView,
+	VStack,
+	useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
-import * as ImagePicker from 'expo-image-picker';
-import * as VideoThumbnails from 'expo-video-thumbnails';
 import Post from '../../components/media/Post';
-import {
-  PostMock,
-  LazyStaticImage,
-  LazyStaticVideo,
-} from '../../xplat/types/types';
+import { userAtom } from '../../utils/atoms';
 import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
-import { useNavigation } from '@react-navigation/native';
+import {
+	LazyStaticImage,
+	LazyStaticVideo,
+	PostMock,
+} from '../../xplat/types';
 
 const CreatePost = () => {
   const navigation = useNavigation();

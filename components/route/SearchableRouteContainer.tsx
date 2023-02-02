@@ -1,7 +1,7 @@
 import { Box, Divider, ScrollView, Spinner, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
 import { DebounceSession } from '../../utils/utils';
-import { Route } from '../../xplat/types/types';
+import { Route } from '../../xplat/types';
 import SearchBar from '../searchbar/SearchBar';
 import RouteRow from './RouteRow';
 

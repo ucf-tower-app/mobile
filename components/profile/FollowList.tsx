@@ -1,13 +1,13 @@
 import {
-  Center,
-  ScrollView,
-  Spinner,
-  VStack,
-  useColorModeValue,
+	Center,
+	ScrollView,
+	Spinner,
+	VStack,
+	useColorModeValue,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { QueryCursor, ArrayCursor, User } from '../../xplat/types/types';
+import { ArrayCursor, QueryCursor, User } from '../../xplat/types';
 import UserRow from './UserRow';
 
 const USER_STRIDE = 5;

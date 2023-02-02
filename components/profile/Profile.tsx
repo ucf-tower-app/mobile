@@ -17,7 +17,7 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Cursor, Post, User, containsRef } from '../../xplat/types/types';
+import { Cursor, Post, User, containsRef } from '../../xplat/types';
 import Feed from '../media/Feed';
 import Tintable from '../util/Tintable';
 import EditProfileModal from './EditProfileModal';
@@ -172,7 +172,11 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   );
 
   return postsCursor !== undefined ? (
-    <Feed postsCursor={postsCursor} topComponent={profileComponent} />
+    <Feed
+      postsCursor={postsCursor}
+      topComponent={profileComponent}
+      userDocRefId={userOfProfile.docRef!.id}
+    />
   ) : (
     profileComponent
   );

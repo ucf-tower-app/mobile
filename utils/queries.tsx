@@ -9,7 +9,7 @@ import {
   RouteType,
   User,
   UserStatus,
-} from '../xplat/types/types';
+} from '../xplat/types';
 
 export interface FetchedUser {
   username: string;

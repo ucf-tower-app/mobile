@@ -1,16 +1,16 @@
 import { ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  Heading,
-  Spinner,
-  Text,
-  VStack,
-  useToken,
+	Box,
+	Button,
+	Center,
+	Flex,
+	HStack,
+	Heading,
+	Spinner,
+	Text,
+	VStack,
+	useToken,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
@@ -23,7 +23,7 @@ import RatingModal from '../../components/route/RatingModal';
 import { userAtom } from '../../utils/atoms';
 import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { Post, QueryCursor, RouteStatus } from '../../xplat/types/types';
+import { Post, QueryCursor, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
