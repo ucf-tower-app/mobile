@@ -18,8 +18,11 @@ const ProfileBanner = ({ fetchedUser }: Props) => {
       <Heading fontSize="3xl" mb={1}>
         {fetchedUser.displayName}
       </Heading>
-      <Text fontSize="lg" color="gray.400">
+      <Text fontSize="md" color="gray.400">
         {`@${fetchedUser.username}`}
+      </Text>
+      <Text fontSize="lg" color="gray.400">
+        {`${fetchedUser.bio}`}
       </Text>
     </VStack>
   );

@@ -48,41 +48,45 @@ const UploadImage = ({ editAvatar, setEditAvatar }: Props) => {
 
   return (
     <Box>
-      <Collapse isOpen={showAlert}>
-        <Alert maxW="400" status="error">
-          <HStack
-            flexShrink={1}
-            space={2}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <HStack flexShrink={1} space={2} alignItems="center">
-              <Alert.Icon />
-              <Text
-                fontSize="md"
-                fontWeight="medium"
-                _dark={{
-                  color: 'coolGray.800',
+      {showAlert ? ( // Gets rid of the weird red line
+        <Collapse isOpen={showAlert}>
+          <Alert maxW="400" status={showAlert ? 'error' : undefined}>
+            <HStack
+              flexShrink={1}
+              space={2}
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack flexShrink={1} space={2} alignItems="center">
+                <Alert.Icon />
+                <Text
+                  fontSize="md"
+                  fontWeight="medium"
+                  _dark={{
+                    color: 'coolGray.800',
+                  }}
+                >
+                  Please grant camera roll permissions inside your system's
+                  settings
+                </Text>
+              </HStack>
+              <IconButton
+                variant="unstyled"
+                _focus={{
+                  borderWidth: 0,
                 }}
-              >
-                Please grant camera roll permissions inside your system's
-                settings
-              </Text>
+                icon={<CloseIcon size="3" />}
+                _icon={{
+                  color: 'coolGray.600',
+                }}
+                onPress={() => setShowAlert(false)}
+              />
             </HStack>
-            <IconButton
-              variant="unstyled"
-              _focus={{
-                borderWidth: 0,
-              }}
-              icon={<CloseIcon size="3" />}
-              _icon={{
-                color: 'coolGray.600',
-              }}
-              onPress={() => setShowAlert(false)}
-            />
-          </HStack>
-        </Alert>
-      </Collapse>
+          </Alert>
+        </Collapse>
+      ) : (
+        <></>
+      )}
       <Center>
         <VStack pt="2">
           <Pressable onPress={addImage}>

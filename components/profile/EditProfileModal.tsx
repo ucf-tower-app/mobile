@@ -14,6 +14,8 @@ import { useRecoilState } from 'recoil';
 import { queryClient } from '../../App';
 import { userAtom } from '../../utils/atoms';
 import { FetchedUser } from '../../utils/queries';
+import { DebounceSession } from '../../utils/utils';
+import { validBio, validDisplayname } from '../../xplat/api';
 import ChangeEmail from './ChangeEmail';
 import ChangePassword from './ChangePassword';
 import UploadImage from './UploadImage';
@@ -38,6 +40,11 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
 
+  const [bioSession] = useState<DebounceSession>(new DebounceSession(500));
+  const [newBio, setNewBio] = useState<string>();
+  const [dispNameSession] = useState<DebounceSession>(new DebounceSession(500));
+  const [newDisplayName, setNewDisplayName] = useState<string>();
+
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
     'darkMode.secondary'
@@ -56,8 +63,12 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
     }
   };
 
+  const invalidDisplayName =
+    newDisplayName !== undefined && !validDisplayname(newDisplayName);
+
+  const invalidBio = newBio !== undefined && !validBio(newBio);
+
   const handleSave = () => {
-    // Save the stuff
     const tasks = [];
     if (editAvatar !== fetchedUser.avatarUrl) {
       tasks.push(
@@ -69,14 +80,25 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
       );
     }
 
+    if (newBio && !invalidBio)
+      tasks.push(fetchedUser.userObject.setBio(newBio).catch(console.error));
+
+    if (newDisplayName && !invalidDisplayName)
+      tasks.push(
+        fetchedUser.userObject
+          .setDisplayName(newDisplayName)
+          .catch(console.error)
+      );
+
     // Await all the updates, *then* force a re-fetch. Otherwise we'd just have some half-updated data :/
-    Promise.all(tasks).then(() =>
-      queryClient
-        .invalidateQueries({
-          queryKey: [fetchedUser.userObject.docRef!.id],
-        })
-        .catch(console.error)
-    );
+    if (tasks.length > 0)
+      Promise.all(tasks).then(() =>
+        queryClient
+          .invalidateQueries({
+            queryKey: [fetchedUser.userObject.docRef!.id],
+          })
+          .catch(console.error)
+      );
 
     handleCancel();
   };
@@ -93,20 +115,37 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
             <ChangeEmail />
           ) : (
             <Box>
+              <FormControl isInvalid={invalidDisplayName}>
+                <FormControl.Label>Name</FormControl.Label>
+                <Input
+                  placeholder={signedInUser?.displayName}
+                  onChangeText={(e) =>
+                    dispNameSession.trigger(() => setNewDisplayName(e.trim()))
+                  }
+                />
+                <FormControl.ErrorMessage>
+                  Display Name must be 5-30 Upper/Lowercase letters, spaces, and
+                  hyphens
+                </FormControl.ErrorMessage>
+              </FormControl>
+              <FormControl mt="3" isInvalid={invalidBio}>
+                <FormControl.Label>Bio</FormControl.Label>
+                <Input
+                  placeholder={signedInUser?.bio}
+                  onChangeText={(e) =>
+                    bioSession.trigger(() => setNewBio(e.trim()))
+                  }
+                />
+                <FormControl.ErrorMessage>
+                  Bio must be at most 200 characters
+                </FormControl.ErrorMessage>
+              </FormControl>
               <Center>
                 <UploadImage
                   editAvatar={editAvatar}
                   setEditAvatar={setEditAvatar}
                 />
               </Center>
-              <FormControl>
-                <FormControl.Label>Name</FormControl.Label>
-                <Input placeholder={signedInUser?.displayName} />
-              </FormControl>
-              <FormControl mt="3">
-                <FormControl.Label>Bio</FormControl.Label>
-                <Input placeholder={signedInUser?.bio} />
-              </FormControl>
               <HStack pt="3" space="xs" justifyContent="space-between">
                 <Button
                   onPress={() => {
