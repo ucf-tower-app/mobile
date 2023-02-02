@@ -28,7 +28,7 @@ export const theme = extendTheme({
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 LogBox.ignoreLogs(['Require cycle:', 'AsyncStorage has been extracted']);
 
 // Construct tabs and their subtrees

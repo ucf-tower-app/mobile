@@ -1,29 +1,28 @@
+import * as ImagePicker from 'expo-image-picker';
 import {
+  Alert,
   Avatar,
   Box,
-  Pressable,
-  Text,
-  VStack,
-  Alert,
+  Center,
+  CloseIcon,
   Collapse,
   HStack,
   IconButton,
-  CloseIcon,
-  Center,
+  Pressable,
+  Text,
+  VStack,
 } from 'native-base';
 import { useState } from 'react';
 import Tintable from '../util/Tintable';
-import * as ImagePicker from 'expo-image-picker';
-import { AvatarUrlData } from './EditProfileModal';
 
 /**
  * Uses expo's Image Picker to choose an image from the device.
  */
 type Props = {
-  avatarUrlData: AvatarUrlData;
-  setAvatarUrlData: any;
+  editAvatar: string;
+  setEditAvatar: any;
 };
-const UploadImage = ({ avatarUrlData, setAvatarUrlData }: Props) => {
+const UploadImage = ({ editAvatar, setEditAvatar }: Props) => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
 
@@ -36,11 +35,13 @@ const UploadImage = ({ avatarUrlData, setAvatarUrlData }: Props) => {
       const _image = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+        aspect: [1, 1],
+        quality: 0,
       });
       if (!_image.cancelled) {
-        setAvatarUrlData({ ...avatarUrlData, newAvatarUrl: _image.uri });
+        console.log('Picked!');
+        console.log(_image);
+        setEditAvatar(_image.uri);
       }
     }
   };
@@ -90,7 +91,7 @@ const UploadImage = ({ avatarUrlData, setAvatarUrlData }: Props) => {
                 <Box>
                   <Tintable tinted={isHovered || isPressed} rounded />
                   <Avatar
-                    source={{ uri: avatarUrlData.newAvatarUrl }}
+                    source={{ uri: editAvatar }}
                     bg="gray.300"
                     size="2xl"
                     mb={3}
