@@ -33,10 +33,7 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
 
   const { isError, data, error } = useQuery(
     userDocRefId,
-    buildUserFetcherFromDocRefId(userDocRefId),
-    {
-      staleTime: 600000,
-    }
+    buildUserFetcherFromDocRefId(userDocRefId)
   );
 
   useEffect(() => {
