@@ -151,10 +151,10 @@ export type FetchedActiveRoutes = {
   activeRoutes: FetchedRoute[];
 };
 export const ACTIVE_ROUTES_CACHE_KEY = 'active-routes';
-const ONE_DAY = 1000 * 60 * 60 * 24; // ms * s * m * h
+const TWO_HOURS = 1000 * 60 * 60 * 2; // ms * s * m * h
 export const ACTIVE_ROUTES_CACHE_OPTIONS = {
-  cacheTime: ONE_DAY,
-  staleTime: ONE_DAY,
+  cacheTime: TWO_HOURS,
+  staleTime: TWO_HOURS,
 };
 const fetchActiveRoutes = async () => {
   const activeRoutesCursor = getActiveRoutesCursor();
