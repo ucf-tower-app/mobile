@@ -49,7 +49,7 @@ const ActiveRoutesDropdown = ({
     >
       {data.activeRoutes.map((route) => (
         <Select.Item
-          label={route.name + ' ' + route.grade}
+          label={route.name + ' (' + route.grade + ')'}
           value={route.name}
           key={route.routeObject.getId()}
         />
