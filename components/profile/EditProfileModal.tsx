@@ -1,4 +1,4 @@
-import * as imageConversion from 'image-conversion';
+import { manipulateAsync } from 'expo-image-manipulator';
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
 } from 'native-base';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { queryClient } from '../../App';
 import { userAtom } from '../../utils/atoms';
 import { FetchedUser } from '../../utils/queries';
 import ChangeEmail from './ChangeEmail';
@@ -55,25 +56,28 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     // Save the stuff
+    const tasks = [];
     if (editAvatar !== fetchedUser.avatarUrl) {
-      console.log('Somehow, get this image!');
-      const response = await fetch(editAvatar);
-      const cur_blob = await response.blob();
-      console.log('Somehow, save this image!');
-      console.log(' ^ the blob');
-      console.log(cur_blob.size, cur_blob.name, cur_blob.length, cur_blob.type);
-      await imageConversion.compressAccurately(cur_blob, 100).then((res) => {
-        //The res in the promise is a compressed Blob type (which can be treated as a File type) file;
-        console.log('Compressed!');
-        console.log('Compressed!', res);
-      });
-      console.log('Hey, done!');
-      // console.log(editAvatar, blob.size, blob.type, blob.name);
+      tasks.push(
+        manipulateAsync(editAvatar, [{ resize: { height: 180, width: 180 } }])
+          .then(async (imageRes) => fetch(imageRes.uri))
+          .then((resp) => resp.blob())
+          .then((blob) => fetchedUser.__userObject.setAvatar(blob))
+          .catch(console.error)
+      );
     }
 
-    // Invalidate the cache. It'd be nice if we could force the parent component to get its data again
+    // Await all the updates, *then* force a re-fetch. Otherwise we'd just have some half-updated data :/
+    Promise.all(tasks).then(() =>
+      queryClient
+        .invalidateQueries({
+          queryKey: [fetchedUser.__userObject.docRef!.id],
+        })
+        .catch(console.error)
+    );
+
     handleCancel();
   };
 

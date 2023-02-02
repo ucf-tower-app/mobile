@@ -101,7 +101,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
       />
       <Box>
         <Box p="5">
-          <ProfileBanner user={userOfProfile} />
+          <ProfileBanner fetchedUser={data} />
         </Box>
         <Center>
           <HStack space="md">
