@@ -3,11 +3,11 @@ import {
   ArrowForwardIcon,
   HStack,
   Image,
-  Text,
-  useColorModeValue,
-  VStack,
   Pressable,
   Skeleton,
+  Text,
+  VStack,
+  useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -27,10 +27,7 @@ const RouteRow = ({ route }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     route.getId(),
-    buildRouteFetcher(route),
-    {
-      staleTime: 600000,
-    }
+    buildRouteFetcher(route)
   );
 
   // Fetch all relevant data and update the state accordingly.

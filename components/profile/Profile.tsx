@@ -7,9 +7,9 @@ import {
   Divider,
   HStack,
   Icon,
+  Pressable,
   VStack,
   useColorModeValue,
-  Pressable,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -54,10 +54,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     userOfProfile.getId(),
-    buildUserFetcher(userOfProfile),
-    {
-      staleTime: 600000,
-    }
+    buildUserFetcher(userOfProfile)
   );
 
   useEffect(() => {
@@ -95,10 +92,14 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
 
   const profileComponent = (
     <VStack space="xs" w="full" bg={baseBgColor}>
-      <EditProfileModal isOpen={showModal} onClose={onClose} />
+      <EditProfileModal
+        isOpen={showModal}
+        onClose={onClose}
+        fetchedUser={data}
+      />
       <Box>
         <Box p="5">
-          <ProfileBanner user={userOfProfile} />
+          <ProfileBanner fetchedUser={data} />
         </Box>
         <Center>
           <HStack space="md">
