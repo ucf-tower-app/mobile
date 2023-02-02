@@ -1,11 +1,6 @@
 import { Route } from '../../xplat/types/types';
 import { Select, Skeleton } from 'native-base';
-import { useQuery } from 'react-query';
-import {
-  ACTIVE_ROUTES_CACHE_KEY,
-  fetchActiveRoutes,
-  FetchedRoute,
-} from '../../utils/queries';
+import { useActiveRoutes, FetchedRoute } from '../../utils/queries';
 import { useEffect, useState } from 'react';
 
 type Props = {
@@ -20,13 +15,7 @@ const ActiveRoutesDropdown = ({
     Record<string, FetchedRoute>
   >({});
 
-  const { isLoading, isError, data, error } = useQuery(
-    ACTIVE_ROUTES_CACHE_KEY,
-    fetchActiveRoutes,
-    {
-      staleTime: 600000,
-    }
-  );
+  const { isLoading, isError, data, error } = useActiveRoutes();
 
   // Build the route name map
   useEffect(() => {

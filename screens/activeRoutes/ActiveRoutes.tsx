@@ -1,18 +1,11 @@
 import { Box, Flex, Spinner, useColorModeValue } from 'native-base';
-import { useQuery } from 'react-query';
 import RouteContainer from '../../components/route/SearchableRouteContainer';
-import {
-  ACTIVE_ROUTES_CACHE_KEY,
-  fetchActiveRoutes,
-} from '../../utils/queries';
+import { useActiveRoutes } from '../../utils/queries';
 
 const ActiveRoutes = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const { isLoading, isError, data, error } = useQuery(
-    ACTIVE_ROUTES_CACHE_KEY,
-    fetchActiveRoutes
-  );
+  const { isLoading, isError, data, error } = useActiveRoutes();
 
   if (isLoading) {
     return (

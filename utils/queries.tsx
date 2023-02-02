@@ -1,3 +1,4 @@
+import { useQuery } from 'react-query';
 import { getActiveRoutesCursor, getRouteById, getUserById } from '../xplat/api';
 import {
   Cursor,
@@ -150,7 +151,12 @@ export type FetchedActiveRoutes = {
   activeRoutes: FetchedRoute[];
 };
 export const ACTIVE_ROUTES_CACHE_KEY = 'active-routes';
-export const fetchActiveRoutes = async () => {
+const ONE_DAY = 1000 * 60 * 60 * 24; // ms * s * m * h
+export const ACTIVE_ROUTES_CACHE_OPTIONS = {
+  cacheTime: ONE_DAY,
+  staleTime: ONE_DAY,
+};
+const fetchActiveRoutes = async () => {
   const activeRoutesCursor = getActiveRoutesCursor();
   const activeRoutesLazy =
     await activeRoutesCursor.________getAll_CLOWNTOWN_LOTS_OF_READS();
@@ -160,4 +166,11 @@ export const fetchActiveRoutes = async () => {
   return {
     activeRoutes: fetchedRoutes,
   } as FetchedActiveRoutes;
+};
+export const useActiveRoutes = () => {
+  return useQuery(
+    ACTIVE_ROUTES_CACHE_KEY,
+    fetchActiveRoutes,
+    ACTIVE_ROUTES_CACHE_OPTIONS
+  );
 };
