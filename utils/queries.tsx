@@ -29,7 +29,7 @@ export interface FetchedUser {
 }
 export const buildUserFetcher = (user: User) => {
   return async () => {
-    await user.getData();
+    await user.getData(true);
     return {
       username: await user.getUsername(),
       email: await user.getEmail(),

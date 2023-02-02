@@ -14,6 +14,7 @@ import { useRecoilState } from 'recoil';
 import { queryClient } from '../../App';
 import { userAtom } from '../../utils/atoms';
 import { FetchedUser } from '../../utils/queries';
+import { DebounceSession } from '../../utils/utils';
 import ChangeEmail from './ChangeEmail';
 import ChangePassword from './ChangePassword';
 import UploadImage from './UploadImage';
@@ -32,11 +33,23 @@ type Props = {
 /**
  * Modal that allow's the user to edit their profile.
  */
+
+type NewProfileFields = {
+  bio?: string;
+  displayName?: string;
+};
+
 function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [editAvatar, setEditAvatar] = useState(fetchedUser.avatarUrl);
   const [signedInUser] = useRecoilState(userAtom);
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
+
+  const [session] = useState<DebounceSession>(new DebounceSession(500));
+  const [newFields, setNewFields] = useState<NewProfileFields>({
+    bio: undefined,
+    displayName: undefined,
+  });
 
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
@@ -57,7 +70,6 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   };
 
   const handleSave = () => {
-    // Save the stuff
     const tasks = [];
     if (editAvatar !== fetchedUser.avatarUrl) {
       tasks.push(
@@ -69,14 +81,27 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
       );
     }
 
+    if (newFields.bio)
+      tasks.push(
+        fetchedUser.userObject.setBio(newFields.bio).catch(console.error)
+      );
+
+    if (newFields.displayName)
+      tasks.push(
+        fetchedUser.userObject
+          .setDisplayName(newFields.displayName)
+          .catch(console.error)
+      );
+
     // Await all the updates, *then* force a re-fetch. Otherwise we'd just have some half-updated data :/
-    Promise.all(tasks).then(() =>
-      queryClient
-        .invalidateQueries({
-          queryKey: [fetchedUser.userObject.docRef!.id],
-        })
-        .catch(console.error)
-    );
+    if (tasks.length > 0)
+      Promise.all(tasks).then(() =>
+        queryClient
+          .invalidateQueries({
+            queryKey: [fetchedUser.userObject.docRef!.id],
+          })
+          .catch(console.error)
+      );
 
     handleCancel();
   };
@@ -101,11 +126,28 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
               </Center>
               <FormControl>
                 <FormControl.Label>Name</FormControl.Label>
-                <Input placeholder={signedInUser?.displayName} />
+                <Input
+                  placeholder={signedInUser?.displayName}
+                  onChangeText={(e) =>
+                    session.trigger(() =>
+                      setNewFields({ bio: newFields.bio, displayName: e })
+                    )
+                  }
+                />
               </FormControl>
               <FormControl mt="3">
                 <FormControl.Label>Bio</FormControl.Label>
-                <Input placeholder={signedInUser?.bio} />
+                <Input
+                  placeholder={signedInUser?.bio}
+                  onChangeText={(e) =>
+                    session.trigger(() =>
+                      setNewFields({
+                        bio: e,
+                        displayName: newFields.displayName,
+                      })
+                    )
+                  }
+                />
               </FormControl>
               <HStack pt="3" space="xs" justifyContent="space-between">
                 <Button
