@@ -54,10 +54,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     userOfProfile.docRef!.id,
-    buildUserFetcher(userOfProfile),
-    {
-      staleTime: 600000,
-    }
+    buildUserFetcher(userOfProfile)
   );
 
   useEffect(() => {

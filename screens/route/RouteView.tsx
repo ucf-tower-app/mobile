@@ -1,29 +1,29 @@
 import { ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Text,
-  Flex,
-  Heading,
-  useToken,
-  HStack,
-  VStack,
   Box,
   Button,
   Center,
+  Flex,
+  HStack,
+  Heading,
   Spinner,
+  Text,
+  VStack,
+  useToken,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
+import { useQuery } from 'react-query';
 import { useRecoilState } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import Feed from '../../components/media/Feed';
 import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
-import Feed from '../../components/media/Feed';
-import { RouteStatus, QueryCursor, Post } from '../../xplat/types/types';
-import { useQuery } from 'react-query';
+import { userAtom } from '../../utils/atoms';
 import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
+import { Post, QueryCursor, RouteStatus } from '../../xplat/types/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -48,10 +48,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const { isLoading, isError, data, error } = useQuery(
     routeDocRefId,
-    buildRouteFetcherFromDocRefId(routeDocRefId),
-    {
-      staleTime: 600000,
-    }
+    buildRouteFetcherFromDocRefId(routeDocRefId)
   );
 
   useEffect(() => {

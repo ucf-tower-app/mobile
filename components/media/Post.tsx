@@ -44,10 +44,7 @@ const Post = ({ post }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     post.docRef!.id,
-    buildPostFetcher(post),
-    {
-      staleTime: 600000,
-    }
+    buildPostFetcher(post)
   );
 
   useEffect(() => {
