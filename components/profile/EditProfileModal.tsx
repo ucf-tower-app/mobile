@@ -64,7 +64,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
         manipulateAsync(editAvatar, [{ resize: { height: 180, width: 180 } }])
           .then(async (imageRes) => fetch(imageRes.uri))
           .then((resp) => resp.blob())
-          .then((blob) => fetchedUser.__userObject.setAvatar(blob))
+          .then((blob) => fetchedUser.userObject.setAvatar(blob))
           .catch(console.error)
       );
     }
@@ -73,7 +73,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
     Promise.all(tasks).then(() =>
       queryClient
         .invalidateQueries({
-          queryKey: [fetchedUser.__userObject.docRef!.id],
+          queryKey: [fetchedUser.userObject.docRef!.id],
         })
         .catch(console.error)
     );

@@ -40,6 +40,30 @@ const sizedStyles = {
   },
 };
 
+type SkeletonProps = {
+  size?: Size;
+};
+export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  return (
+    <Box rounded="full" bg={baseBgColor}>
+      <HStack alignItems="center" pr={3}>
+        <Skeleton
+          w={sizedStyles[size].avatarSize}
+          h={sizedStyles[size].avatarSize}
+          rounded="full"
+        />
+        <Box pl={2} w={sizedStyles[size].preloadTextWidth}>
+          <Skeleton.Text
+            fontSize={sizedStyles[size].displayNameSize}
+            lines={2}
+          />
+        </Box>
+      </HStack>
+    </Box>
+  );
+};
+
 type Props = {
   user: User;
   size?: Size;
@@ -57,23 +81,7 @@ const UserTag = ({ user, size = 'md' }: Props) => {
   );
 
   if (isLoading) {
-    return (
-      <Box rounded="full" bg={baseBgColor}>
-        <HStack alignItems="center" pr={3}>
-          <Skeleton
-            w={sizedStyles[size].avatarSize}
-            h={sizedStyles[size].avatarSize}
-            rounded="full"
-          />
-          <Skeleton.Text
-            fontSize={sizedStyles[size].displayNameSize}
-            lines={2}
-            pl={2}
-            w={sizedStyles[size].preloadTextWidth}
-          />
-        </HStack>
-      </Box>
-    );
+    return <UserTagSkeleton size={size} />;
   }
 
   if (isError || data === undefined) {

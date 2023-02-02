@@ -40,7 +40,7 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
   );
 
   useEffect(() => {
-    if (data) setUser(data.__userObject);
+    if (data) setUser(data.userObject);
   }, [data]);
 
   useEffect(() => {
