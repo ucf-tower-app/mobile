@@ -27,7 +27,7 @@ import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { Post, QueryCursor, RouteStatus } from '../../xplat/types';
+import { RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -37,10 +37,6 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const [user] = useRecoilState(userAtom);
-
-  const [postsCursor, setPostsCursor] = useState<QueryCursor<Post> | undefined>(
-    undefined
-  );
 
   const [_userHasRated, setUserHasRated] = useState<boolean>(false);
   const [isRating, setIsRating] = useState<boolean>(false);
@@ -61,18 +57,18 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     if (user === undefined || data === undefined) return;
 
     data.routeObject.getSendByUser(user).then((send) => {
+      setIsSending(false);
       if (send === undefined) return;
       setUserHasSent(true);
-      setIsSending(false);
-    });
-
-    data.routeObject.getForum().then((forum) => {
-      setPostsCursor(forum.getPostsCursor());
     });
   }, [data, user]);
 
   if (isLoading) {
-    return null;
+    return (
+      <Center>
+        <Spinner size="lg" />
+      </Center>
+    );
   }
 
   if (isError || data === undefined) {
@@ -99,7 +95,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const post = () => {
     navigation.push('CreatePost', {
-      routeName: data.name,
+      routeDocRefId: data.routeObject.getId(),
     });
   };
 
@@ -180,16 +176,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           setUserHasRated(true);
         }}
       />
-      {postsCursor !== undefined ? (
-        <Feed
-          forumDocRefId={data.forumDocRefID}
-          topComponent={routeViewComponent}
-        />
-      ) : (
-        <Center>
-          <Spinner size="lg" />
-        </Center>
-      )}
+      <Feed
+        forumDocRefId={data.forum.getId()}
+        topComponent={routeViewComponent}
+      />
     </>
   );
 };

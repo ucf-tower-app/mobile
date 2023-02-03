@@ -14,19 +14,20 @@ import {
   useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
+import { queryClient } from '../../App';
 import Post from '../../components/media/Post';
 import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 import { userAtom } from '../../utils/atoms';
+import {
+  FetchedRoute,
+  buildRouteFetcherFromDocRefId,
+} from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession } from '../../utils/utils';
 import { createPost } from '../../xplat/api';
-import {
-  LazyStaticImage,
-  LazyStaticVideo,
-  PostMock,
-  Route,
-} from '../../xplat/types';
+import { LazyStaticImage, LazyStaticVideo, PostMock } from '../../xplat/types';
 
 /**
  * The CreatePost screen is responsible for handling post creation from
@@ -34,7 +35,7 @@ import {
  * or not the Route field is pre-loaded.
  */
 const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
-  const routeName = route.params.routeName;
+  const routeDocRefId = route.params.routeDocRefId;
 
   const navigation = useNavigation();
   const user = useRecoilValue(userAtom);
@@ -43,21 +44,27 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
     new DebounceSession(250)
   );
   const [textContent, setTextContent] = useState<string>('');
-  const [videoContent, setVideoContent] = useState<LazyStaticVideo | undefined>(
-    undefined
-  );
+  const [videoContent, setVideoContent] = useState<LazyStaticVideo>();
   const [isPickingVideo, setIsPickingVideo] = useState<boolean>(false);
   const [imageContent, setImageContent] = useState<LazyStaticImage[]>([]);
   const [isPickingImages, setIsPickingImages] = useState<boolean>(false);
-  const [selectedRoute, setSelectedRoute] = useState<Route | undefined>(
-    undefined
-  );
+  const [selectedRoute, setSelectedRoute] = useState<FetchedRoute>();
   const [isProcessingPost, setIsProcessingPost] = useState<boolean>(false);
-  const [previewPost, setPreviewPost] = useState<PostMock | undefined>(
-    undefined
-  );
+  const [previewPost, setPreviewPost] = useState<PostMock>();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  const { data } = useQuery(
+    routeDocRefId!,
+    buildRouteFetcherFromDocRefId(routeDocRefId!),
+    {
+      enabled: routeDocRefId !== undefined,
+    }
+  );
+
+  useEffect(() => {
+    if (data && selectedRoute === undefined) setSelectedRoute(data);
+  }, [data, selectedRoute]);
 
   // Build the preview post whenever relevant state changes
   useEffect(() => {
@@ -135,11 +142,6 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
     try {
       setIsProcessingPost(true);
 
-      if (user === null) {
-        setIsProcessingPost(false);
-        return;
-      }
-
       const videoBlob =
         videoContent !== undefined
           ? {
@@ -152,9 +154,14 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
-      const forum = await selectedRoute?.getForum();
-
-      createPost(user, textContent, forum, imageBlobs, videoBlob);
+      const forum = selectedRoute?.forum;
+      createPost(user, textContent, forum, imageBlobs, videoBlob).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
+        if (forum)
+          queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
+      });
+    } catch (e) {
+      console.error(e);
     } finally {
       setIsProcessingPost(false);
       // Leave the "Posting" screen
@@ -162,7 +169,8 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
       navigation.navigate('Tabs', {
         screen: 'ProfileTab',
         params: {
-          screen: 'MyProfile',
+          screen: 'Profile',
+          params: {},
         },
       });
     }
@@ -245,7 +253,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
               <Box flexGrow={1}>
                 <ActiveRoutesDropdown
                   onSelectRoute={setSelectedRoute}
-                  preSelectedRouteName={routeName}
+                  preSelectedRouteDocRefId={routeDocRefId}
                 />
               </Box>
             </HStack>

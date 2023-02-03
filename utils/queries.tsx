@@ -63,7 +63,7 @@ export type FetchedRoute = {
   setter: User | undefined;
   rope: number | undefined;
 
-  forumDocRefID: string;
+  forum: Forum;
   routeObject: Route;
 };
 const routeToFetchedRoute = async (route: Route) => {
@@ -91,7 +91,7 @@ const routeToFetchedRoute = async (route: Route) => {
       : DEFAULT_THUMBNAIL_TMP,
     setter: (await route.hasSetter()) ? await route.getSetter() : undefined,
     rope: (await route.hasRope()) ? await route.getRope() : undefined,
-    forumDocRefID: (await route.getForum()).docRef!.id,
+    forum: await route.getForum(),
     routeObject: route,
   } as FetchedRoute;
 };
