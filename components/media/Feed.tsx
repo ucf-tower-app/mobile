@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery } from 'react-query';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
+import { getIQParams_ForumPosts } from '../../xplat/queries/forum';
 import { Post as PostObj } from '../../xplat/types';
 import Post from './Post';
 
@@ -35,15 +36,24 @@ const isCloseToBottom = ({
  */
 type Props = {
   topComponent?: JSX.Element;
-  userDocRefId: string;
+  userDocRefId?: string;
+  forumDocRefId?: string;
 };
-const Feed = ({ topComponent, userDocRefId }: Props) => {
+const Feed = ({
+  topComponent,
+  userDocRefId = undefined,
+  forumDocRefId = undefined,
+}: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(getIQParams_UserPosts(userDocRefId));
+    useInfiniteQuery(
+      userDocRefId !== undefined
+        ? getIQParams_UserPosts(userDocRefId)
+        : getIQParams_ForumPosts(forumDocRefId!)
+    );
 
   useEffect(() => {
     if (data)
@@ -72,7 +82,7 @@ const Feed = ({ topComponent, userDocRefId }: Props) => {
         <VStack w="full">
           {posts?.map((post, index) => {
             return (
-              <VStack key={post.docRef!.id} pt={4}>
+              <VStack key={post.getId()} pt={4}>
                 <Post post={post} />
                 {index < posts.length - 1 ? <Divider /> : null}
               </VStack>

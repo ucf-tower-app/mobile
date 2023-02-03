@@ -52,7 +52,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
   const { isLoading, isError, data, error } = useQuery(
-    userOfProfile.docRef!.id,
+    userOfProfile.getId(),
     buildUserFetcher(userOfProfile)
   );
 

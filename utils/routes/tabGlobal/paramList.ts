@@ -10,4 +10,7 @@ export type ParamList = {
   RouteView: {
     routeDocRefId: string;
   };
+  CreatePost: {
+    routeName?: string;
+  };
 };
