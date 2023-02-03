@@ -1,5 +1,10 @@
 import { useQuery } from 'react-query';
-import { getActiveRoutesCursor, getRouteById, getUserById } from '../xplat/api';
+import {
+  getActiveRoutesCursor,
+  getPostById,
+  getRouteById,
+  getUserById,
+} from '../xplat/api';
 import {
   Cursor,
   Forum,
@@ -139,6 +144,9 @@ export const buildPostFetcher = (post: Post) => {
       postObject: post,
     } as FetchedPost;
   };
+};
+export const buildPostFetcherFromDocRefId = (docRefId: string) => {
+  return buildPostFetcher(getPostById(docRefId));
 };
 
 /**
