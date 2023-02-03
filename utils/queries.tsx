@@ -1,6 +1,5 @@
 import { getRouteById, getUserById } from '../xplat/api';
 import {
-  Cursor,
   Forum,
   Post,
   Route,
@@ -12,6 +11,7 @@ import {
 } from '../xplat/types';
 
 export interface FetchedUser {
+  docRefId: string;
   username: string;
   email: string;
   displayName: string;
@@ -22,15 +22,13 @@ export interface FetchedUser {
   bestBoulder: RouteClassifier | undefined;
   bestToprope: RouteClassifier | undefined;
   totalSends: number;
-  postsCursor: Cursor<Post>;
-  followersCursor: Cursor<User>;
-  followingCursor: Cursor<User>;
   userObject: User;
 }
 export const buildUserFetcher = (user: User) => {
   return async () => {
     await user.getData(true);
     return {
+      docRefId: user.docRef!.id,
       username: await user.getUsername(),
       email: await user.getEmail(),
       displayName: await user.getDisplayName(),

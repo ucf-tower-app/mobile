@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery } from 'react-query';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
-import { Cursor, Post as PostObj } from '../../xplat/types';
+import { Post as PostObj } from '../../xplat/types';
 import Post from './Post';
 
 // const POST_STRIDE = 3;
@@ -34,7 +34,6 @@ const isCloseToBottom = ({
  * the screen.
  */
 type Props = {
-  postsCursor: Cursor<PostObj>;
   topComponent?: JSX.Element;
   userDocRefId: string;
 };

@@ -17,7 +17,7 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Cursor, Post, User, containsRef } from '../../xplat/types';
+import { User, containsRef } from '../../xplat/types';
 import Feed from '../media/Feed';
 import Tintable from '../util/Tintable';
 import EditProfileModal from './EditProfileModal';
@@ -50,7 +50,6 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const [showModal, setShowModal] = useState(false);
 
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [postsCursor, setPostsCursor] = useState<Cursor<Post> | undefined>();
 
   const { isLoading, isError, data, error } = useQuery(
     userOfProfile.docRef!.id,
@@ -59,7 +58,6 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
 
   useEffect(() => {
     if (!data) return;
-    setPostsCursor(data.postsCursor);
     if (signedInUser)
       setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
   }, [data, signedInUser]);
@@ -171,14 +169,11 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
     </VStack>
   );
 
-  return postsCursor !== undefined ? (
+  return (
     <Feed
-      postsCursor={postsCursor}
       topComponent={profileComponent}
       userDocRefId={userOfProfile.docRef!.id}
     />
-  ) : (
-    profileComponent
   );
 };
 
