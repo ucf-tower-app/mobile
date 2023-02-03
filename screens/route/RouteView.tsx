@@ -22,13 +22,19 @@ import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import { userAtom } from '../../utils/atoms';
 import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
-import { TabGlobalScreenProps } from '../../utils/types';
+import {
+  TabGlobalNavigationProp,
+  TabGlobalScreenProps,
+} from '../../utils/types';
+import { useNavigation } from '@react-navigation/native';
 import { Post, QueryCursor, RouteStatus } from '../../xplat/types/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
 const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const routeDocRefId = route.params.routeDocRefId;
+
+  const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const [user] = useRecoilState(userAtom);
 
@@ -92,7 +98,9 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const post = () => {
-    // TODO: impl
+    navigation.push('CreatePost', {
+      routeName: data.name,
+    });
   };
 
   const routeViewComponent = (

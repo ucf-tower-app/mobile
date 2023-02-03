@@ -53,7 +53,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
   const [postsCursor, setPostsCursor] = useState<Cursor<Post> | undefined>();
 
   const { isLoading, isError, data, error } = useQuery(
-    userOfProfile.docRef!.id,
+    userOfProfile.getId(),
     buildUserFetcher(userOfProfile)
   );
 

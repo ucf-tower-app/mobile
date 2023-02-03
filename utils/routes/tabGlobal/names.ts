@@ -5,5 +5,6 @@ export const names = [
   'Sends',
   'MyProfile',
   'RouteView',
+  'CreatePost',
 ] as const;
 export type Name = (typeof names)[number];
