@@ -46,6 +46,11 @@ const SignInOrRegister = () => {
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
 
   const onSubmit = () => {
+    if (process.env.NODE_ENV === 'development') {
+      signIn('tylerhm.dev@gmail.com', 'group47root');
+      return;
+    }
+
     const newErrorData: SignInErrorData = {};
     checkUsernameOrEmail(formData.usernameOrEmail, newErrorData);
     checkPassword(formData.password, newErrorData);
