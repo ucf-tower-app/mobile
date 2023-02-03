@@ -1,17 +1,18 @@
 import { TabGlobalNavigationProp } from './types';
 
 /**
- * Navigates the current Screen navigator to the target profile,
- * rendering MyProfile if it is their own
+ * Navigates the current Screen navigator to the target profile.
  */
 export const navigateToUserProfile = async (
-  signedInUsername: string,
-  targetProfileUsername: string,
+  signedInUserId: string,
+  targetProfileId: string,
   navigation: TabGlobalNavigationProp
 ) => {
-  if (signedInUsername === targetProfileUsername) {
-    navigation.push('MyProfile');
+  if (signedInUserId === targetProfileId) {
+    navigation.push('Profile', {});
   } else {
-    navigation.push('UserProfile', { username: targetProfileUsername });
+    navigation.push('Profile', {
+      userDocRefId: targetProfileId,
+    });
   }
 };

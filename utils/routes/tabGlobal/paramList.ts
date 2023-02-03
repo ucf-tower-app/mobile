@@ -1,12 +1,11 @@
 export type ParamList = {
-  UserProfile: {
-    userDocRefId: string;
+  Profile: {
+    userDocRefId?: string;
   };
   Sends: undefined;
   Follows: {
     userDocRefId: string;
   };
-  MyProfile: undefined;
   RouteView: {
     routeDocRefId: string;
   };
