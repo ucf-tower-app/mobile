@@ -89,9 +89,8 @@ const UserTag = ({ user, size = 'md' }: Props) => {
     return null;
   }
 
-  const tryNavigate = async () => {
-    // Can't navigate to an unfetched user
-    const signedInUserId = await signedInUser?.docRef!.id;
+  const tryNavigate = () => {
+    const signedInUserId = signedInUser?.docRef!.id;
     if (signedInUserId === undefined) return;
 
     const targetProfileUserId = data.userObject.docRef!.id;

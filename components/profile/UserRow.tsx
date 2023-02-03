@@ -17,11 +17,11 @@ const UserRow = ({ user, endComponent }: Props) => {
 
   const signedInUser = useRecoilValue(userAtom);
 
-  const tryNavigate = async () => {
-    const [signedInUserId, targetProfileUserId] = await Promise.all([
+  const tryNavigate = () => {
+    const [signedInUserId, targetProfileUserId] = [
       signedInUser?.docRef!.id,
       user?.docRef!.id,
-    ]);
+    ];
 
     if (targetProfileUserId === undefined || signedInUserId === undefined)
       return;
