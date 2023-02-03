@@ -1,11 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Flex, Icon, Text } from 'native-base';
 import { useEffect, useState } from 'react';
-import IconToggle from './IconToggle';
-import { Ionicons } from '@expo/vector-icons';
-import { DebounceSession } from '../../utils/utils';
-import { containsRef, User } from '../../xplat/types/types';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
+import { DebounceSession } from '../../utils/utils';
+import { User, containsRef } from '../../xplat/types';
+import IconToggle from './IconToggle';
 
 type Props = {
   likes: User[];

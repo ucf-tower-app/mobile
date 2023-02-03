@@ -38,8 +38,8 @@ const SignInOrRegister = () => {
   const toast = useToast();
 
   const [formData, setData] = useState<SignInFormData>({
-    usernameOrEmail: '',
-    password: '',
+    usernameOrEmail: 'lkf53414@xcoxc.com',
+    password: 'newpassword',
   });
   const [errorData, setErrorData] = useState<SignInErrorData>({});
   const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);

@@ -1,9 +1,9 @@
-import Profile from '../../components/profile/Profile';
-import LoadingProfile from '../../components/profile/LoadingProfile';
 import { useEffect, useState } from 'react';
-import { User } from '../../xplat/types/types';
-import { getUserByUsername } from '../../xplat/api';
+import LoadingProfile from '../../components/profile/LoadingProfile';
+import Profile from '../../components/profile/Profile';
 import { TabGlobalScreenProps } from '../../utils/types';
+import { getUserByUsername } from '../../xplat/api';
+import { User } from '../../xplat/types';
 
 const UserProfile = ({ route }: TabGlobalScreenProps<'UserProfile'>) => {
   const [user, setUser] = useState<User | undefined>(undefined);
