@@ -16,7 +16,7 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { containsRef } from '../../xplat/types/types';
+import { containsRef } from '../../xplat/types';
 import Feed from '../../components/media/Feed';
 import Tintable from '../../components/util/Tintable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
