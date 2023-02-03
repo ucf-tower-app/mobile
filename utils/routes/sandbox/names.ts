@@ -14,6 +14,5 @@ export const names = [
   'UserTag',
   'Post',
   'SearchableRoutes',
-  'CreatePost',
 ] as const;
 export type Name = (typeof names)[number] | TabGlobalName;

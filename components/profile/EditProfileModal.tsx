@@ -40,6 +40,10 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
 
+  const [oldPwd, setOldPwd] = useState<string>();
+  const [newPwd, setNewPwd] = useState<string>();
+  const [confirmPwd, setConfirmPwd] = useState<string>();
+
   const [bioSession] = useState<DebounceSession>(new DebounceSession(500));
   const [newBio, setNewBio] = useState<string>();
   const [dispNameSession] = useState<DebounceSession>(new DebounceSession(500));
@@ -52,10 +56,15 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
 
   const handleCancel = () => {
     if (viewChangePassword) {
+      setOldPwd(undefined);
+      setNewPwd(undefined);
+      setConfirmPwd(undefined);
       setViewChangePassword(false);
     } else if (viewChangeEmail) {
       setViewChangeEmail(false);
     } else {
+      setNewBio(undefined);
+      setNewDisplayName(undefined);
       setViewChangePassword(false);
       setViewChangeEmail(false);
       setEditAvatar(fetchedUser.avatarUrl);
@@ -68,7 +77,16 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
 
   const invalidBio = newBio !== undefined && !validBio(newBio);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (viewChangePassword) {
+      if (signedInUser && oldPwd && newPwd) {
+        await signedInUser
+          .changePassword(oldPwd, newPwd)
+          .catch(console.error)
+          .then(() => handleCancel());
+      }
+      return;
+    }
     const tasks = [];
     if (editAvatar !== fetchedUser.avatarUrl) {
       tasks.push(
@@ -110,7 +128,13 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
         <Modal.Header>Edit Profile</Modal.Header>
         <Modal.Body>
           {viewChangePassword ? (
-            <ChangePassword />
+            <ChangePassword
+              setOldPwd={setOldPwd}
+              setNewPwd={setNewPwd}
+              setConfirmPwd={setConfirmPwd}
+              newPwd={newPwd}
+              confirmPwd={confirmPwd}
+            />
           ) : viewChangeEmail ? (
             <ChangeEmail />
           ) : (

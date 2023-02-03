@@ -1,7 +1,7 @@
 import { Box, Divider, ScrollView, Spinner, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
+import { FetchedRoute } from '../../utils/queries';
 import { DebounceSession } from '../../utils/utils';
-import { Route } from '../../xplat/types/types';
 import SearchBar from '../searchbar/SearchBar';
 import RouteRow from './RouteRow';
 
@@ -11,9 +11,9 @@ import RouteRow from './RouteRow';
  * a corpus that is generated from each route's metadata
  */
 type Props = {
-  routes: Route[];
+  fetchedRoutes: FetchedRoute[];
 };
-const SearchableRouteContainer = ({ routes }: Props) => {
+const SearchableRouteContainer = ({ fetchedRoutes }: Props) => {
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [displayedRouteIndices, setDisplayedRouteIndices] = useState<number[]>(
@@ -26,29 +26,20 @@ const SearchableRouteContainer = ({ routes }: Props) => {
       const newDisplayedRouteIndices: number[] = [];
 
       // Here we check every route for it's status in the search results
-      await Promise.all(
-        routes.map(async (route, index) => {
-          // Here we build a corpus. This is the search text that we should query on
-          // For now, we are simply asynchonously concatenating the name, rating, and all tags
-          const tags = await Promise.all(
-            (await route.getTags()).map((tag) => tag.getName())
-          );
-          const corpus = (
-            await Promise.all([route.getName(), route.getGradeDisplayString()])
-          )
-            .concat(tags)
-            .join('$')
-            .toLowerCase();
-
-          if (corpus.includes(query)) newDisplayedRouteIndices.push(index);
-        })
-      );
+      fetchedRoutes.forEach((route, index) => {
+        // Here we build a corpus. This is the search text that we should query on
+        // For now, we are simply concatenating the name, rating, and all tags
+        const corpus = [route.name, route.grade, route.stringifiedTags]
+          .join('$')
+          .toLowerCase();
+        if (corpus.includes(query)) newDisplayedRouteIndices.push(index);
+      });
       setDisplayedRouteIndices(newDisplayedRouteIndices);
       setIsLoading(false);
     };
 
     processQuery();
-  }, [routes, query]);
+  }, [fetchedRoutes, query]);
 
   return (
     <VStack w="full">
@@ -67,7 +58,7 @@ const SearchableRouteContainer = ({ routes }: Props) => {
         <ScrollView>
           {displayedRouteIndices.map((index) => (
             <Box key={index}>
-              <RouteRow route={routes[index]} />
+              <RouteRow route={fetchedRoutes[index].routeObject} />
               <Divider />
             </Box>
           ))}

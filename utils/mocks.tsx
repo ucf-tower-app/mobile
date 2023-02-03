@@ -4,15 +4,15 @@ import {
 } from '../xplat/api';
 import {
   ForumMock,
-  LazyStaticVideo,
   LazyStaticImage,
+  LazyStaticVideo,
   PostMock,
   RouteMock,
   RouteStatus,
   TagMock,
-  UserStatus,
   UserMock,
-} from '../xplat/types/types';
+  UserStatus,
+} from '../xplat/types';
 
 export const profilePic = new LazyStaticImage(
   'mock/path',

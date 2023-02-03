@@ -1,6 +1,6 @@
-import { getRouteById, getUserById } from '../xplat/api';
+import { useQuery } from 'react-query';
+import { getActiveRoutesCursor, getRouteById, getUserById } from '../xplat/api';
 import {
-  Cursor,
   Forum,
   Post,
   Route,
@@ -9,9 +9,10 @@ import {
   RouteType,
   User,
   UserStatus,
-} from '../xplat/types/types';
+} from '../xplat/types';
 
 export interface FetchedUser {
+  docRefId: string;
   username: string;
   email: string;
   displayName: string;
@@ -22,15 +23,13 @@ export interface FetchedUser {
   bestBoulder: RouteClassifier | undefined;
   bestToprope: RouteClassifier | undefined;
   totalSends: number;
-  postsCursor: Cursor<Post>;
-  followersCursor: Cursor<User>;
-  followingCursor: Cursor<User>;
   userObject: User;
 }
 export const buildUserFetcher = (user: User) => {
   return async () => {
     await user.getData(true);
     return {
+      docRefId: user.docRef!.id,
       username: await user.getUsername(),
       email: await user.getEmail(),
       displayName: await user.getDisplayName(),
@@ -52,7 +51,7 @@ export const buildUserFetcherFromDocRefId = (docRefId: string) => {
   return buildUserFetcher(getUserById(docRefId));
 };
 
-type FetchedRoute = {
+export type FetchedRoute = {
   name: string;
   grade: string;
   likes: User[];
@@ -64,38 +63,41 @@ type FetchedRoute = {
   setter: User | undefined;
   rope: number | undefined;
 
+  forumDocRefID: string;
   routeObject: Route;
+};
+const routeToFetchedRoute = async (route: Route) => {
+  await route.getData();
+
+  const tags = await route.getTags();
+  let tagStringBuilder = '';
+  for (const tag of tags) {
+    const tagName = await tag.getName();
+    tagStringBuilder = tagStringBuilder + tagName + ', ';
+  }
+  // Remove trailing comma
+  if (tagStringBuilder.length > 2 && tagStringBuilder.endsWith(', '))
+    tagStringBuilder = tagStringBuilder.slice(0, -2);
+
+  return {
+    name: await route.getName(),
+    grade: await route.getGradeDisplayString(),
+    likes: await route.getLikes(),
+    stringifiedTags: tagStringBuilder,
+    status: await route.getStatus(),
+    description: await route.getDescription(),
+    thumbnailUrl: (await route.hasThumbnail())
+      ? await route.getThumbnailUrl()
+      : DEFAULT_THUMBNAIL_TMP,
+    setter: (await route.hasSetter()) ? await route.getSetter() : undefined,
+    rope: (await route.hasRope()) ? await route.getRope() : undefined,
+    forumDocRefID: (await route.getForum()).docRef!.id,
+    routeObject: route,
+  } as FetchedRoute;
 };
 const DEFAULT_THUMBNAIL_TMP = 'https://wallpaperaccess.com/full/317501.jpg';
 export const buildRouteFetcher = (route: Route) => {
-  return async () => {
-    await route.getData();
-
-    const tags = await route.getTags();
-    let tagStringBuilder = '';
-    for (const tag of tags) {
-      const tagName = await tag.getName();
-      tagStringBuilder = tagStringBuilder + tagName + ', ';
-    }
-    // Remove trailing comma
-    if (tagStringBuilder.length > 2 && tagStringBuilder.endsWith(', '))
-      tagStringBuilder = tagStringBuilder.slice(0, -2);
-
-    return {
-      name: await route.getName(),
-      grade: await route.getGradeDisplayString(),
-      likes: await route.getLikes(),
-      stringifiedTags: tagStringBuilder,
-      status: await route.getStatus(),
-      description: await route.getDescription(),
-      thumbnailUrl: (await route.hasThumbnail())
-        ? await route.getThumbnailUrl()
-        : DEFAULT_THUMBNAIL_TMP,
-      setter: (await route.hasSetter()) ? await route.getSetter() : undefined,
-      rope: (await route.hasRope()) ? await route.getRope() : undefined,
-      routeObject: route,
-    } as FetchedRoute;
-  };
+  return async () => routeToFetchedRoute(route);
 };
 export const buildRouteFetcherFromDocRefId = (docRefId: string) => {
   return buildRouteFetcher(getRouteById(docRefId));
@@ -137,4 +139,38 @@ export const buildPostFetcher = (post: Post) => {
       postObject: post,
     } as FetchedPost;
   };
+};
+
+/**
+ * When fetching active routes, use the provided cache key
+ * so that active routes are fetched less often. We also eagerly
+ * load all active routes here, as future cache results will simply
+ * return the fully loaded routes at no extra cost
+ */
+export type FetchedActiveRoutes = {
+  activeRoutes: FetchedRoute[];
+};
+export const ACTIVE_ROUTES_CACHE_KEY = 'active-routes';
+const TWO_HOURS = 1000 * 60 * 60 * 2; // ms * s * m * h
+export const ACTIVE_ROUTES_CACHE_OPTIONS = {
+  cacheTime: TWO_HOURS,
+  staleTime: TWO_HOURS,
+};
+const fetchActiveRoutes = async () => {
+  const activeRoutesCursor = getActiveRoutesCursor();
+  const activeRoutesLazy =
+    await activeRoutesCursor.________getAll_CLOWNTOWN_LOTS_OF_READS();
+  const fetchedRoutes = await Promise.all(
+    activeRoutesLazy.map((route) => routeToFetchedRoute(route))
+  );
+  return {
+    activeRoutes: fetchedRoutes,
+  } as FetchedActiveRoutes;
+};
+export const useActiveRoutes = () => {
+  return useQuery(
+    ACTIVE_ROUTES_CACHE_KEY,
+    fetchActiveRoutes,
+    ACTIVE_ROUTES_CACHE_OPTIONS
+  );
 };

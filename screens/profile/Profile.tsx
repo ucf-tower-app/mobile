@@ -16,7 +16,7 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { buildUserFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { Cursor, Post, containsRef } from '../../xplat/types/types';
+import { containsRef } from '../../xplat/types/types';
 import Feed from '../../components/media/Feed';
 import Tintable from '../../components/util/Tintable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
@@ -43,7 +43,6 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   );
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [postsCursor, setPostsCursor] = useState<Cursor<Post> | undefined>();
 
   const { isLoading, isError, data, error } = useQuery(
     userDocRefId!,
@@ -55,7 +54,6 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     if (!data) return;
-    setPostsCursor(data.postsCursor);
     if (signedInUser)
       setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
   }, [data, signedInUser]);
@@ -167,11 +165,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     </VStack>
   );
 
-  return postsCursor !== undefined ? (
-    <Feed postsCursor={postsCursor} topComponent={profileComponent} />
-  ) : (
-    profileComponent
-  );
+  return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
 };
 
 export default Profile;

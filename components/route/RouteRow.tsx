@@ -1,19 +1,19 @@
 import { useNavigation } from '@react-navigation/native';
 import {
-  ArrowForwardIcon,
-  HStack,
-  Image,
-  Text,
-  useColorModeValue,
-  VStack,
-  Pressable,
-  Skeleton,
+	ArrowForwardIcon,
+	HStack,
+	Image,
+	Pressable,
+	Skeleton,
+	Text,
+	VStack,
+	useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { buildRouteFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Route } from '../../xplat/types/types';
+import { Route } from '../../xplat/types';
 
 type Props = {
   route: Route;
@@ -26,11 +26,8 @@ const RouteRow = ({ route }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { isLoading, isError, data, error } = useQuery(
-    route.docRef!.id,
-    buildRouteFetcher(route),
-    {
-      staleTime: 600000,
-    }
+    route.getId(),
+    buildRouteFetcher(route)
   );
 
   // Fetch all relevant data and update the state accordingly.
@@ -64,7 +61,7 @@ const RouteRow = ({ route }: Props) => {
   return (
     <Pressable
       onPress={() =>
-        navigation.push('RouteView', { routeDocRefId: route.docRef!.id })
+        navigation.push('RouteView', { routeDocRefId: route.getId() })
       }
     >
       <HStack

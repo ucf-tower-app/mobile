@@ -6,13 +6,12 @@ import {
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 import FollowList from '../../components/profile/FollowList';
 import SearchBar from '../../components/searchbar/SearchBar';
 import { buildUserFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { ArrayCursor, QueryCursor, User } from '../../xplat/types/types';
 
 type UserTab = 'followers' | 'following';
 
@@ -23,39 +22,24 @@ type UserTab = 'followers' | 'following';
 const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
   const userDocRefId = route.params.userDocRefId;
 
-  const [user, setUser] = useState<User | undefined>(undefined);
   const [tabViewed, setTabViewed] = useState<UserTab>('followers');
-  const [chosenCursor, setChosenCursor] = useState<
-    ArrayCursor<User> | QueryCursor<User> | undefined
-  >(undefined);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const { isError, data, error } = useQuery(
+  const { isLoading, isError, data, error } = useQuery(
     userDocRefId,
-    buildUserFetcherFromDocRefId(userDocRefId),
-    {
-      staleTime: 600000,
-    }
+    buildUserFetcherFromDocRefId(userDocRefId)
   );
 
-  useEffect(() => {
-    if (data) setUser(data.userObject);
-  }, [data]);
+  if (isLoading) {
+    return (
+      <Center pt={4}>
+        <Spinner size="lg" />
+      </Center>
+    );
+  }
 
-  useEffect(() => {
-    const updateCursor = async () => {
-      if (user === undefined) return;
-      setChosenCursor(
-        tabViewed === 'followers'
-          ? user?.getFollowersCursor()
-          : await user?.getFollowingCursor()
-      );
-    };
-    updateCursor();
-  }, [user, tabViewed]);
-
-  if (isError) {
+  if (isError || data === undefined) {
     console.error(error);
     return null;
   }
@@ -84,12 +68,12 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
     </Center>
   );
 
-  return chosenCursor !== undefined ? (
-    <FollowList userCursor={chosenCursor} topComponent={followsComponent} />
-  ) : (
-    <Center pt={4}>
-      <Spinner size="lg" />
-    </Center>
+  return (
+    <FollowList
+      userTab={tabViewed}
+      fetchedUser={data}
+      topComponent={followsComponent}
+    />
   );
 };
 
