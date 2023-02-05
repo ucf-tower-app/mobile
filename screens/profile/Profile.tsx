@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
@@ -15,51 +14,46 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
-import { buildUserFetcher } from '../../utils/queries';
-import { TabGlobalNavigationProp } from '../../utils/types';
-import { Cursor, Post, User, containsRef } from '../../xplat/types/types';
-import Feed from '../media/Feed';
-import Tintable from '../util/Tintable';
-import EditProfileModal from './EditProfileModal';
-import LoadingProfile from './LoadingProfile';
-import ProfileBanner from './ProfileBanner';
-import StatBox from './StatBox';
+import { buildUserFetcherFromDocRefId } from '../../utils/queries';
+import { TabGlobalScreenProps } from '../../utils/types';
+import { containsRef } from '../../xplat/types';
+import Feed from '../../components/media/Feed';
+import Tintable from '../../components/util/Tintable';
+import EditProfileModal from '../../components/profile/EditProfileModal';
+import LoadingProfile from '../../components/profile/LoadingProfile';
+import ProfileBanner from '../../components/profile/ProfileBanner';
+import StatBox from '../../components/profile/StatBox';
 
 /**
  * The profile component displays the profile banner, a statbox,
  * a button to see followers and the post's the user has posted.
  *
- * If the prop profileIsMine is true then there will be button
- * to edit the profile. If it's false then it will be a follow
- * button.
+ * If the route param userDocRefId was not passed then the profile
+ * will be rendered for the signed in user.
  */
-type Props = {
-  profileIsMine: boolean;
-  userOfProfile: User;
-};
-
-const Profile = ({ profileIsMine, userOfProfile }: Props) => {
-  const navigation = useNavigation<TabGlobalNavigationProp>();
-
+const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const signedInUser = useRecoilValue(userAtom);
+  const profileIsMine = route.params?.userDocRefId === undefined;
+  const userDocRefId = route.params?.userDocRefId ?? signedInUser?.docRef!.id;
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
     'darkMode.secondary'
   );
   const [showModal, setShowModal] = useState(false);
-
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [postsCursor, setPostsCursor] = useState<Cursor<Post> | undefined>();
 
   const { isLoading, isError, data, error } = useQuery(
-    userOfProfile.getId(),
-    buildUserFetcher(userOfProfile)
+    userDocRefId!,
+    buildUserFetcherFromDocRefId(userDocRefId!),
+    {
+      staleTime: 600000,
+    }
   );
 
   useEffect(() => {
     if (!data) return;
-    setPostsCursor(data.postsCursor);
     if (signedInUser)
       setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
   }, [data, signedInUser]);
@@ -76,11 +70,11 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
     if (profileIsMine) {
       setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
-      await signedInUser.unfollowUser(userOfProfile);
+      await signedInUser.unfollowUser(data.userObject);
       setIsFollowing(false);
     } else {
-      if (userOfProfile !== undefined && signedInUser !== undefined) {
-        await signedInUser.followUser(userOfProfile);
+      if (data.userObject !== undefined && signedInUser !== undefined) {
+        await signedInUser.followUser(data.userObject);
         setIsFollowing(true);
       }
     }
@@ -121,7 +115,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
               <Pressable
                 onPress={async () => {
                   navigation.push('Follows', {
-                    userDocRefId: userOfProfile.docRef?.id!,
+                    userDocRefId: userDocRefId!,
                   });
                 }}
               >
@@ -171,11 +165,7 @@ const Profile = ({ profileIsMine, userOfProfile }: Props) => {
     </VStack>
   );
 
-  return postsCursor !== undefined ? (
-    <Feed postsCursor={postsCursor} topComponent={profileComponent} />
-  ) : (
-    profileComponent
-  );
+  return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
 };
 
 export default Profile;

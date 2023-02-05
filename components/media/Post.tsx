@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { buildPostFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { Post as PostObj } from '../../xplat/types/types';
+import { Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';

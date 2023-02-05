@@ -7,10 +7,15 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
-import { QueryCursor, ArrayCursor, User } from '../../xplat/types/types';
+import { useInfiniteQuery } from 'react-query';
+import { FetchedUser } from '../../utils/queries';
+import {
+  constructPageData,
+  getIQParams_UserFollowers,
+  getIQParams_UserFollowing,
+} from '../../xplat/queries';
+import { User } from '../../xplat/types';
 import UserRow from './UserRow';
-
-const USER_STRIDE = 5;
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -30,45 +35,56 @@ const isCloseToBottom = ({
  * to the user's profile.
  */
 type Props = {
-  userCursor: QueryCursor<User> | ArrayCursor<User>;
+  userTab: 'followers' | 'following';
+  fetchedUser: FetchedUser;
   topComponent?: JSX.Element;
 };
-const FollowList = ({ userCursor, topComponent }: Props) => {
+const FollowList = ({ userTab, fetchedUser, topComponent }: Props) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [isOutOfUsers, setIsOutOfUsers] = useState<boolean>(false);
 
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const followersIQ = useInfiniteQuery(
+    getIQParams_UserFollowers(fetchedUser.docRefId)
+  );
 
-  const loadNextUsers = useCallback(
-    async (base: User[], outOfUsers: boolean) => {
-      if (outOfUsers) return;
-      const newUsers = [];
-      while (newUsers.length < USER_STRIDE) {
-        if (await userCursor.hasNext())
-          newUsers.push(await userCursor.pollNext());
-        else {
-          setIsOutOfUsers(true);
-          break;
-        }
-      }
-      setUsers([...base, ...newUsers]);
-    },
-    [userCursor]
+  const followingIQ = useInfiniteQuery(
+    getIQParams_UserFollowing(fetchedUser.followingList)
   );
 
   useEffect(() => {
-    setUsers([]);
-    setIsOutOfUsers(false);
-    loadNextUsers([], false);
-  }, [loadNextUsers]);
+    if (userTab === 'followers') {
+      if (followersIQ.data)
+        setUsers(
+          followersIQ.data.pages.flatMap((page) =>
+            constructPageData(User, page)
+          )
+        );
+    } else {
+      if (followingIQ.data) setUsers(followingIQ.data.pages.flat());
+    }
+  }, [followersIQ.data, followingIQ.data, userTab]);
+
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  const loadNextUsers = useCallback(async () => {
+    if (userTab === 'followers') {
+      if (followersIQ.hasNextPage && !followersIQ.isFetchingNextPage)
+        await followersIQ.fetchNextPage();
+    } else {
+      if (followingIQ.hasNextPage && !followingIQ.isFetchingNextPage)
+        await followingIQ.fetchNextPage();
+    }
+  }, [followersIQ, followingIQ, userTab]);
+
+  const hasNextPage =
+    userTab === 'followers' ? followersIQ.hasNextPage : followingIQ.hasNextPage;
 
   return (
     <ScrollView
       w="full"
       bg={baseBgColor}
       onScroll={({ nativeEvent }) => {
-        if (!isOutOfUsers && isCloseToBottom(nativeEvent)) {
-          loadNextUsers(users, isOutOfUsers);
+        if (hasNextPage && isCloseToBottom(nativeEvent)) {
+          loadNextUsers();
         }
       }}
       scrollEventThrottle={1000}
@@ -83,7 +99,7 @@ const FollowList = ({ userCursor, topComponent }: Props) => {
               </VStack>
             );
           })}
-          {!isOutOfUsers ? (
+          {hasNextPage ? (
             <Center pt={4}>
               <Spinner size="lg" />
             </Center>

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -26,8 +27,7 @@ import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { useNavigation } from '@react-navigation/native';
-import { Post, QueryCursor, RouteStatus } from '../../xplat/types/types';
+import { Post, QueryCursor, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -181,7 +181,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
         }}
       />
       {postsCursor !== undefined ? (
-        <Feed postsCursor={postsCursor} topComponent={routeViewComponent} />
+        <Feed
+          forumDocRefId={data.forumDocRefID}
+          topComponent={routeViewComponent}
+        />
       ) : (
         <Center>
           <Spinner size="lg" />

@@ -17,16 +17,16 @@ const UserRow = ({ user, endComponent }: Props) => {
 
   const signedInUser = useRecoilValue(userAtom);
 
-  const tryNavigate = async () => {
-    const [signedInUsername, targetProfileUsername] = await Promise.all([
-      signedInUser?.getUsername(),
-      user?.getUsername(),
-    ]);
+  const tryNavigate = () => {
+    const [signedInUserId, targetProfileUserId] = [
+      signedInUser?.docRef!.id,
+      user?.docRef!.id,
+    ];
 
-    if (targetProfileUsername === undefined || signedInUsername === undefined)
+    if (targetProfileUserId === undefined || signedInUserId === undefined)
       return;
 
-    navigateToUserProfile(signedInUsername, targetProfileUsername, navigation);
+    navigateToUserProfile(signedInUserId, targetProfileUserId, navigation);
   };
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');

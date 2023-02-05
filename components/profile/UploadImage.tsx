@@ -39,8 +39,6 @@ const UploadImage = ({ editAvatar, setEditAvatar }: Props) => {
         quality: 0,
       });
       if (!_image.cancelled) {
-        console.log('Picked!');
-        console.log(_image);
         setEditAvatar(_image.uri);
       }
     }
