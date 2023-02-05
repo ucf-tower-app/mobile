@@ -4,20 +4,12 @@ import { TabGlobalScreenProps } from '../../utils/types';
 import {
   Center,
   Box,
-  Input,
   Spinner,
-  VStack,
-  HStack,
-  Button,
   useColorModeValue,
-} from 'native-base';
-import {
-  KeyboardAvoidingView,
-  NativeScrollEvent,
   ScrollView,
-} from 'react-native';
+} from 'native-base';
+import { NativeScrollEvent } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
-import { DebounceSession } from '../../utils/utils';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { getIQParams_PostComments } from '../../xplat/queries/post';
@@ -25,6 +17,7 @@ import { queryClient } from '../../App';
 import Comment from '../../components/media/Comment';
 import { constructPageData } from '../../xplat/queries';
 import { Comment as CommentObj } from '../../xplat/types';
+import CommentTextInput from '../../components/media/CommentTextInput';
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -38,15 +31,13 @@ const isCloseToBottom = ({
   );
 };
 
+const INITIAL_COMMENTS_LOADED = 15;
+
 const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
   const postDocRefId = route.params.postDocRefId;
 
   const user = useRecoilValue(userAtom);
 
-  const [newCommentDebounceSession] = useState<DebounceSession>(
-    new DebounceSession(200)
-  );
-  const [newCommentText, setNewCommentText] = useState<string>('');
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentObj[]>([]);
 
@@ -73,6 +64,11 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
     );
   }, [commentsQuery.data]);
 
+  useEffect(() => {
+    if (comments.length !== 0 && comments.length < INITIAL_COMMENTS_LOADED)
+      loadNextComments();
+  }, [comments, loadNextComments]);
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   if (postQuery.isLoading || commentsQuery.isLoading) {
@@ -94,23 +90,26 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
     return null;
   }
 
-  const comment = async () => {
+  const postComment = async (comment: string) => {
     if (user === undefined) return;
 
     setIsPostingComment(true);
 
-    await postQuery.data.postObject.addComment(user, newCommentText);
+    await postQuery.data.postObject.addComment(user, comment);
 
     queryClient.invalidateQueries({
       queryKey: ['comments', postDocRefId],
     });
 
     setIsPostingComment(false);
-    setNewCommentText('');
   };
 
   return (
-    <VStack w="full" h="full" bg={baseBgColor}>
+    <Box w="full" h="full" bg={baseBgColor}>
+      <CommentTextInput
+        onSubmitComment={postComment}
+        isLoading={isPostingComment}
+      />
       <ScrollView
         onScroll={({ nativeEvent }) => {
           if (commentsQuery.hasNextPage && isCloseToBottom(nativeEvent)) {
@@ -124,28 +123,13 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
             <Comment comment={commentObj} />
           </Box>
         ))}
+        {commentsQuery.hasNextPage ? (
+          <Center>
+            <Spinner size="lg" />
+          </Center>
+        ) : null}
       </ScrollView>
-      <KeyboardAvoidingView>
-        <HStack mt="auto" p={2} w="full">
-          <Input
-            placeholder="Say what's on your mind"
-            onChangeText={(text) =>
-              newCommentDebounceSession.trigger(() => setNewCommentText(text))
-            }
-            flexGrow={1}
-            mr={2}
-          />
-          <Button
-            onPress={comment}
-            isDisabled={newCommentText === ''}
-            isLoading={isPostingComment}
-            minW={24}
-          >
-            Comment
-          </Button>
-        </HStack>
-      </KeyboardAvoidingView>
-    </VStack>
+    </Box>
   );
 };
 
