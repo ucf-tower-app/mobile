@@ -39,7 +39,7 @@ const Comment = ({ comment }: Props) => {
   return (
     <VStack w="full" p={2} alignItems="flex-start">
       <HStack w="full" justifyContent="space-between">
-        <UserTag user={data.author} size="xs" />
+        <UserTag user={data.author} size="sm" />
         <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
       </HStack>
       <Text my={2}>{data.textContent}</Text>
