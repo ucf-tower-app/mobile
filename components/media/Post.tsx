@@ -10,8 +10,8 @@ import {
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { buildPostFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
+import { buildPostFetcher, FetchedPost, fetchPost } from '../../utils/queries';
 import { Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
@@ -54,42 +54,54 @@ const Post = ({ post }: Props) => {
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const { isLoading, isError, data, error } = useQuery(
-    post.getId(),
-    buildPostFetcher(post)
-  );
+  const [postData, setPostData] = useState<FetchedPost>();
+
+  const realQR = useQuery(post.getId(), buildPostFetcher(post), {
+    enabled: !post.isMock(),
+  });
 
   useEffect(() => {
-    if (data === undefined) return;
+    if (realQR.data) setPostData(realQR.data);
+  }, [realQR.data]);
+
+  useEffect(() => {
+    if (post.isMock()) {
+      fetchPost(post).then(setPostData);
+    }
+  }, [post]);
+
+  useEffect(() => {
+    if (postData === undefined) return;
     const newMediaList: MediaType[] = [];
-    if (data.videoContent !== undefined) {
+    if (postData.videoContent !== undefined) {
       newMediaList.push({
-        videoUrl: data.videoContent.videoUrl,
-        imageUrl: data.videoContent.thumbnailUrl,
+        videoUrl: postData.videoContent.videoUrl,
+        imageUrl: postData.videoContent.thumbnailUrl,
       });
     }
-    data.imageContentUrls.forEach((url) =>
+    postData.imageContentUrls.forEach((url) =>
       newMediaList.push({ imageUrl: url })
     );
     setMediaList(newMediaList);
-  }, [data]);
+  }, [post, postData]);
 
-  if (isLoading) {
-    return <PostSkeleton />;
-  }
-
-  if (isError || data === undefined) {
-    console.error(error);
-    return null;
+  if (post.isMock()) {
+    if (postData === undefined) return <PostSkeleton />;
+  } else {
+    if (realQR.isError) {
+      console.error(realQR.error);
+      return null;
+    }
+    if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
   return (
     <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
       <Box pl={2}>
-        <UserTag user={data.author} />
+        <UserTag user={postData.author} />
       </Box>
       <Box p={2}>
-        <Text>{data.textContent}</Text>
+        <Text>{postData.textContent}</Text>
       </Box>
       {mediaList === undefined ? null : (
         <Box w="full" pt={2}>
@@ -101,7 +113,7 @@ const Post = ({ post }: Props) => {
           variant="link"
           onPress={() =>
             navigation.push('Comments', {
-              postDocRefId: data.postObject.getId(),
+              postDocRefId: postData.postObject.getId(),
             })
           }
         >

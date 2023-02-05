@@ -31,31 +31,32 @@ export interface FetchedUser {
   totalSends: number;
   userObject: User;
 }
-export const buildUserFetcher = (user: User) => {
-  return async () => {
-    await user.getData(true);
-    return {
-      docRefId: user.docRef!.id,
-      username: await user.getUsername(),
-      email: await user.getEmail(),
-      displayName: await user.getDisplayName(),
-      bio: await user.getBio(),
-      status: await user.getStatus(),
-      avatarUrl: await user.getAvatarUrl(),
-      followingList: user.following ?? [],
-      bestBoulder: await user.getBestSendClassifier(RouteType.Boulder),
-      bestToprope: await user.getBestSendClassifier(RouteType.Toprope),
-      totalSends: await user.getTotalSends(),
-      postsCursor: user.getPostsCursor(),
-      followersCursor: user.getFollowersCursor(),
-      followingCursor: await user.getFollowingCursor(),
-      userObject: user,
-    } as FetchedUser;
-  };
-};
-export const buildUserFetcherFromDocRefId = (docRefId: string) => {
+
+async function fetchUser(user: User) {
+  return {
+    docRefId: user.docRef!.id,
+    username: await user.getUsername(),
+    email: await user.getEmail(),
+    displayName: await user.getDisplayName(),
+    bio: await user.getBio(),
+    status: await user.getStatus(),
+    avatarUrl: await user.getAvatarUrl(),
+    followingList: user.following ?? [],
+    bestBoulder: await user.getBestSendClassifier(RouteType.Boulder),
+    bestToprope: await user.getBestSendClassifier(RouteType.Toprope),
+    totalSends: await user.getTotalSends(),
+    postsCursor: user.getPostsCursor(),
+    followersCursor: user.getFollowersCursor(),
+    followingCursor: await user.getFollowingCursor(),
+    userObject: user,
+  } as FetchedUser;
+}
+export function buildUserFetcher(user: User) {
+  return async () => user.getData().then(() => fetchUser(user));
+}
+export function buildUserFetcherFromDocRefId(docRefId: string) {
   return buildUserFetcher(getUserById(docRefId));
-};
+}
 
 export type FetchedRoute = {
   name: string;
@@ -72,9 +73,7 @@ export type FetchedRoute = {
   forumDocRefID: string;
   routeObject: Route;
 };
-const routeToFetchedRoute = async (route: Route) => {
-  await route.getData();
-
+async function fetchRoute(route: Route) {
   const tags = await route.getTags();
   let tagStringBuilder = '';
   for (const tag of tags) {
@@ -100,16 +99,16 @@ const routeToFetchedRoute = async (route: Route) => {
     forumDocRefID: (await route.getForum()).docRef!.id,
     routeObject: route,
   } as FetchedRoute;
-};
+}
 const DEFAULT_THUMBNAIL_TMP = 'https://wallpaperaccess.com/full/317501.jpg';
-export const buildRouteFetcher = (route: Route) => {
-  return async () => routeToFetchedRoute(route);
-};
-export const buildRouteFetcherFromDocRefId = (docRefId: string) => {
+export function buildRouteFetcher(route: Route) {
+  return async () => route.getData().then(() => fetchRoute(route));
+}
+export function buildRouteFetcherFromDocRefId(docRefId: string) {
   return buildRouteFetcher(getRouteById(docRefId));
-};
+}
 
-type FetchedPost = {
+export type FetchedPost = {
   author: User;
   timestamp: Date;
   textContent: string;
@@ -126,29 +125,32 @@ type FetchedPost = {
 
   postObject: Post;
 };
-export const buildPostFetcher = (post: Post) => {
-  return async () => {
-    await post.getData();
-    return {
-      author: await post.getAuthor(),
-      timestamp: await post.getTimestamp(),
-      textContent: await post.getTextContent(),
-      likes: await post.getLikes(),
-      imageContentUrls: await post.getImageContentUrls(),
-      forum: (await post.hasForum()) ? await post.getForum() : undefined,
-      videoContent: (await post.hasVideoContent())
-        ? {
-            videoUrl: await post.getVideoUrl(),
-            thumbnailUrl: await post.getVideoThumbnailUrl(),
-          }
-        : undefined,
-      postObject: post,
-    } as FetchedPost;
-  };
-};
-export const buildPostFetcherFromDocRefId = (docRefId: string) => {
+
+export async function fetchPost(post: Post) {
+  return {
+    author: await post.getAuthor(),
+    timestamp: await post.getTimestamp(),
+    textContent: await post.getTextContent(),
+    likes: await post.getLikes(),
+    imageContentUrls: await post.getImageContentUrls(),
+    forum: (await post.hasForum()) ? await post.getForum() : undefined,
+    videoContent: (await post.hasVideoContent())
+      ? {
+          videoUrl: await post.getVideoUrl(),
+          thumbnailUrl: await post.getVideoThumbnailUrl(),
+        }
+      : undefined,
+    postObject: post,
+  } as FetchedPost;
+}
+
+export function buildPostFetcher(post: Post) {
+  return async () => post.getData().then(() => fetchPost(post));
+}
+
+export function buildPostFetcherFromDocRefId(docRefId: string) {
   return buildPostFetcher(getPostById(docRefId));
-};
+}
 
 /**
  * When fetching active routes, use the provided cache key
@@ -165,12 +167,13 @@ export const ACTIVE_ROUTES_CACHE_OPTIONS = {
   cacheTime: TWO_HOURS,
   staleTime: TWO_HOURS,
 };
+
 const fetchActiveRoutes = async () => {
   const activeRoutesCursor = getActiveRoutesCursor();
   const activeRoutesLazy =
     await activeRoutesCursor.________getAll_CLOWNTOWN_LOTS_OF_READS();
   const fetchedRoutes = await Promise.all(
-    activeRoutesLazy.map((route) => routeToFetchedRoute(route))
+    activeRoutesLazy.map((route) => fetchRoute(route))
   );
   return {
     activeRoutes: fetchedRoutes,
@@ -194,15 +197,18 @@ export type FetchedComment = {
 
   commentObject: Comment;
 };
+
+export const fetchComment = async (comment: Comment) => {
+  return {
+    author: await comment.getAuthor(),
+    timestamp: await comment.getTimestamp(),
+    textContent: await comment.getTextContent(),
+    post: await comment.getPost(),
+    likes: await comment.getLikes(),
+    commentObject: comment,
+  } as FetchedComment;
+};
+
 export const buildCommentFetcher = (comment: Comment) => {
-  return async () => {
-    return {
-      author: await comment.getAuthor(),
-      timestamp: await comment.getTimestamp(),
-      textContent: await comment.getTextContent(),
-      post: await comment.getPost(),
-      likes: await comment.getLikes(),
-      commentObject: comment,
-    } as FetchedComment;
-  };
+  return async () => comment.getData().then(() => fetchComment(comment));
 };
