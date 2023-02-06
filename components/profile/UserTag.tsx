@@ -9,14 +9,13 @@ import {
   useColorModeValue,
   VStack,
 } from 'native-base';
+import { useQuery } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
+import { navigateToUserProfile } from '../../utils/nav';
+import { TabGlobalNavigationProp } from '../../utils/types';
 import { User } from '../../xplat/types/user';
 import Tintable from '../util/Tintable';
-import { TabGlobalNavigationProp } from '../../utils/types';
-import { userAtom } from '../../utils/atoms';
-import { useRecoilValue } from 'recoil';
-import { navigateToUserProfile } from '../../utils/nav';
-import { useQuery } from 'react-query';
-import { buildUserFetcher } from '../../utils/queries';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg';
 const sizedStyles = {
@@ -83,7 +82,7 @@ const UserTag = ({ user, size = 'md' }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     user.getId(),
-    buildUserFetcher(user)
+    user.buildFetcher()
   );
 
   if (isLoading) {

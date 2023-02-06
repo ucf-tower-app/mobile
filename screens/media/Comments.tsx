@@ -1,23 +1,22 @@
-import { useInfiniteQuery, useQuery } from 'react-query';
-import { buildPostFetcherFromDocRefId } from '../../utils/queries';
-import { TabGlobalScreenProps } from '../../utils/types';
 import {
-  Center,
   Box,
+  Center,
+  ScrollView,
   Spinner,
   useColorModeValue,
-  ScrollView,
 } from 'native-base';
-import { NativeScrollEvent } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
+import { NativeScrollEvent } from 'react-native';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
-import { getIQParams_PostComments } from '../../xplat/queries/post';
 import { queryClient } from '../../App';
 import Comment from '../../components/media/Comment';
-import { constructPageData } from '../../xplat/queries';
-import { Comment as CommentObj } from '../../xplat/types';
 import CommentTextInput from '../../components/media/CommentTextInput';
+import { userAtom } from '../../utils/atoms';
+import { TabGlobalScreenProps } from '../../utils/types';
+import { constructPageData } from '../../xplat/queries';
+import { getIQParams_PostComments } from '../../xplat/queries/post';
+import { Comment as CommentObj, Post } from '../../xplat/types';
 
 const isCloseToBottom = ({
   layoutMeasurement,
@@ -43,7 +42,7 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   const postQuery = useQuery(
     postDocRefId,
-    buildPostFetcherFromDocRefId(postDocRefId)
+    Post.buildFetcherFromDocRefId(postDocRefId)
   );
   const commentsQuery = useInfiniteQuery(
     getIQParams_PostComments(postDocRefId)

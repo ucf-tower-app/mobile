@@ -21,9 +21,8 @@ import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
 import { userAtom } from '../../utils/atoms';
-import { buildUserFetcherFromDocRefId } from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { containsRef } from '../../xplat/types';
+import { User, containsRef } from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -47,13 +46,13 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   const { isLoading, isError, data, error } = useQuery(
     userDocRefId!,
-    buildUserFetcherFromDocRefId(userDocRefId!),
+    User.buildFetcherFromDocRefId(userDocRefId!),
     { enabled: userDocRefId !== undefined }
   );
 
   const signedInUserIQResult = useQuery(
     [signedInUser?.getId()],
-    buildUserFetcherFromDocRefId(signedInUser!.getId()),
+    signedInUser!.buildFetcher(),
     {
       enabled:
         signedInUser !== undefined && signedInUser.getId() !== userDocRefId,

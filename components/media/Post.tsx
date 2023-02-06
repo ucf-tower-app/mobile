@@ -11,8 +11,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { buildPostFetcher, FetchedPost, fetchPost } from '../../utils/queries';
-import { Post as PostObj } from '../../xplat/types';
+import { FetchedPost, Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
@@ -56,7 +55,7 @@ const Post = ({ post }: Props) => {
 
   const [postData, setPostData] = useState<FetchedPost>();
 
-  const realQR = useQuery(post.getId(), buildPostFetcher(post), {
+  const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
 
@@ -66,7 +65,7 @@ const Post = ({ post }: Props) => {
 
   useEffect(() => {
     if (post.isMock()) {
-      fetchPost(post).then(setPostData);
+      post.fetch().then(setPostData);
     }
   }, [post]);
 
