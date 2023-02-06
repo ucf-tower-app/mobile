@@ -1,6 +1,16 @@
-import { Box, Skeleton, Text, useColorModeValue, VStack } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
+import {
+  Box,
+  Button,
+  Center,
+  Skeleton,
+  Text,
+  useColorModeValue,
+  VStack,
+} from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { TabGlobalNavigationProp } from '../../utils/types';
 import { buildPostFetcher, FetchedPost, fetchPost } from '../../utils/queries';
 import { Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
@@ -36,6 +46,8 @@ type Props = {
   post: PostObj;
 };
 const Post = ({ post }: Props) => {
+  const navigation = useNavigation<TabGlobalNavigationProp>();
+
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
   );
@@ -96,6 +108,18 @@ const Post = ({ post }: Props) => {
           <MediaCarousel mediaList={mediaList} />
         </Box>
       )}
+      <Center w="full">
+        <Button
+          variant="link"
+          onPress={() =>
+            navigation.push('Comments', {
+              postDocRefId: postData.postObject.getId(),
+            })
+          }
+        >
+          Comments
+        </Button>
+      </Center>
     </VStack>
   );
 };

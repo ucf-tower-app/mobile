@@ -14,6 +14,7 @@ import {
   RouteType,
   User,
   UserStatus,
+  Comment,
 } from '../xplat/types';
 
 export interface FetchedUser {
@@ -184,4 +185,30 @@ export const useActiveRoutes = () => {
     fetchActiveRoutes,
     ACTIVE_ROUTES_CACHE_OPTIONS
   );
+};
+
+export type FetchedComment = {
+  author: User;
+  timestamp: Date;
+  textContent: string;
+  post: Post;
+
+  likes: User[];
+
+  commentObject: Comment;
+};
+
+export const fetchComment = async (comment: Comment) => {
+  return {
+    author: await comment.getAuthor(),
+    timestamp: await comment.getTimestamp(),
+    textContent: await comment.getTextContent(),
+    post: await comment.getPost(),
+    likes: await comment.getLikes(),
+    commentObject: comment,
+  } as FetchedComment;
+};
+
+export const buildCommentFetcher = (comment: Comment) => {
+  return async () => comment.getData().then(() => fetchComment(comment));
 };
