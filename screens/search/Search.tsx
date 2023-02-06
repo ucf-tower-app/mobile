@@ -1,9 +1,10 @@
 import {
+  Box,
   Button,
   Center,
+  Divider,
   HStack,
   ScrollView,
-  Text,
   useColorModeValue,
   VStack,
 } from 'native-base';
@@ -13,6 +14,7 @@ import { DebounceSession } from '../../utils/utils';
 import { UserSearchResult } from '../../xplat/api';
 import { useSearchSubstringMatchers } from '../../utils/queries';
 import UserRow from '../../components/profile/UserRow';
+import ArchivedRouteRow from '../../components/route/ArchivedRouteRow';
 
 type SearchTab = 'routes' | 'users';
 
@@ -88,16 +90,18 @@ const Search = () => {
           {tabViewed === 'users'
             ? userSearchResults.map((userSearchResult) => {
                 return (
-                  <VStack key={userSearchResult.user.getId()} py="3">
+                  <Box key={userSearchResult.user.getId()}>
                     <UserRow user={userSearchResult.user} />
-                  </VStack>
+                    <Divider my="3" />
+                  </Box>
                 );
               })
-            : archivedRoutesSearchResults.map((routeSearchResult) => {
+            : archivedRoutesSearchResults.map((routeTitle) => {
                 return (
-                  <VStack py="3">
-                    <Text>{routeSearchResult}</Text>
-                  </VStack>
+                  <Box key={routeTitle.toString()}>
+                    <ArchivedRouteRow title={routeTitle.toString()} />
+                    <Divider my="3" />
+                  </Box>
                 );
               })}
         </VStack>
