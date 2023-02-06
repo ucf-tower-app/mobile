@@ -1,5 +1,12 @@
 import { useQuery } from 'react-query';
-import { getActiveRoutesCursor, getRouteById, getUserById } from '../xplat/api';
+import {
+  getActiveRoutesCursor,
+  getArchivedRoutesSubstringMatcher,
+  getRouteById,
+  getUserById,
+  getUserSubstringMatcher,
+  UserSearchResult,
+} from '../xplat/api';
 import {
   Forum,
   Post,
@@ -7,6 +14,7 @@ import {
   RouteClassifier,
   RouteStatus,
   RouteType,
+  SubstringMatcher,
   User,
   UserStatus,
 } from '../xplat/types';
@@ -172,5 +180,26 @@ export const useActiveRoutes = () => {
     ACTIVE_ROUTES_CACHE_KEY,
     fetchActiveRoutes,
     ACTIVE_ROUTES_CACHE_OPTIONS
+  );
+};
+
+export type FetchedSearchSubstringMatchers = {
+  userSubstringMatcher: SubstringMatcher<UserSearchResult[]>;
+  archivedRoutesSubstringMatcher: SubstringMatcher<String>;
+};
+const SEARCH_SUBSTRING_MATCHER_CACHE_KEY = 'search-substring-matcher';
+const fetchSearchSubstringMatchers = async () => {
+  const userSubstringMatcher = await getUserSubstringMatcher();
+  const archivedRoutesSubstringMatcher =
+    await getArchivedRoutesSubstringMatcher();
+  return {
+    userSubstringMatcher: userSubstringMatcher,
+    archivedRoutesSubstringMatcher: archivedRoutesSubstringMatcher,
+  } as FetchedSearchSubstringMatchers;
+};
+export const useSearchSubstringMatchers = () => {
+  return useQuery(
+    SEARCH_SUBSTRING_MATCHER_CACHE_KEY,
+    fetchSearchSubstringMatchers
   );
 };
