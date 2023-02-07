@@ -16,7 +16,7 @@ import { useSearchSubstringMatchers } from '../../utils/queries';
 import UserRow from '../../components/profile/UserRow';
 import ArchivedRouteRow from '../../components/route/ArchivedRouteRow';
 
-type SearchTab = 'routes' | 'users';
+type SearchTab = 'active' | 'users' | 'archived';
 
 const Search = () => {
   const [query, setQuery] = useState<string>('');
@@ -69,18 +69,23 @@ const Search = () => {
           />
           <HStack w="full" justifyContent="space-around" p="3" space="md">
             <Button
-              onPress={() => setTabViewed('routes')}
-              variant={tabViewed === 'routes' ? 'solid' : 'outline'}
+              onPress={() => setTabViewed('archived')}
+              variant={tabViewed === 'archived' ? 'solid' : 'outline'}
               rounded="full"
-              w="1/2"
             >
-              Routes
+              Archived Routes
+            </Button>
+            <Button
+              onPress={() => setTabViewed('active')}
+              variant={tabViewed === 'active' ? 'solid' : 'outline'}
+              rounded="full"
+            >
+              Active Routes
             </Button>
             <Button
               onPress={() => setTabViewed('users')}
               variant={tabViewed === 'users' ? 'solid' : 'outline'}
               rounded="full"
-              w="1/2"
             >
               People
             </Button>
@@ -96,14 +101,16 @@ const Search = () => {
                   </Box>
                 );
               })
-            : archivedRoutesSearchResults.map((routeTitle) => {
+            : tabViewed === 'archived'
+            ? archivedRoutesSearchResults.map((routeTitle) => {
                 return (
                   <Box key={routeTitle.toString()}>
                     <ArchivedRouteRow title={routeTitle.toString()} />
                     <Divider my="3" />
                   </Box>
                 );
-              })}
+              })
+            : null}
         </VStack>
       </Center>
     </ScrollView>
