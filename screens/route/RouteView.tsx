@@ -12,16 +12,18 @@ import {
   Text,
   VStack,
   useToken,
+  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import { useQuery } from 'react-query';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import Feed from '../../components/media/Feed';
 import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
@@ -35,7 +37,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
-  const [user] = useRecoilState(userAtom);
+  const user = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
   const [postsCursor, setPostsCursor] = useState<QueryCursor<Post> | undefined>(
     undefined
@@ -60,9 +63,9 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     if (user === undefined || data === undefined) return;
 
     data.routeObject.getSendByUser(user).then((send) => {
+      setIsSending(false);
       if (send === undefined) return;
       setUserHasSent(true);
-      setIsSending(false);
     });
 
     data.routeObject.getForum().then((forum) => {
@@ -103,7 +106,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const routeViewComponent = (
-    <Box w="full" h={600} bg={backgroundHex}>
+    <Box w="full" bg={backgroundHex}>
       <ImageBackground
         style={styles.thumbnail}
         resizeMode={ResizeMode.COVER}
@@ -113,7 +116,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           style={styles.gradient}
           colors={[backgroundHex + '00', backgroundHex]}
         />
-        <Flex direction="column" h="full" w="full" mt={4}>
+        <Flex direction="column" h="full" w="full" bg={backgroundHex}>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
             <Heading size="2xl">{data.name}</Heading>
             <Heading size="2xl" color="grey">
@@ -151,20 +154,30 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                 <Text fontSize="md">Rope {data.rope}</Text>
               ) : null}
             </Box>
-            <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+            {permissionLevelCanWrite(userPermissionLevel) ? (
+              <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+            ) : null}
           </HStack>
-          <Button
-            mx={4}
-            mt={4}
-            onPress={send}
-            isDisabled={userHasSent}
-            isLoading={isSending}
-          >
-            {userHasSent ? 'Sent!' : 'Send it!'}
-          </Button>
-          <Button mx={4} mt={4} onPress={post}>
-            Post to this route
-          </Button>
+          {permissionLevelCanWrite(userPermissionLevel) ? (
+            <>
+              <Button
+                mx={4}
+                mt={4}
+                onPress={send}
+                isDisabled={userHasSent}
+                isLoading={isSending}
+              >
+                {userHasSent ? 'Sent!' : 'Send it!'}
+              </Button>
+              <Button mx={4} mt={4} onPress={post}>
+                Post to this route
+              </Button>
+            </>
+          ) : null}
+          <Center mt={4} mb={2}>
+            <Heading>Posts</Heading>
+          </Center>
+          <Divider />
         </Flex>
       </ImageBackground>
     </Box>
@@ -197,10 +210,10 @@ const styles = StyleSheet.create({
   thumbnail: {
     flex: 1,
     width: '100%',
-    height: FORCED_THUMBNAIL_HEIGHT,
+    minHeight: FORCED_THUMBNAIL_HEIGHT,
   },
   gradient: {
-    height: FORCED_THUMBNAIL_HEIGHT,
+    minHeight: FORCED_THUMBNAIL_HEIGHT,
   },
 });
 

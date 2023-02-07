@@ -1,7 +1,8 @@
 import { VStack, HStack, Text } from 'native-base';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { buildCommentFetcher } from '../../utils/queries';
 import { Comment as CommentObj } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
@@ -16,6 +17,7 @@ type Props = {
 };
 const Comment = ({ comment }: Props) => {
   const user = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
   const { isLoading, isError, data, error } = useQuery(
     comment.getId(),
@@ -40,7 +42,9 @@ const Comment = ({ comment }: Props) => {
     <VStack w="full" p={2} alignItems="flex-start">
       <HStack w="full" justifyContent="space-between">
         <UserTag user={data.author} size="sm" />
-        <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+        {permissionLevelCanWrite(userPermissionLevel) ? (
+          <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+        ) : null}
       </HStack>
       <Text my={2}>{data.textContent}</Text>
     </VStack>

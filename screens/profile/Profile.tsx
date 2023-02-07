@@ -20,7 +20,8 @@ import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { User, containsRef } from '../../xplat/types';
 
@@ -33,6 +34,8 @@ import { User, containsRef } from '../../xplat/types';
  */
 const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const signedInUser = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
+
   const profileIsMine = route.params?.userDocRefId === undefined;
   const userDocRefId = route.params?.userDocRefId ?? signedInUser?.docRef!.id;
 
@@ -111,20 +114,22 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         </Box>
         <Center>
           <HStack space="md">
-            <Button
-              variant="subtle"
-              size="md"
-              bg={secondaryBgColor}
-              rounded="2xl"
-              _text={{ color: 'black' }}
-              onPress={handleButtonPress}
-            >
-              {profileIsMine
-                ? 'Edit Profile'
-                : isFollowing
-                ? 'Unfollow'
-                : 'Follow'}
-            </Button>
+            {permissionLevelCanWrite(userPermissionLevel) ? (
+              <Button
+                variant="subtle"
+                size="md"
+                bg={secondaryBgColor}
+                rounded="2xl"
+                _text={{ color: 'black' }}
+                onPress={handleButtonPress}
+              >
+                {profileIsMine
+                  ? 'Edit Profile'
+                  : isFollowing
+                  ? 'Unfollow'
+                  : 'Follow'}
+              </Button>
+            ) : null}
             <Center>
               <Pressable
                 onPress={async () => {

@@ -4,6 +4,7 @@ import {
   ScrollView,
   Spinner,
   useColorModeValue,
+  Text,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
@@ -12,7 +13,8 @@ import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
 import Comment from '../../components/media/Comment';
 import CommentTextInput from '../../components/media/CommentTextInput';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { constructPageData } from '../../xplat/queries';
 import { getIQParams_PostComments } from '../../xplat/queries/post';
@@ -36,6 +38,7 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
   const postDocRefId = route.params.postDocRefId;
 
   const user = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentObj[]>([]);
@@ -105,10 +108,12 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   return (
     <Box w="full" h="full" bg={baseBgColor}>
-      <CommentTextInput
-        onSubmitComment={postComment}
-        isLoading={isPostingComment}
-      />
+      {permissionLevelCanWrite(userPermissionLevel) ? (
+        <CommentTextInput
+          onSubmitComment={postComment}
+          isLoading={isPostingComment}
+        />
+      ) : null}
       <ScrollView
         onScroll={({ nativeEvent }) => {
           if (commentsQuery.hasNextPage && isCloseToBottom(nativeEvent)) {
@@ -117,11 +122,17 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
         }}
         scrollEventThrottle={1000}
       >
-        {comments.map((commentObj) => (
-          <Box key={commentObj.getId()}>
-            <Comment comment={commentObj} />
-          </Box>
-        ))}
+        {comments.length === 0 ? (
+          <Center mt={4}>
+            <Text color="gray.500">Nothing here yet...t!</Text>
+          </Center>
+        ) : (
+          comments.map((commentObj) => (
+            <Box key={commentObj.getId()}>
+              <Comment comment={commentObj} />
+            </Box>
+          ))
+        )}
         {commentsQuery.hasNextPage ? (
           <Center>
             <Spinner size="lg" />
