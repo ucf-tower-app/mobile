@@ -9,7 +9,6 @@ import {
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import FollowList from '../../components/profile/FollowList';
-import SearchBar from '../../components/searchbar/SearchBar';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { User } from '../../xplat/types';
 
@@ -47,7 +46,6 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
   const followsComponent = (
     <Center w="full" bgColor={baseBgColor} p="2">
       <VStack w="full">
-        <SearchBar />
         <HStack space="1" p={1} mt={1}>
           <Button
             onPress={() => setTabViewed('followers')}
