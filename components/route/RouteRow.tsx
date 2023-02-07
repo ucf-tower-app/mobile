@@ -1,17 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
 import {
-	ArrowForwardIcon,
-	HStack,
-	Image,
-	Pressable,
-	Skeleton,
-	Text,
-	VStack,
-	useColorModeValue,
+  ArrowForwardIcon,
+  HStack,
+  Image,
+  Pressable,
+  Skeleton,
+  Text,
+  VStack,
+  useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { buildRouteFetcher } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { Route } from '../../xplat/types';
 
@@ -27,13 +26,13 @@ const RouteRow = ({ route }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     route.getId(),
-    buildRouteFetcher(route)
+    route.buildFetcher()
   );
 
   // Fetch all relevant data and update the state accordingly.
   useEffect(() => {
     if (data === undefined) return;
-    let newDescriptors = data.grade;
+    let newDescriptors = data.gradeDisplayString;
     if (data.stringifiedTags !== '')
       newDescriptors += ', ' + data.stringifiedTags;
     setDescriptors(newDescriptors);

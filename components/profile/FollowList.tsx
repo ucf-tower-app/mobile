@@ -8,13 +8,12 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery } from 'react-query';
-import { FetchedUser } from '../../utils/queries';
 import {
   constructPageData,
   getIQParams_UserFollowers,
   getIQParams_UserFollowing,
 } from '../../xplat/queries';
-import { User } from '../../xplat/types';
+import { FetchedUser, User } from '../../xplat/types';
 import UserRow from './UserRow';
 
 const isCloseToBottom = ({
