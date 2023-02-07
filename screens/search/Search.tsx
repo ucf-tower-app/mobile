@@ -32,7 +32,7 @@ const Search = () => {
   const { isLoading, isError, data, error } = useSearchSubstringMatchers();
 
   useEffect(() => {
-    if (!data) return;
+    if (data === undefined) return;
     if (query === '') {
       setUserSearchResults([]);
       setArchivedRoutesSearchResults([]);
