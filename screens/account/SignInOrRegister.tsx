@@ -47,7 +47,7 @@ const SignInOrRegister = () => {
 
   const onSubmit = () => {
     if (process.env.NODE_ENV === 'development') {
-      signIn('tylerhm.dev@gmail.com', 'group47root');
+      signIn('lkf53414@xcoxc.com', 'newpassword');
       return;
     }
 
