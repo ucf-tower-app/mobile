@@ -18,8 +18,14 @@ import { navigateToUserProfile } from '../../utils/nav';
 import { useQuery } from 'react-query';
 import { buildUserFetcher } from '../../utils/queries';
 
-type Size = 'sm' | 'md' | 'lg';
+type Size = 'xs' | 'sm' | 'md' | 'lg';
 const sizedStyles = {
+  xs: {
+    avatarSize: 8,
+    preloadTextWidth: 12,
+    displayNameSize: 'xs',
+    usernameSize: 'xs',
+  },
   sm: {
     avatarSize: 8,
     preloadTextWidth: 18,

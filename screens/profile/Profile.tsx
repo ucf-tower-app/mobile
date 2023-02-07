@@ -13,16 +13,17 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
-import { buildUserFetcherFromDocRefId } from '../../utils/queries';
-import { TabGlobalScreenProps } from '../../utils/types';
-import { containsRef } from '../../xplat/types';
+import { queryClient } from '../../App';
 import Feed from '../../components/media/Feed';
-import Tintable from '../../components/util/Tintable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
+import Tintable from '../../components/util/Tintable';
+import { userAtom } from '../../utils/atoms';
+import { buildUserFetcherFromDocRefId } from '../../utils/queries';
+import { TabGlobalScreenProps } from '../../utils/types';
+import { containsRef } from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -47,16 +48,26 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const { isLoading, isError, data, error } = useQuery(
     userDocRefId!,
     buildUserFetcherFromDocRefId(userDocRefId!),
+    { enabled: userDocRefId !== undefined }
+  );
+
+  const signedInUserIQResult = useQuery(
+    [signedInUser?.getId()],
+    buildUserFetcherFromDocRefId(signedInUser!.getId()),
     {
-      staleTime: 600000,
+      enabled:
+        signedInUser !== undefined && signedInUser.getId() !== userDocRefId,
     }
   );
 
   useEffect(() => {
-    if (!data) return;
-    if (signedInUser)
-      setIsFollowing(containsRef(data.followingList, signedInUser) ?? false);
-  }, [data, signedInUser]);
+    if (data && signedInUser && signedInUserIQResult.data) {
+      setIsFollowing(
+        containsRef(signedInUserIQResult.data.followingList, data.userObject) ??
+          false
+      );
+    }
+  }, [data, signedInUser, signedInUserIQResult.data]);
 
   if (isLoading) return <LoadingProfile />;
   if (isError || data === undefined) {
@@ -64,17 +75,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     return null;
   }
 
-  // TODO: Use APIs to set stats
+  if (userDocRefId === undefined) return null;
 
   const handleButtonPress = async () => {
     if (profileIsMine) {
       setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
-      await signedInUser.unfollowUser(data.userObject);
+      await signedInUser.unfollowUser(data.userObject).then(() => {
+        queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
+      });
       setIsFollowing(false);
     } else {
       if (data.userObject !== undefined && signedInUser !== undefined) {
-        await signedInUser.followUser(data.userObject);
+        await signedInUser.followUser(data.userObject).then(() => {
+          queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
+        });
         setIsFollowing(true);
       }
     }
