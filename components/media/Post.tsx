@@ -1,14 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
   Center,
+  HStack,
+  Icon,
   Skeleton,
   Text,
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj } from '../../xplat/types';
@@ -92,6 +95,26 @@ const Post = ({ post }: Props) => {
       return null;
     }
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
+  }
+
+  if (postData.isSend) {
+    return (
+      <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
+        <Icon
+          as={<Ionicons name="trending-up" />}
+          color="black"
+          opacity={75}
+          size="xl"
+        />
+        <Box pl={2}>
+          <UserTag user={postData.author} mini />
+        </Box>
+
+        <Box pl={2}>
+          <Text>{'Sent it on ' + postData.timestamp.toLocaleDateString()}</Text>
+        </Box>
+      </HStack>
+    );
   }
 
   return (

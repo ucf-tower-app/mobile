@@ -79,6 +79,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         [],
         [],
         imageContent,
+        true,
         videoContent
       )
     );
@@ -158,7 +159,20 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
       );
 
       const forum = selectedRoute && getForumById(selectedRoute.forumDocRefID);
-      createPost(user, textContent, forum, imageBlobs, videoBlob).then(() => {
+      createPost({
+        author: user,
+        textContent: textContent,
+        forum: forum,
+        imageContent: imageBlobs,
+        videoContent: videoBlob,
+        ...(selectedRoute && {
+          routeInfo: {
+            name: selectedRoute.name,
+            grade: selectedRoute.gradeDisplayString,
+          },
+        }),
+        isSend: false,
+      }).then(() => {
         queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
         if (forum)
           queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
