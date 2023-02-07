@@ -5,6 +5,7 @@ import {
   Divider,
   HStack,
   ScrollView,
+  Spinner,
   useColorModeValue,
   VStack,
 } from 'native-base';
@@ -12,9 +13,13 @@ import SearchBar from '../../components/searchbar/SearchBar';
 import { useEffect, useState } from 'react';
 import { DebounceSession } from '../../utils/utils';
 import { UserSearchResult } from '../../xplat/api';
-import { useSearchSubstringMatchers } from '../../utils/queries';
+import {
+  useActiveRoutes,
+  useSearchSubstringMatchers,
+} from '../../utils/queries';
 import UserRow from '../../components/profile/UserRow';
 import ArchivedRouteRow from '../../components/route/ArchivedRouteRow';
+import RouteRow from '../../components/route/RouteRow';
 
 type SearchTab = 'active' | 'users' | 'archived';
 
@@ -26,33 +31,88 @@ const Search = () => {
   const [archivedRoutesSearchResults, setArchivedRoutesSearchResults] =
     useState<String[]>([]);
   const [tabViewed, setTabViewed] = useState<SearchTab>('users');
+  const [displayedRouteIndices, setDisplayedRouteIndices] = useState<number[]>(
+    []
+  );
+  const [isLoadingResults, setIsLoadingResults] = useState<boolean>(false);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const { isLoading, isError, data, error } = useSearchSubstringMatchers();
+  const substringMatcherQuery = useSearchSubstringMatchers();
+  const activeRoutesQuery = useActiveRoutes();
+
+  const subMatcherIsLoading = substringMatcherQuery.isLoading;
+  const subMatcherIsError = substringMatcherQuery.isError;
+  const subMatcherError = substringMatcherQuery.error;
+  const subMatcherData = substringMatcherQuery.data;
+
+  const activeRoutesIsLoading = activeRoutesQuery.isLoading;
+  const activeRoutesIsError = activeRoutesQuery.isError;
+  const activeRoutesError = activeRoutesQuery.error;
+  const activeRoutesData = activeRoutesQuery.data;
 
   useEffect(() => {
-    if (data === undefined) return;
+    if (subMatcherData === undefined) return;
     if (query === '') {
-      setUserSearchResults([]);
       setArchivedRoutesSearchResults([]);
       return;
     }
-    if (tabViewed === 'users') {
-      setUserSearchResults(data.userSubstringMatcher.getMatches(query));
-    } else {
+    if (tabViewed === 'archived') {
+      setIsLoadingResults(true);
       setArchivedRoutesSearchResults(
-        data.archivedRoutesSubstringMatcher.getMatches(query)
+        subMatcherData.archivedRoutesSubstringMatcher.getMatches(query)
       );
+      setIsLoadingResults(false);
     }
-  }, [data, query, tabViewed]);
+  }, [query, subMatcherData, tabViewed]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (subMatcherData === undefined) return;
+    if (query === '') {
+      setUserSearchResults([]);
+      return;
+    }
+    if (tabViewed === 'users') {
+      setIsLoadingResults(true);
+      setUserSearchResults(
+        subMatcherData.userSubstringMatcher.getMatches(query)
+      );
+      setIsLoadingResults(false);
+    }
+  }, [query, subMatcherData, tabViewed]);
+
+  useEffect(() => {
+    if (activeRoutesData === undefined) return;
+    if (query === '') {
+      setDisplayedRouteIndices([]);
+      return;
+    }
+    if (tabViewed === 'active') {
+      setIsLoadingResults(true);
+      const newDisplayedRouteIndices: number[] = [];
+      activeRoutesData.activeRoutes.forEach((route, index) => {
+        const corpus = [route.name, route.grade, route.stringifiedTags]
+          .join('$')
+          .toLowerCase();
+        if (corpus.includes(query)) newDisplayedRouteIndices.push(index);
+      });
+      setDisplayedRouteIndices(newDisplayedRouteIndices);
+      setIsLoadingResults(false);
+    }
+  }, [query, activeRoutesData, tabViewed]);
+
+  if (subMatcherIsLoading || activeRoutesIsLoading) {
     return;
   }
 
-  if (isError || data === undefined) {
-    console.error(error);
+  if (
+    subMatcherIsError ||
+    activeRoutesIsError ||
+    subMatcherData === undefined ||
+    activeRoutesData === undefined
+  ) {
+    console.error(activeRoutesError);
+    console.error(subMatcherError);
     return null;
   }
 
@@ -91,27 +151,40 @@ const Search = () => {
             </Button>
           </HStack>
         </VStack>
-        <VStack w="full">
-          {tabViewed === 'users'
-            ? userSearchResults.map((userSearchResult) => {
-                return (
-                  <Box key={userSearchResult.user.getId()}>
-                    <UserRow user={userSearchResult.user} />
-                    <Divider my="3" />
-                  </Box>
-                );
-              })
-            : tabViewed === 'archived'
-            ? archivedRoutesSearchResults.map((routeTitle) => {
-                return (
-                  <Box key={routeTitle.toString()}>
-                    <ArchivedRouteRow title={routeTitle.toString()} />
-                    <Divider my="3" />
-                  </Box>
-                );
-              })
-            : null}
-        </VStack>
+        {isLoadingResults ? (
+          <Spinner mt={8} size="lg" />
+        ) : (
+          <VStack w="full">
+            {tabViewed === 'users'
+              ? userSearchResults.map((userSearchResult) => {
+                  return (
+                    <Box key={userSearchResult.user.getId()}>
+                      <UserRow user={userSearchResult.user} />
+                      <Divider my="3" />
+                    </Box>
+                  );
+                })
+              : tabViewed === 'archived'
+              ? archivedRoutesSearchResults.map((routeTitle) => {
+                  return (
+                    <Box key={routeTitle.toString()}>
+                      <ArchivedRouteRow title={routeTitle.toString()} />
+                      <Divider my="3" />
+                    </Box>
+                  );
+                })
+              : displayedRouteIndices.map((index) => {
+                  return (
+                    <Box key={index}>
+                      <RouteRow
+                        route={activeRoutesData.activeRoutes[index].routeObject}
+                      />
+                      <Divider />
+                    </Box>
+                  );
+                })}
+          </VStack>
+        )}
       </Center>
     </ScrollView>
   );
