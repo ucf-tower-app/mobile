@@ -72,8 +72,9 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
 type Props = {
   user: User;
   size?: Size;
+  mini?: boolean;
 };
-const UserTag = ({ user, size = 'md' }: Props) => {
+const UserTag = ({ user, size = 'md', mini = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -103,6 +104,16 @@ const UserTag = ({ user, size = 'md' }: Props) => {
       navigateToUserProfile(signedInUserId, targetProfileUserId, navigation);
     }
   };
+
+  if (mini) {
+    return (
+      <Pressable onPress={tryNavigate}>
+        <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
+          {data.displayName}
+        </Text>
+      </Pressable>
+    );
+  }
 
   return (
     <Pressable onPress={tryNavigate}>
