@@ -1,6 +1,9 @@
 import { useQuery } from 'react-query';
 import {
   getActiveRoutesCursor,
+  getArchivedRoutesSubstringMatcher,
+  getUserSubstringMatcher,
+  UserSearchResult,
   getPostById,
   getRouteById,
   getUserById,
@@ -12,6 +15,7 @@ import {
   RouteClassifier,
   RouteStatus,
   RouteType,
+  SubstringMatcher,
   User,
   UserStatus,
   Comment,
@@ -187,6 +191,27 @@ export const useActiveRoutes = () => {
   );
 };
 
+export type FetchedSearchSubstringMatchers = {
+  userSubstringMatcher: SubstringMatcher<UserSearchResult[]>;
+  archivedRoutesSubstringMatcher: SubstringMatcher<String>;
+};
+const SEARCH_SUBSTRING_MATCHER_CACHE_KEY = 'search-substring-matcher';
+const fetchSearchSubstringMatchers = async () => {
+  const userSubstringMatcher = await getUserSubstringMatcher();
+  const archivedRoutesSubstringMatcher =
+    await getArchivedRoutesSubstringMatcher();
+  return {
+    userSubstringMatcher: userSubstringMatcher,
+    archivedRoutesSubstringMatcher: archivedRoutesSubstringMatcher,
+  } as FetchedSearchSubstringMatchers;
+};
+export const useSearchSubstringMatchers = () => {
+  return useQuery(
+    SEARCH_SUBSTRING_MATCHER_CACHE_KEY,
+    fetchSearchSubstringMatchers
+  );
+};
+
 export type FetchedComment = {
   author: User;
   timestamp: Date;
@@ -197,7 +222,6 @@ export type FetchedComment = {
 
   commentObject: Comment;
 };
-
 export const fetchComment = async (comment: Comment) => {
   return {
     author: await comment.getAuthor(),

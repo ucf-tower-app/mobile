@@ -126,7 +126,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
+              <VStack justifyContent="flex-start" flexGrow={0}>
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
