@@ -22,12 +22,11 @@ import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import { userAtom } from '../../utils/atoms';
-import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
 import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { RouteStatus } from '../../xplat/types';
+import { Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -50,7 +49,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const { isLoading, isError, data, error } = useQuery(
     routeDocRefId,
-    buildRouteFetcherFromDocRefId(routeDocRefId)
+    Route.buildFetcherFromDocRefId(routeDocRefId)
   );
 
   useEffect(() => {
@@ -114,7 +113,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
             <Heading size="2xl">{data.name}</Heading>
             <Heading size="2xl" color="grey">
-              {data.grade}
+              {data.gradeDisplayString}
             </Heading>
           </HStack>
           <Text fontSize="2xl" color="grey" mx={4}>
@@ -122,7 +121,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
+              <VStack justifyContent="flex-start" flexGrow={0}>
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
@@ -177,7 +176,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
         }}
       />
       <Feed
-        forumDocRefId={data.forum.getId()}
+        forumDocRefId={data.forumDocRefID}
         topComponent={routeViewComponent}
       />
     </>

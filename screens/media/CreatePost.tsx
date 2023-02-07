@@ -20,14 +20,16 @@ import { queryClient } from '../../App';
 import Post from '../../components/media/Post';
 import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 import { userAtom } from '../../utils/atoms';
-import {
-  FetchedRoute,
-  buildRouteFetcherFromDocRefId,
-} from '../../utils/queries';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession } from '../../utils/utils';
-import { createPost } from '../../xplat/api';
-import { LazyStaticImage, LazyStaticVideo, PostMock } from '../../xplat/types';
+import { createPost, getForumById } from '../../xplat/api';
+import {
+  FetchedRoute,
+  LazyStaticImage,
+  LazyStaticVideo,
+  PostMock,
+  Route as RouteObj,
+} from '../../xplat/types';
 
 /**
  * The CreatePost screen is responsible for handling post creation from
@@ -56,7 +58,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
 
   const { data } = useQuery(
     routeDocRefId!,
-    buildRouteFetcherFromDocRefId(routeDocRefId!),
+    RouteObj.buildFetcherFromDocRefId(routeDocRefId!),
     {
       enabled: routeDocRefId !== undefined,
     }
@@ -74,6 +76,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         user,
         new Date(Date.now()),
         textContent,
+        [],
         [],
         imageContent,
         videoContent
@@ -154,7 +157,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
-      const forum = selectedRoute?.forum;
+      const forum = selectedRoute && getForumById(selectedRoute.forumDocRefID);
       createPost(user, textContent, forum, imageBlobs, videoBlob).then(() => {
         queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
         if (forum)

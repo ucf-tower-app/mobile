@@ -1,6 +1,7 @@
 import { Select, Skeleton } from 'native-base';
 import { useEffect, useState } from 'react';
-import { FetchedRoute, useActiveRoutes } from '../../utils/queries';
+import { useActiveRoutes } from '../../utils/queries';
+import { FetchedRoute } from '../../xplat/types';
 
 type Props = {
   onSelectRoute: (route: FetchedRoute) => void;
@@ -53,7 +54,7 @@ const ActiveRoutesDropdown = ({
     >
       {data.activeRoutes.map((route) => (
         <Select.Item
-          label={route.name + ' (' + route.grade + ')'}
+          label={route.name + ' (' + route.gradeDisplayString + ')'}
           value={route.name}
           key={route.routeObject.getId()}
         />

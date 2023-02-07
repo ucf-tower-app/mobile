@@ -1,5 +1,5 @@
 import { Avatar, Heading, Text, useColorModeValue, VStack } from 'native-base';
-import { FetchedUser } from '../../utils/queries';
+import { FetchedUser } from '../../xplat/types';
 
 type Props = {
   fetchedUser: FetchedUser;

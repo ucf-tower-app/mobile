@@ -1,4 +1,5 @@
 // Route metadata for tab-global routes
+import Comments from '../../../screens/media/Comments';
 import CreatePost from '../../../screens/media/CreatePost';
 import Follows from '../../../screens/profile/Follows';
 import Profile from '../../../screens/profile/Profile';
@@ -31,5 +32,9 @@ export const routes: Route[] = [
   {
     name: 'CreatePost',
     component: CreatePost,
+  },
+  {
+    name: 'Comments',
+    component: Comments,
   },
 ];

@@ -12,4 +12,7 @@ export type ParamList = {
   CreatePost: {
     routeDocRefId?: string;
   };
+  Comments: {
+    postDocRefId: string;
+  };
 };
