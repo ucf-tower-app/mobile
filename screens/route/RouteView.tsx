@@ -28,7 +28,7 @@ import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { Post, QueryCursor, Route, RouteStatus } from '../../xplat/types';
+import { Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -39,10 +39,6 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const user = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
-
-  const [postsCursor, setPostsCursor] = useState<QueryCursor<Post> | undefined>(
-    undefined
-  );
 
   const [_userHasRated, setUserHasRated] = useState<boolean>(false);
   const [isRating, setIsRating] = useState<boolean>(false);
@@ -67,14 +63,14 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
       if (send === undefined) return;
       setUserHasSent(true);
     });
-
-    data.routeObject.getForum().then((forum) => {
-      setPostsCursor(forum.getPostsCursor());
-    });
   }, [data, user]);
 
   if (isLoading) {
-    return null;
+    return (
+      <Center>
+        <Spinner size="lg" />
+      </Center>
+    );
   }
 
   if (isError || data === undefined) {
@@ -101,7 +97,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const post = () => {
     navigation.push('CreatePost', {
-      routeName: data.name,
+      routeDocRefId: data.routeObject.getId(),
     });
   };
 
@@ -128,7 +124,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
+              <VStack justifyContent="flex-start" flexGrow={0}>
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
@@ -192,16 +188,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           setUserHasRated(true);
         }}
       />
-      {postsCursor !== undefined ? (
-        <Feed
-          forumDocRefId={data.forumDocRefID}
-          topComponent={routeViewComponent}
-        />
-      ) : (
-        <Center>
-          <Spinner size="lg" />
-        </Center>
-      )}
+      <Feed
+        forumDocRefId={data.forumDocRefID}
+        topComponent={routeViewComponent}
+      />
     </>
   );
 };

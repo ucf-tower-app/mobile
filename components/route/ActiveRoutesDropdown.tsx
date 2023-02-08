@@ -1,15 +1,15 @@
 import { Select, Skeleton } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useActiveRoutes } from '../../utils/queries';
-import { FetchedRoute, Route } from '../../xplat/types';
+import { FetchedRoute } from '../../xplat/types';
 
 type Props = {
-  onSelectRoute: (route: Route) => void;
-  preSelectedRouteName?: string;
+  onSelectRoute: (route: FetchedRoute) => void;
+  preSelectedRouteDocRefId?: string;
 };
 const ActiveRoutesDropdown = ({
   onSelectRoute,
-  preSelectedRouteName,
+  preSelectedRouteDocRefId,
 }: Props) => {
   const [routeNameToRoute, setRouteNameToRoute] = useState<
     Record<string, FetchedRoute>
@@ -30,7 +30,7 @@ const ActiveRoutesDropdown = ({
   }, [data]);
 
   const onSelectRouteName = (routeName: string) => {
-    onSelectRoute(routeNameToRoute[routeName].routeObject);
+    onSelectRoute(routeNameToRoute[routeName]);
   };
 
   if (isLoading) {
@@ -41,6 +41,11 @@ const ActiveRoutesDropdown = ({
     console.error(error);
     return null;
   }
+
+  const preSelectedRouteName = data.activeRoutes.find(
+    (fetchedRoute) =>
+      fetchedRoute.routeObject.getId() === preSelectedRouteDocRefId
+  )?.name;
 
   return (
     <Select

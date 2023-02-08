@@ -1,20 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
   Center,
+  HStack,
+  Icon,
   Skeleton,
   Text,
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
+import ContextMenu, { ContextOptions } from './ContextMenu';
+import Reportable from './Reportable';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -47,6 +54,10 @@ type Props = {
 const Post = ({ post }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
+  const signedInUser = useRecoilValue(userAtom);
+  const [contextOptions, setContextOptions] = useState<ContextOptions>({});
+  const [isReporting, setIsReporting] = useState<boolean>(false);
+
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
   );
@@ -58,6 +69,19 @@ const Post = ({ post }: Props) => {
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
+
+  // Set up the context menu
+  useEffect(() => {
+    const _contextOptions: ContextOptions = {};
+    if (
+      signedInUser !== undefined &&
+      signedInUser?.getId() !== postData?.author.getId()
+    )
+      _contextOptions.Report = () => {
+        setIsReporting(true);
+      };
+    setContextOptions(_contextOptions);
+  }, [signedInUser, postData]);
 
   useEffect(() => {
     if (realQR.data) setPostData(realQR.data);
@@ -94,32 +118,61 @@ const Post = ({ post }: Props) => {
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
-  return (
-    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-      <Box pl={2}>
-        <UserTag user={postData.author} />
-      </Box>
-      <Box p={2}>
-        <Text>{postData.textContent}</Text>
-      </Box>
-      {mediaList === undefined ? null : (
-        <Box w="full" pt={2}>
-          <MediaCarousel mediaList={mediaList} />
+  if (postData.isSend) {
+    return (
+      <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
+        <Icon
+          as={<Ionicons name="trending-up" />}
+          color="black"
+          opacity={75}
+          size="xl"
+        />
+        <Box pl={2}>
+          <UserTag user={postData.author} mini />
         </Box>
-      )}
-      <Center w="full">
-        <Button
-          variant="link"
-          onPress={() =>
-            navigation.push('Comments', {
-              postDocRefId: postData.postObject.getId(),
-            })
-          }
-        >
-          Comments
-        </Button>
-      </Center>
-    </VStack>
+
+        <Box pl={2}>
+          <Text>{'Sent it on ' + postData.timestamp.toLocaleDateString()}</Text>
+        </Box>
+      </HStack>
+    );
+  }
+
+  return (
+    <Reportable
+      isConfirming={isReporting}
+      media={postData.postObject}
+      close={() => {
+        setIsReporting(false);
+      }}
+    >
+      <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
+        <HStack w="full" px={2} justifyContent="space-between">
+          <UserTag user={postData.author} />
+          <ContextMenu contextOptions={contextOptions} />
+        </HStack>
+        <Box p={2}>
+          <Text>{postData.textContent}</Text>
+        </Box>
+        {mediaList === undefined ? null : (
+          <Box w="full" pt={2}>
+            <MediaCarousel mediaList={mediaList} />
+          </Box>
+        )}
+        <Center w="full">
+          <Button
+            variant="link"
+            onPress={() =>
+              navigation.push('Comments', {
+                postDocRefId: postData.postObject.getId(),
+              })
+            }
+          >
+            Comments
+          </Button>
+        </Center>
+      </VStack>
+    </Reportable>
   );
 };
 

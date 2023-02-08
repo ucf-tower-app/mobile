@@ -5,6 +5,7 @@ import {
   Spinner,
   useColorModeValue,
   Text,
+  Divider,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
@@ -124,17 +125,18 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
       >
         {comments.length === 0 ? (
           <Center mt={4}>
-            <Text color="gray.500">Nothing here yet...t!</Text>
+            <Text color="gray.500">Nothing here yet...!</Text>
           </Center>
         ) : (
-          comments.map((commentObj) => (
+          comments.map((commentObj, index) => (
             <Box key={commentObj.getId()}>
               <Comment comment={commentObj} />
+              {index < comments.length - 1 ? <Divider /> : null}
             </Box>
           ))
         )}
         {commentsQuery.hasNextPage ? (
-          <Center>
+          <Center mt={4}>
             <Spinner size="lg" />
           </Center>
         ) : null}

@@ -1,7 +1,7 @@
 // Route metadata for the profile tab
-import { View } from 'react-native';
 import { Name } from './names';
 import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
+import Search from '../../../screens/search/Search';
 
 export type Route = {
   name: Name;
@@ -11,7 +11,7 @@ export type Route = {
 export const routes: Route[] = [
   {
     name: 'Search',
-    component: View,
+    component: Search,
   },
   ...tabGlobalRoutes,
 ];
