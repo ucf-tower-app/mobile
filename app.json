@@ -19,7 +19,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tyler.hm.tower"
+      "bundleIdentifier": "com.tyler.hm.tower",
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {
