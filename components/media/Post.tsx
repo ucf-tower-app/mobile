@@ -21,6 +21,7 @@ import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import ContextMenu, { ContextOptions } from './ContextMenu';
+import Reportable from './Reportable';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -55,6 +56,7 @@ const Post = ({ post }: Props) => {
 
   const signedInUser = useRecoilValue(userAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
+  const [isReporting, setIsReporting] = useState<boolean>(false);
 
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
@@ -68,15 +70,18 @@ const Post = ({ post }: Props) => {
     enabled: !post.isMock(),
   });
 
+  // Set up the context menu
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
     if (
       signedInUser !== undefined &&
-      signedInUser?.getId() === postData?.author.getId()
+      signedInUser?.getId() !== postData?.author.getId()
     )
-      _contextOptions.Report = () => {};
+      _contextOptions.Report = () => {
+        setIsReporting(true);
+      };
     setContextOptions(_contextOptions);
-  }, [signedInUser, postData, setContextOptions]);
+  }, [signedInUser, postData]);
 
   useEffect(() => {
     if (realQR.data) setPostData(realQR.data);
@@ -134,32 +139,40 @@ const Post = ({ post }: Props) => {
   }
 
   return (
-    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-      <HStack w="full" px={2} justifyContent="space-between">
-        <UserTag user={postData.author} />
-        <ContextMenu contextOptions={contextOptions} />
-      </HStack>
-      <Box p={2}>
-        <Text>{postData.textContent}</Text>
-      </Box>
-      {mediaList === undefined ? null : (
-        <Box w="full" pt={2}>
-          <MediaCarousel mediaList={mediaList} />
+    <Reportable
+      isConfirming={isReporting}
+      media={postData.postObject}
+      close={() => {
+        setIsReporting(false);
+      }}
+    >
+      <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
+        <HStack w="full" px={2} justifyContent="space-between">
+          <UserTag user={postData.author} />
+          <ContextMenu contextOptions={contextOptions} />
+        </HStack>
+        <Box p={2}>
+          <Text>{postData.textContent}</Text>
         </Box>
-      )}
-      <Center w="full">
-        <Button
-          variant="link"
-          onPress={() =>
-            navigation.push('Comments', {
-              postDocRefId: postData.postObject.getId(),
-            })
-          }
-        >
-          Comments
-        </Button>
-      </Center>
-    </VStack>
+        {mediaList === undefined ? null : (
+          <Box w="full" pt={2}>
+            <MediaCarousel mediaList={mediaList} />
+          </Box>
+        )}
+        <Center w="full">
+          <Button
+            variant="link"
+            onPress={() =>
+              navigation.push('Comments', {
+                postDocRefId: postData.postObject.getId(),
+              })
+            }
+          >
+            Comments
+          </Button>
+        </Center>
+      </VStack>
+    </Reportable>
   );
 };
 
