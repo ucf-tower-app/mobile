@@ -13,11 +13,14 @@ import {
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
+import ContextMenu, { ContextOptions } from './ContextMenu';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -50,6 +53,9 @@ type Props = {
 const Post = ({ post }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
+  const signedInUser = useRecoilValue(userAtom);
+  const [contextOptions, setContextOptions] = useState<ContextOptions>({});
+
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
   );
@@ -61,6 +67,16 @@ const Post = ({ post }: Props) => {
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
+
+  useEffect(() => {
+    const _contextOptions: ContextOptions = {};
+    if (
+      signedInUser !== undefined &&
+      signedInUser?.getId() === postData?.author.getId()
+    )
+      _contextOptions.Report = () => {};
+    setContextOptions(_contextOptions);
+  }, [signedInUser, postData, setContextOptions]);
 
   useEffect(() => {
     if (realQR.data) setPostData(realQR.data);
@@ -119,9 +135,10 @@ const Post = ({ post }: Props) => {
 
   return (
     <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-      <Box pl={2}>
+      <HStack w="full" px={2} justifyContent="space-between">
         <UserTag user={postData.author} />
-      </Box>
+        <ContextMenu contextOptions={contextOptions} />
+      </HStack>
       <Box p={2}>
         <Text>{postData.textContent}</Text>
       </Box>
