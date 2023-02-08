@@ -130,18 +130,20 @@ const Post = ({ post }: Props) => {
           <MediaCarousel mediaList={mediaList} />
         </Box>
       )}
-      <Center w="full">
-        <Button
-          variant="link"
-          onPress={() =>
-            navigation.push('Comments', {
-              postDocRefId: postData.postObject.getId(),
-            })
-          }
-        >
-          Comments
-        </Button>
-      </Center>
+      {!post.isMock() && (
+        <Center w="full">
+          <Button
+            variant="link"
+            onPress={() =>
+              navigation.push('Comments', {
+                postDocRefId: postData.postObject.getId(),
+              })
+            }
+          >
+            Comments
+          </Button>
+        </Center>
+      )}
     </VStack>
   );
 };
