@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { VStack, HStack, Text, Center } from 'native-base';
+import { VStack, HStack, Text } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { buildCommentFetcher } from '../../utils/queries';
 import { Comment as CommentObj } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
@@ -20,6 +20,7 @@ type Props = {
 };
 const Comment = ({ comment }: Props) => {
   const signedInUser = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
 
@@ -69,7 +70,9 @@ const Comment = ({ comment }: Props) => {
         </HStack>
         <HStack w="full" justifyContent="space-between">
           <Text my={2}>{data.textContent}</Text>
-          <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+          {permissionLevelCanWrite(userPermissionLevel) ? (
+            <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+          ) : null}
         </HStack>
       </VStack>
     </Reportable>
