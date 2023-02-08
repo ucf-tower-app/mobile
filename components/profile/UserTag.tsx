@@ -15,6 +15,7 @@ import { userAtom } from '../../utils/atoms';
 import { navigateToUserProfile } from '../../utils/nav';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { User } from '../../xplat/types/user';
+import Timestamp from '../media/Timestamp';
 import Tintable from '../util/Tintable';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg';
@@ -73,8 +74,9 @@ type Props = {
   user: User;
   size?: Size;
   mini?: boolean;
+  timestamp?: Date;
 };
-const UserTag = ({ user, size = 'md', mini = false }: Props) => {
+const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -134,9 +136,16 @@ const UserTag = ({ user, size = 'md', mini = false }: Props) => {
                 >
                   {data.displayName}
                 </Text>
-                <Text fontSize={sizedStyles[size].usernameSize} color="grey">
-                  @{data.username}
-                </Text>
+                <HStack alignItems="center">
+                  <Text fontSize={sizedStyles[size].usernameSize} color="grey">
+                    @{data.username}
+                  </Text>
+                  {timestamp !== undefined ? (
+                    <Box ml={2}>
+                      <Timestamp relative date={timestamp} />
+                    </Box>
+                  ) : null}
+                </HStack>
               </VStack>
             </HStack>
           </Box>

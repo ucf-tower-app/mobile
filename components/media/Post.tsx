@@ -3,13 +3,13 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
-  Center,
   HStack,
   Icon,
   Skeleton,
   Text,
   useColorModeValue,
   VStack,
+  Center,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -18,6 +18,7 @@ import { FetchedPost, Post as PostObj } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
+import Timestamp from './Timestamp';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -120,7 +121,7 @@ const Post = ({ post }: Props) => {
   return (
     <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
       <Box pl={2}>
-        <UserTag user={postData.author} />
+        <UserTag user={postData.author} timestamp={postData.timestamp} />
       </Box>
       <Box p={2}>
         <Text>{postData.textContent}</Text>
