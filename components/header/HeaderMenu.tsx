@@ -1,4 +1,4 @@
-import { Entypo } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { HStack, Icon, Menu, Pressable } from 'native-base';
 import { auth } from '../../xplat/Firebase';
 
@@ -6,14 +6,10 @@ type Props = {
   navigate: Function;
 };
 
-const PressableIcon = (triggerProps: any) => {
+export const PressableDots = (triggerProps: any) => {
   return (
     <Pressable {...triggerProps}>
-      <Icon
-        as={<Entypo name="dots-three-horizontal" />}
-        color="black"
-        size="lg"
-      />
+      <Icon as={Ionicons} name="ellipsis-horizontal" color="black" size="lg" />
     </Pressable>
   );
 };
@@ -23,7 +19,7 @@ const HeaderMenu = ({ navigate }: Props) => {
     <HStack space={3}>
       <Menu
         trigger={(triggerProps) => {
-          return PressableIcon(triggerProps);
+          return PressableDots(triggerProps);
         }}
       >
         <Menu.Item onPress={() => navigate('Settings')}>Settings</Menu.Item>

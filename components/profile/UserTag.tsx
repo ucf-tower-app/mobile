@@ -22,25 +22,21 @@ type Size = 'xs' | 'sm' | 'md' | 'lg';
 const sizedStyles = {
   xs: {
     avatarSize: 8,
-    preloadTextWidth: 12,
     displayNameSize: 'xs',
     usernameSize: 'xs',
   },
   sm: {
     avatarSize: 8,
-    preloadTextWidth: 18,
     displayNameSize: 'sm',
     usernameSize: 'xs',
   },
   md: {
     avatarSize: 12,
-    preloadTextWidth: 24,
     displayNameSize: 'md',
     usernameSize: 'sm',
   },
   lg: {
     avatarSize: 16,
-    preloadTextWidth: 32,
     displayNameSize: 'lg',
     usernameSize: 'md',
   },
@@ -59,7 +55,7 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
           h={sizedStyles[size].avatarSize}
           rounded="full"
         />
-        <Box pl={2} w={sizedStyles[size].preloadTextWidth}>
+        <Box pl={2} w={24}>
           <Skeleton.Text
             fontSize={sizedStyles[size].displayNameSize}
             lines={2}

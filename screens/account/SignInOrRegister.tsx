@@ -38,16 +38,19 @@ const SignInOrRegister = () => {
   const toast = useToast();
 
   const [formData, setData] = useState<SignInFormData>({
-    usernameOrEmail: 'lkf53414@xcoxc.com',
-    password: 'newpassword',
+    usernameOrEmail: '',
+    password: '',
   });
   const [errorData, setErrorData] = useState<SignInErrorData>({});
   const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
 
   const onSubmit = () => {
-    if (process.env.NODE_ENV === 'development') {
-      signIn('lkf53414@xcoxc.com', 'newpassword');
+    if (
+      process.env.NODE_ENV === 'development' &&
+      formData.usernameOrEmail === ''
+    ) {
+      signIn('tylerhm.dev@gmail.com', 'group47root');
       return;
     }
 
