@@ -42,7 +42,18 @@ const MediaCarousel = ({ mediaList, preview = false }: Props) => {
 
   if (mediaList.length === 0) return null;
   if (mediaList.length === 1)
-    return <Media media={mediaList[0]} width={width} height={height} />;
+    return (
+      <Center>
+        <Text fontSize={'xs'} color={'gray.400'} textAlign={'center'}>
+          (This is a preview; post images/videos will be full-size.)
+        </Text>
+        <Media
+          media={mediaList[0]}
+          width={width * (preview ? 0.5 : 1)}
+          height={height * (preview ? 0.5 : 1)}
+        />
+      </Center>
+    );
 
   return (
     <VStack space={2} width={width}>

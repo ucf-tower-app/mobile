@@ -189,7 +189,7 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
             <MediaCarousel mediaList={mediaList} preview={preview} />
           </Box>
         )}
-        {!post.isMock() && (
+        {!preview && (
           <Center w="full">
             <Button
               variant="link"
