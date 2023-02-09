@@ -5,13 +5,7 @@ import {
   getUserSubstringMatcher,
   UserSearchResult,
 } from '../xplat/api';
-import {
-  Post,
-  SubstringMatcher,
-  User,
-  Comment,
-  FetchedRoute,
-} from '../xplat/types';
+import { SubstringMatcher, FetchedRoute } from '../xplat/types';
 
 /**
  * When fetching active routes, use the provided cache key
@@ -67,29 +61,4 @@ export const useSearchSubstringMatchers = () => {
     SEARCH_SUBSTRING_MATCHER_CACHE_KEY,
     fetchSearchSubstringMatchers
   );
-};
-
-export type FetchedComment = {
-  author: User;
-  timestamp: Date;
-  textContent: string;
-  post: Post;
-
-  likes: User[];
-
-  commentObject: Comment;
-};
-export const fetchComment = async (comment: Comment) => {
-  return {
-    author: await comment.getAuthor(),
-    timestamp: await comment.getTimestamp(),
-    textContent: await comment.getTextContent(),
-    post: await comment.getPost(),
-    likes: await comment.getLikes(),
-    commentObject: comment,
-  } as FetchedComment;
-};
-
-export const buildCommentFetcher = (comment: Comment) => {
-  return async () => comment.getData().then(() => fetchComment(comment));
 };
