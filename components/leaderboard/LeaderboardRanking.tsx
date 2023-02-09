@@ -1,128 +1,79 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import {
-  Text,
-  HStack,
   Avatar,
-  Center,
-  Icon,
-  VStack,
-  Box,
-  Pressable,
   Badge,
+  Box,
+  Center,
+  HStack,
+  Icon,
+  Pressable,
+  Text,
+  VStack,
   useColorModeValue,
-  Heading,
 } from 'native-base';
-import { Entypo } from '@expo/vector-icons';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
+import { navigateToUserProfile } from '../../utils/nav';
+import { TabGlobalNavigationProp } from '../../utils/types';
+import { FetchedUser } from '../../xplat/types';
 
 //TODO: Change props once we know what leaderboard APIs will return
 type Props = {
   ranking: number;
-  avatarUrl: string;
-  username: string;
+  fetchedUser: FetchedUser;
   numOfSends: number;
-  navigate: Function;
 };
-const LeaderboardRanking = ({
-  ranking,
-  avatarUrl,
-  username,
-  numOfSends,
-  navigate,
-}: Props) => {
+const LeaderboardRanking = ({ ranking, fetchedUser, numOfSends }: Props) => {
+  const signedInUser = useRecoilValue(userAtom);
+  const navigation = useNavigation<TabGlobalNavigationProp>();
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-  const secondaryBgColor = useColorModeValue(
-    'lightMode.secondary',
-    'darkMode.secondary'
-  );
+
+  const tryNavigate = () => {
+    const signedInUserId = signedInUser?.docRef!.id;
+    if (signedInUserId === undefined) return;
+
+    const targetProfileUserId = fetchedUser.docRefId;
+    if (targetProfileUserId !== undefined) {
+      navigateToUserProfile(signedInUserId, targetProfileUserId, navigation);
+    }
+  };
 
   return (
-    <Pressable onPress={() => navigate('LeaderboardUserProfile')}>
+    <Pressable onPress={() => {}}>
       {({ isHovered, isPressed }) => {
-        return ranking !== 1 ? (
+        return (
           <Box
             p="3"
             rounded="8px"
-            shadow={1}
-            //TODO: Use function to use percentage of color used when component is pressed
-            bg={
-              isPressed
-                ? 'coolGray.100'
-                : isHovered
-                ? 'coolGray.100'
-                : baseBgColor
-            }
+            shadow="1"
+            bg={isPressed || isHovered ? 'coolGray.100' : baseBgColor}
           >
             <HStack justifyContent="space-between">
-              <HStack space={2}>
-                <Center mr={3}>
-                  <Text fontSize="xl">{ranking}</Text>
-                </Center>
+              <Pressable onPress={tryNavigate} pr={3}>
                 <Center>
                   <Avatar
-                    source={{
-                      uri: avatarUrl,
-                    }}
-                    size="md"
+                    source={{ uri: fetchedUser.avatarUrl }}
+                    size="xl"
+                    mb={3}
+                    borderWidth={2}
                   />
+                  <Badge rounded="full" variant="solid" mt={-6} fontSize="lg">
+                    {ranking}
+                  </Badge>
                 </Center>
-                <Center>
-                  <Text fontSize="xl">
-                    {username.length >= 13
-                      ? username.slice(0, 12) + '...'
-                      : username}
-                  </Text>
-                </Center>
-              </HStack>
-              <HStack space={3}>
-                <Center>
-                  <Icon
-                    as={<Entypo name="line-graph" />}
-                    size="lg"
-                    color="black"
-                  />
-                </Center>
-                <Center>
+              </Pressable>
+              <VStack justifyContent="center">
+                <Text fontSize="xl">{fetchedUser.displayName}</Text>
+                <HStack space={3} justifyContent="center">
+                  <Text fontSize="md">@{fetchedUser.username}</Text>
+                  <Icon as={<Ionicons name="trending-up" />} size="2xl" />
                   <Text fontSize="xl" bold>
                     {numOfSends}
                   </Text>
-                </Center>
-              </HStack>
+                </HStack>
+              </VStack>
             </HStack>
-          </Box>
-        ) : (
-          <Box
-            p={3}
-            //TODO: Use function to use percentage of color used when component is pressed
-            bg={
-              isPressed
-                ? 'coolGray.100'
-                : isHovered
-                ? 'coolGray.100'
-                : baseBgColor
-            }
-          >
-            <VStack>
-              <Center>
-                <Avatar
-                  source={{ uri: avatarUrl }}
-                  size="2xl"
-                  mb={3}
-                  bg="cyan.500"
-                  borderColor={secondaryBgColor}
-                  borderWidth={2}
-                />
-                <Badge
-                  rounded="full"
-                  variant="solid"
-                  mt={-6}
-                  bg={secondaryBgColor}
-                  fontSize="md"
-                >
-                  1
-                </Badge>
-                <Heading>{username}</Heading>
-                <Text>{numOfSends} Sends</Text>
-              </Center>
-            </VStack>
           </Box>
         );
       }}
