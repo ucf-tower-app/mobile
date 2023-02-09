@@ -134,18 +134,17 @@ const Post = ({ post, isInRouteView = false }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
+      <HStack w="full" justifyContent={'center'} bg={'red'}>
         <Icon
           as={<Ionicons name="trending-up" />}
           color="black"
           opacity={75}
-          size="xl"
+          size="2xl"
         />
-        <Box pl={2}>
+        <Box height={'full'} alignItems={'center'} pl={2}>
           <UserTag user={postData.author} mini />
         </Box>
-
-        <Box pl={2}>
+        <Box height={'full'} alignItems={'center'} pl={2}>
           <Text>{'Sent it on ' + postData.timestamp.toLocaleDateString()}</Text>
         </Box>
       </HStack>
