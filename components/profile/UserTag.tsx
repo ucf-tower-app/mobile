@@ -106,9 +106,16 @@ const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
   if (mini) {
     return (
       <Pressable onPress={tryNavigate}>
-        <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
-          {data.displayName}
-        </Text>
+        <HStack alignItems="center">
+          <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
+            {data.displayName}
+          </Text>
+          {timestamp !== undefined ? (
+            <Box ml={2}>
+              <Timestamp relative date={timestamp} />
+            </Box>
+          ) : null}
+        </HStack>
       </Pressable>
     );
   }
