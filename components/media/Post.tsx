@@ -16,12 +16,13 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj } from '../../xplat/types';
+import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './Reportable';
+import RouteLink from '../route/RouteLink';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -50,8 +51,9 @@ const PostSkeleton = () => {
  */
 type Props = {
   post: PostObj;
+  isInRouteView?: boolean;
 };
-const Post = ({ post }: Props) => {
+const Post = ({ post, isInRouteView = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -65,6 +67,7 @@ const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
+  const [route, setRoute] = useState<Route>();
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
@@ -84,7 +87,18 @@ const Post = ({ post }: Props) => {
   }, [signedInUser, postData]);
 
   useEffect(() => {
-    if (realQR.data) setPostData(realQR.data);
+    if (realQR.data !== undefined) {
+      setPostData(realQR.data);
+
+      const updateRoute = async () => {
+        const _route = await (
+          await realQR.data.postObject.getForum()
+        )?.getRoute();
+        setRoute(_route);
+      };
+
+      updateRoute();
+    }
   }, [realQR.data]);
 
   useEffect(() => {
@@ -138,6 +152,7 @@ const Post = ({ post }: Props) => {
     );
   }
 
+  const showRouteLink = !isInRouteView && route !== undefined;
   return (
     <Reportable
       isConfirming={isReporting}
@@ -147,11 +162,21 @@ const Post = ({ post }: Props) => {
       }}
     >
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-        <HStack w="full" px={2} justifyContent="space-between">
+        <HStack
+          w="full"
+          px={2}
+          justifyContent="space-between"
+          mb={showRouteLink ? 0 : 2}
+        >
           <UserTag user={postData.author} timestamp={postData.timestamp} />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
-        <Box p={2}>
+        {showRouteLink ? (
+          <Box mb={2}>
+            <RouteLink route={route!} />
+          </Box>
+        ) : null}
+        <Box p={2} pt={0}>
           <Text>{postData.textContent}</Text>
         </Box>
         {mediaList === undefined ? null : (

@@ -191,6 +191,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
       <Feed
         forumDocRefId={data.forumDocRefID}
         topComponent={routeViewComponent}
+        isInRouteView
       />
     </>
   );
