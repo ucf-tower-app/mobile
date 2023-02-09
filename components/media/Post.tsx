@@ -8,16 +8,21 @@ import {
   Icon,
   Skeleton,
   Text,
-  useColorModeValue,
   VStack,
+  useColorModeValue,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj } from '../../xplat/types';
+import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
+import RouteLink from '../route/RouteLink';
+import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
+import Reportable from './Reportable';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -46,9 +51,14 @@ const PostSkeleton = () => {
  */
 type Props = {
   post: PostObj;
+  isInRouteView?: boolean;
 };
-const Post = ({ post }: Props) => {
+const Post = ({ post, isInRouteView = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
+
+  const signedInUser = useRecoilValue(userAtom);
+  const [contextOptions, setContextOptions] = useState<ContextOptions>({});
+  const [isReporting, setIsReporting] = useState<boolean>(false);
 
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
@@ -57,13 +67,38 @@ const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
+  const [route, setRoute] = useState<Route>();
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
 
+  // Set up the context menu
   useEffect(() => {
-    if (realQR.data) setPostData(realQR.data);
+    const _contextOptions: ContextOptions = {};
+    if (
+      signedInUser !== undefined &&
+      signedInUser?.getId() !== postData?.author.getId()
+    )
+      _contextOptions.Report = () => {
+        setIsReporting(true);
+      };
+    setContextOptions(_contextOptions);
+  }, [signedInUser, postData]);
+
+  useEffect(() => {
+    if (realQR.data !== undefined) {
+      setPostData(realQR.data);
+
+      const updateRoute = async () => {
+        const _route = await (
+          await realQR.data.postObject.getForum()
+        )?.getRoute();
+        setRoute(_route);
+      };
+
+      updateRoute();
+    }
   }, [realQR.data]);
 
   useEffect(() => {
@@ -117,34 +152,54 @@ const Post = ({ post }: Props) => {
     );
   }
 
+  const showRouteLink = !isInRouteView && route !== undefined;
   return (
-    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-      <Box pl={2}>
-        <UserTag user={postData.author} />
-      </Box>
-      <Box p={2}>
-        <Text>{postData.textContent}</Text>
-      </Box>
-      {mediaList === undefined ? null : (
-        <Box w="full" pt={2}>
-          <MediaCarousel mediaList={mediaList} />
+    <Reportable
+      isConfirming={isReporting}
+      media={postData.postObject}
+      close={() => {
+        setIsReporting(false);
+      }}
+    >
+      <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
+        <HStack
+          w="full"
+          px={2}
+          justifyContent="space-between"
+          mb={showRouteLink ? 0 : 2}
+        >
+          <UserTag user={postData.author} timestamp={postData.timestamp} />
+          <ContextMenu contextOptions={contextOptions} />
+        </HStack>
+        {showRouteLink ? (
+          <Box mb={2}>
+            <RouteLink route={route!} />
+          </Box>
+        ) : null}
+        <Box p={2} pt={0}>
+          <Text>{postData.textContent}</Text>
         </Box>
-      )}
-      {!post.isMock() && (
-        <Center w="full">
-          <Button
-            variant="link"
-            onPress={() =>
-              navigation.push('Comments', {
-                postDocRefId: postData.postObject.getId(),
-              })
-            }
-          >
-            Comments
-          </Button>
-        </Center>
-      )}
-    </VStack>
+        {mediaList === undefined ? null : (
+          <Box w="full" pt={2}>
+            <MediaCarousel mediaList={mediaList} />
+          </Box>
+        )}
+        {post.isMock() && (
+          <Center w="full">
+            <Button
+              variant="link"
+              onPress={() =>
+                navigation.push('Comments', {
+                  postDocRefId: postData.postObject.getId(),
+                })
+              }
+            >
+              Comments
+            </Button>
+          </Center>
+        )}
+      </VStack>
+    </Reportable>
   );
 };
 
