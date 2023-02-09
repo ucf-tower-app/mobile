@@ -50,7 +50,7 @@ const SignInOrRegister = () => {
       process.env.NODE_ENV === 'development' &&
       formData.usernameOrEmail === ''
     ) {
-      signIn('tylerhm.dev@gmail.com', 'group47root');
+      signIn('lkf53414@xcoxc.com', 'newpassword');
       return;
     }
 
