@@ -3,13 +3,13 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
-  Center,
   HStack,
   Icon,
   Skeleton,
   Text,
   useColorModeValue,
   VStack,
+  Center,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -168,7 +168,7 @@ const Post = ({ post, isInRouteView = false }: Props) => {
           justifyContent="space-between"
           mb={showRouteLink ? 0 : 2}
         >
-          <UserTag user={postData.author} />
+          <UserTag user={postData.author} timestamp={postData.timestamp} />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         {showRouteLink ? (

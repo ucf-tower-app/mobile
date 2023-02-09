@@ -15,31 +15,28 @@ import { userAtom } from '../../utils/atoms';
 import { navigateToUserProfile } from '../../utils/nav';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { User } from '../../xplat/types/user';
+import Timestamp from '../media/Timestamp';
 import Tintable from '../util/Tintable';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg';
 const sizedStyles = {
   xs: {
     avatarSize: 8,
-    preloadTextWidth: 12,
     displayNameSize: 'xs',
     usernameSize: 'xs',
   },
   sm: {
     avatarSize: 8,
-    preloadTextWidth: 18,
     displayNameSize: 'sm',
     usernameSize: 'xs',
   },
   md: {
     avatarSize: 12,
-    preloadTextWidth: 24,
     displayNameSize: 'md',
     usernameSize: 'sm',
   },
   lg: {
     avatarSize: 16,
-    preloadTextWidth: 32,
     displayNameSize: 'lg',
     usernameSize: 'md',
   },
@@ -58,7 +55,7 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
           h={sizedStyles[size].avatarSize}
           rounded="full"
         />
-        <Box pl={2} w={sizedStyles[size].preloadTextWidth}>
+        <Box pl={2} w={24}>
           <Skeleton.Text
             fontSize={sizedStyles[size].displayNameSize}
             lines={2}
@@ -73,8 +70,9 @@ type Props = {
   user: User;
   size?: Size;
   mini?: boolean;
+  timestamp?: Date;
 };
-const UserTag = ({ user, size = 'md', mini = false }: Props) => {
+const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -108,9 +106,16 @@ const UserTag = ({ user, size = 'md', mini = false }: Props) => {
   if (mini) {
     return (
       <Pressable onPress={tryNavigate}>
-        <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
-          {data.displayName}
-        </Text>
+        <HStack alignItems="center">
+          <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
+            {data.displayName}
+          </Text>
+          {timestamp !== undefined ? (
+            <Box ml={2}>
+              <Timestamp relative date={timestamp} />
+            </Box>
+          ) : null}
+        </HStack>
       </Pressable>
     );
   }
@@ -134,9 +139,16 @@ const UserTag = ({ user, size = 'md', mini = false }: Props) => {
                 >
                   {data.displayName}
                 </Text>
-                <Text fontSize={sizedStyles[size].usernameSize} color="grey">
-                  @{data.username}
-                </Text>
+                <HStack alignItems="center">
+                  <Text fontSize={sizedStyles[size].usernameSize} color="grey">
+                    @{data.username}
+                  </Text>
+                  {timestamp !== undefined ? (
+                    <Box ml={2}>
+                      <Timestamp relative date={timestamp} />
+                    </Box>
+                  ) : null}
+                </HStack>
               </VStack>
             </HStack>
           </Box>
