@@ -79,7 +79,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         [],
         [],
         imageContent,
-        true,
+        false,
         videoContent
       )
     );

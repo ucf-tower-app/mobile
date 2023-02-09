@@ -3,13 +3,13 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
+  Center,
   HStack,
   Icon,
   Skeleton,
   Text,
-  useColorModeValue,
   VStack,
-  Center,
+  useColorModeValue,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -18,11 +18,11 @@ import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
+import RouteLink from '../route/RouteLink';
+import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './Reportable';
-import RouteLink from '../route/RouteLink';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -184,18 +184,20 @@ const Post = ({ post, isInRouteView = false }: Props) => {
             <MediaCarousel mediaList={mediaList} />
           </Box>
         )}
-        <Center w="full">
-          <Button
-            variant="link"
-            onPress={() =>
-              navigation.push('Comments', {
-                postDocRefId: postData.postObject.getId(),
-              })
-            }
-          >
-            Comments
-          </Button>
-        </Center>
+        {post.isMock() && (
+          <Center w="full">
+            <Button
+              variant="link"
+              onPress={() =>
+                navigation.push('Comments', {
+                  postDocRefId: postData.postObject.getId(),
+                })
+              }
+            >
+              Comments
+            </Button>
+          </Center>
+        )}
       </VStack>
     </Reportable>
   );
