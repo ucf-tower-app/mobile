@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
-import { buildCommentFetcher } from '../../utils/queries';
 import { Comment as CommentObj } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
@@ -26,7 +25,7 @@ const Comment = ({ comment }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     comment.getId(),
-    buildCommentFetcher(comment)
+    comment.buildFetcher()
   );
 
   useEffect(() => {
@@ -54,6 +53,9 @@ const Comment = ({ comment }: Props) => {
     if (isLiked) data.commentObject.addLike(signedInUser);
     else data.commentObject.removeLike(signedInUser);
   };
+
+  // uh oh scary comment
+  if (data.shouldBeHidden) return null;
 
   return (
     <Reportable

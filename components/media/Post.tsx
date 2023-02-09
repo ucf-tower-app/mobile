@@ -118,6 +118,9 @@ const Post = ({ post }: Props) => {
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
+  // uh oh this post is scary
+  if (postData.shouldBeHidden) return null;
+
   if (postData.isSend) {
     return (
       <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
