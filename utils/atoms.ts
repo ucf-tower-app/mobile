@@ -1,11 +1,6 @@
 import { atom } from 'recoil';
 import { User, UserStatus } from '../xplat/types';
 
-export const isInitializingAtom = atom<boolean>({
-  key: 'isInitializing',
-  default: true,
-});
-
 export const userAtom = atom<User | undefined>({
   key: 'user',
   default: undefined,

@@ -1,15 +1,12 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Flex, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
-import { useRecoilState } from 'recoil';
-import {
-  isInitializingAtom,
-  isSignedInAtom,
-  userPermissionLevelAtom,
-} from '../../utils/atoms';
+import { useRecoilValue } from 'recoil';
+import { isSignedInAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import { UserStatus } from '../../xplat/types';
+import NotifyBanned from './NotifyBanned';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
 
@@ -31,11 +28,10 @@ const Tabs = createMaterialBottomTabNavigator<TabParamList>();
  * 3. Logged in, email verified --> Render tab navigator
  */
 const EnsureAuth = () => {
-  const [isInitializing] = useRecoilState(isInitializingAtom);
-  const [isSignedIn] = useRecoilState(isSignedInAtom);
-  const [userStatus] = useRecoilState(userPermissionLevelAtom);
+  const isSignedIn = useRecoilValue(isSignedInAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
-  if (isInitializing)
+  if (isSignedIn && userPermissionLevel === undefined)
     return (
       <Flex w="full" h="full" justifyContent="center" alignItems="center">
         <Spinner size="lg" />
@@ -46,7 +42,11 @@ const EnsureAuth = () => {
     return <SignInOrRegister />;
   }
 
-  if (userStatus === UserStatus.Unverified) {
+  if (userPermissionLevel === UserStatus.Banned) {
+    return <NotifyBanned />;
+  }
+
+  if (userPermissionLevel === UserStatus.Unverified) {
     return <VerifyEmail />;
   }
 

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import {
-  isInitializingAtom,
   isSignedInAtom,
   userAtom,
   userPermissionLevelAtom,
@@ -13,7 +12,6 @@ type Props = {
   children: React.ReactNode;
 };
 const AuthProvider = ({ children }: Props) => {
-  const setIsInitializing = useSetRecoilState(isInitializingAtom);
   const setIsSignedIn = useSetRecoilState(isSignedInAtom);
   const setUser = useSetRecoilState(userAtom);
   const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
@@ -21,7 +19,6 @@ const AuthProvider = ({ children }: Props) => {
   useEffect(
     () =>
       auth.onAuthStateChanged(async (user) => {
-        setIsInitializing(true);
         if (user !== null) {
           setIsSignedIn(true);
           const lazyUser = await getCurrentUser();
@@ -32,9 +29,8 @@ const AuthProvider = ({ children }: Props) => {
           setUserPermissionLevel(undefined);
           setUser(undefined);
         }
-        setIsInitializing(false);
       }),
-    [setIsInitializing, setIsSignedIn, setUserPermissionLevel, setUser]
+    [setIsSignedIn, setUserPermissionLevel, setUser]
   );
 
   return <>{children}</>;
