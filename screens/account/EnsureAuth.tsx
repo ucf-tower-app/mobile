@@ -3,12 +3,13 @@ import { Flex, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
 import { useRecoilState } from 'recoil';
 import {
-  isEmailVerifiedAtom,
   isInitializingAtom,
   isSignedInAtom,
+  userPermissionLevelAtom,
 } from '../../utils/atoms';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
+import { UserStatus } from '../../xplat/types';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
 
@@ -32,7 +33,7 @@ const Tabs = createMaterialBottomTabNavigator<TabParamList>();
 const EnsureAuth = () => {
   const [isInitializing] = useRecoilState(isInitializingAtom);
   const [isSignedIn] = useRecoilState(isSignedInAtom);
-  const [isEmailVerified] = useRecoilState(isEmailVerifiedAtom);
+  const [userStatus] = useRecoilState(userPermissionLevelAtom);
 
   if (isInitializing)
     return (
@@ -45,7 +46,7 @@ const EnsureAuth = () => {
     return <SignInOrRegister />;
   }
 
-  if (!isEmailVerified) {
+  if (userStatus === UserStatus.Unverified) {
     return <VerifyEmail />;
   }
 
