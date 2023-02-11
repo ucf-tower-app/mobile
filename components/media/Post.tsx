@@ -52,8 +52,9 @@ const PostSkeleton = () => {
 type Props = {
   post: PostObj;
   isInRouteView?: boolean;
+  preview?: boolean;
 };
-const Post = ({ post, isInRouteView = false }: Props) => {
+const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -168,7 +169,11 @@ const Post = ({ post, isInRouteView = false }: Props) => {
           justifyContent="space-between"
           mb={showRouteLink ? 0 : 2}
         >
-          <UserTag user={postData.author} timestamp={postData.timestamp} />
+          <UserTag
+            user={postData.author}
+            timestamp={postData.timestamp}
+            disbled={preview}
+          />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         {showRouteLink ? (
@@ -176,15 +181,15 @@ const Post = ({ post, isInRouteView = false }: Props) => {
             <RouteLink route={route!} />
           </Box>
         ) : null}
-        <Box p={2} pt={0}>
+        <Box p={preview ? 1 : 2} pt={0}>
           <Text>{postData.textContent}</Text>
         </Box>
         {mediaList === undefined ? null : (
-          <Box w="full" pt={2}>
-            <MediaCarousel mediaList={mediaList} />
+          <Box w="full" pt={preview ? 0 : 2}>
+            <MediaCarousel mediaList={mediaList} preview={preview} />
           </Box>
         )}
-        {post.isMock() && (
+        {!preview && (
           <Center w="full">
             <Button
               variant="link"

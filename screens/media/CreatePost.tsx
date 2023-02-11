@@ -287,12 +287,12 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         </VStack>
       </ScrollView>
 
-      <Box mt="auto" pb={2}>
-        <Heading mt={4} px={2}>
+      <Box mt="auto" pb={1}>
+        <Heading mt={1} px={2}>
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        {previewPost !== undefined ? <Post post={previewPost} /> : null}
+        {previewPost !== undefined ? <Post post={previewPost} preview /> : null}
       </Box>
     </Box>
   );

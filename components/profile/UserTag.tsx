@@ -71,8 +71,15 @@ type Props = {
   size?: Size;
   mini?: boolean;
   timestamp?: Date;
+  disbled?: boolean;
 };
-const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
+const UserTag = ({
+  user,
+  size = 'md',
+  mini = false,
+  timestamp,
+  disbled = true,
+}: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -94,6 +101,7 @@ const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
   }
 
   const tryNavigate = () => {
+    if (disbled) return;
     const signedInUserId = signedInUser?.docRef!.id;
     if (signedInUserId === undefined) return;
 
@@ -105,7 +113,7 @@ const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
 
   if (mini) {
     return (
-      <Pressable onPress={tryNavigate}>
+      <Pressable onPress={tryNavigate} disabled={!disbled}>
         <HStack alignItems="center">
           <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
             {data.displayName}
@@ -121,7 +129,7 @@ const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
   }
 
   return (
-    <Pressable onPress={tryNavigate}>
+    <Pressable onPress={tryNavigate} disabled={!disbled}>
       {({ isHovered, isPressed }) => {
         return (
           <Box rounded="full" bg={baseBgColor}>
