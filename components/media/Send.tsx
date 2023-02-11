@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { FetchedSend, Send as SendObj } from '../../xplat/types';
 import UserTag from '../profile/UserTag';
+import Timestamp from './Timestamp';
 
 type Props = {
   send: SendObj;
@@ -70,10 +71,10 @@ const Send = ({ send }: Props) => {
           <UserTag user={sendData.user} mini />
         </Box>
         <HStack>
-          <Text>{routeName}</Text>
+          <Text>Route: {routeName} </Text>
           <Text bold>{sendData.classifier.displayString}</Text>
         </HStack>
-        <Text>{'Sent it on ' + sendData.timestamp.toLocaleDateString()}</Text>
+        <Timestamp relative date={sendData.timestamp} />
       </VStack>
     </HStack>
   );

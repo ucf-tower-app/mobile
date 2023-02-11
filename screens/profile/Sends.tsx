@@ -1,30 +1,10 @@
-import {
-  Center,
-  Divider,
-  ScrollView,
-  Spinner,
-  useColorModeValue,
-  VStack,
-} from 'native-base';
+import { Divider, FlatList, Spinner, useColorModeValue } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery } from 'react-query';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { constructPageData, getIQParams_UserSends } from '../../xplat/queries';
 import { Send as SendObj } from '../../xplat/types';
 import Send from '../../components/media/Send';
-
-const isCloseToBottom = ({
-  layoutMeasurement,
-  contentOffset,
-  contentSize,
-}: NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
-};
 
 const Sends = ({ route }: TabGlobalScreenProps<'Sends'>) => {
   const userDocRefId = route.params.userDocRefId;
@@ -39,42 +19,29 @@ const Sends = ({ route }: TabGlobalScreenProps<'Sends'>) => {
       setSends(data.pages.flatMap((page) => constructPageData(SendObj, page)));
   }, [data]);
 
-  const loadNextPosts = useCallback(async () => {
+  const loadNextSends = useCallback(async () => {
     if (hasNextPage && !isFetchingNextPage) {
       await fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  console.log(sends);
+  const renderSpinner = () => {
+    if (isFetchingNextPage) return <Spinner size="lg" />;
+    else return null;
+  };
+
   return (
-    <ScrollView
-      w="full"
-      bg={baseBgColor}
-      onScroll={({ nativeEvent }) => {
-        if (hasNextPage && isCloseToBottom(nativeEvent)) {
-          loadNextPosts();
-        }
-      }}
-      scrollEventThrottle={1000}
-    >
-      <Center w="full">
-        <VStack w="full">
-          {sends?.map((send, index) => {
-            return (
-              <VStack key={send.getId()} pt={4}>
-                <Send send={send} />
-                {index < sends.length - 1 ? <Divider /> : null}
-              </VStack>
-            );
-          })}
-          {hasNextPage ? (
-            <Center pt={4}>
-              <Spinner size="lg" />
-            </Center>
-          ) : null}
-        </VStack>
-      </Center>
-    </ScrollView>
+    <FlatList
+      bgColor={baseBgColor}
+      data={sends}
+      extraData={sends}
+      onEndReached={loadNextSends}
+      onEndReachedThreshold={0.8}
+      ItemSeparatorComponent={Divider}
+      renderItem={({ item }) => <Send send={item} />}
+      keyExtractor={(item) => item.getId()}
+      ListFooterComponent={renderSpinner}
+    />
   );
 };
 
