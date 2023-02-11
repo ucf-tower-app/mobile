@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
-  Center,
   HStack,
   Icon,
   Skeleton,
@@ -17,6 +16,7 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
+import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
 import ContextMenu, { ContextOptions } from './ContextMenu';
@@ -123,6 +123,14 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
     setMediaList(newMediaList);
   }, [post, postData]);
 
+  // Like the post
+  const onSetIsLiked = (isLiked: boolean) => {
+    if (signedInUser === undefined || postData === undefined) return;
+
+    if (isLiked) postData.postObject.addLike(signedInUser);
+    else postData.postObject.removeLike(signedInUser);
+  };
+
   if (post.isMock()) {
     if (postData === undefined) return <PostSkeleton />;
   } else {
@@ -184,8 +192,13 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
             <MediaCarousel mediaList={mediaList} preview={preview} />
           </Box>
         )}
-        {!preview && (
-          <Center w="full">
+        {!preview ? (
+          <HStack
+            w="full"
+            justifyContent="center"
+            alignItems="center"
+            position="relative"
+          >
             <Button
               variant="link"
               onPress={() =>
@@ -196,8 +209,11 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
             >
               Comments
             </Button>
-          </Center>
-        )}
+            <Box position="absolute" right={4}>
+              <LikeButton likes={postData.likes} onSetIsLiked={onSetIsLiked} />
+            </Box>
+          </HStack>
+        ) : null}
       </VStack>
     </Reportable>
   );
