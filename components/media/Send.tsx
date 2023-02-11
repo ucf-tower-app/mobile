@@ -1,9 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { Box, HStack, Icon, Text, useColorModeValue } from 'native-base';
+import {
+  Box,
+  Center,
+  HStack,
+  Icon,
+  Text,
+  useColorModeValue,
+  VStack,
+} from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedSend, Send as SendObj } from '../../xplat/types';
 import UserTag from '../profile/UserTag';
 
@@ -16,13 +22,20 @@ const Send = ({ send }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [sendData, setSendData] = useState<FetchedSend>();
+  const [routeName, setRouteName] = useState<string>();
 
   const realQR = useQuery(send.getId(), send.buildFetcher(), {
     enabled: !send.isMock(),
   });
 
   useEffect(() => {
-    if (realQR.data) setSendData(realQR.data);
+    if (realQR.data) {
+      const getRouteName = async () => {
+        setRouteName(await realQR.data.route.getName());
+      };
+      setSendData(realQR.data);
+      getRouteName();
+    }
   }, [realQR.data]);
 
   useEffect(() => {
@@ -42,20 +55,26 @@ const Send = ({ send }: Props) => {
   }
 
   return (
-    <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
-      <Icon
-        as={<Ionicons name="trending-up" />}
-        color="black"
-        opacity={75}
-        size="xl"
-      />
-      <Box pl={2}>
-        <UserTag user={sendData.user} mini />
-      </Box>
+    <HStack w="full" bg={baseBgColor} space="3" p="2">
+      <Center>
+        <Icon
+          as={<Ionicons name="trending-up" />}
+          color="black"
+          opacity={75}
+          size="xl"
+        />
+      </Center>
 
-      <Box pl={2}>
+      <VStack>
+        <Box>
+          <UserTag user={sendData.user} mini />
+        </Box>
+        <HStack>
+          <Text>{routeName}</Text>
+          <Text bold>{sendData.classifier.displayString}</Text>
+        </HStack>
         <Text>{'Sent it on ' + sendData.timestamp.toLocaleDateString()}</Text>
-      </Box>
+      </VStack>
     </HStack>
   );
 };
