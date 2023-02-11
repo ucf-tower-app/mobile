@@ -135,20 +135,15 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
-        <Icon
-          as={<Ionicons name="trending-up" />}
-          color="black"
-          opacity={75}
-          size="xl"
-        />
+      <HStack w="full" alignItems="center" bg={baseBgColor} mb={2} px={2}>
+        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
         <Box pl={2}>
           <UserTag user={postData.author} mini />
         </Box>
 
-        <Box pl={2}>
-          <Text>{'Sent it on ' + postData.timestamp.toLocaleDateString()}</Text>
-        </Box>
+        <Text pl={2}>
+          {'Sent it on ' + postData.timestamp.toLocaleDateString()}
+        </Text>
       </HStack>
     );
   }
@@ -172,7 +167,7 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
           <UserTag
             user={postData.author}
             timestamp={postData.timestamp}
-            disbled={preview}
+            isNavigationDisabled={preview}
           />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
