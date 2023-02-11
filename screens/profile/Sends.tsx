@@ -1,4 +1,14 @@
-import { Divider, FlatList, Spinner, useColorModeValue } from 'native-base';
+import {
+  Center,
+  Divider,
+  FlatList,
+  Icon,
+  Spinner,
+  Text,
+  useColorModeValue,
+  VStack,
+} from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { TabGlobalScreenProps } from '../../utils/types';
@@ -30,11 +40,25 @@ const Sends = ({ route }: TabGlobalScreenProps<'Sends'>) => {
     else return null;
   };
 
+  const renderEmptyList = () => {
+    return (
+      <Center w="full" mt="1/2">
+        <VStack>
+          <Center>
+            <Icon as={<Ionicons name="trending-up" />} size="6xl" />
+          </Center>
+          <Text fontSize="lg">No sends.</Text>
+        </VStack>
+      </Center>
+    );
+  };
+
   return (
     <FlatList
       bgColor={baseBgColor}
       data={sends}
       extraData={sends}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={loadNextSends}
       onEndReachedThreshold={0.8}
       ItemSeparatorComponent={Divider}
