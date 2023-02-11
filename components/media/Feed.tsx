@@ -38,11 +38,13 @@ type Props = {
   topComponent?: JSX.Element;
   userDocRefId?: string;
   forumDocRefId?: string;
+  isInRouteView?: boolean;
 };
 const Feed = ({
   topComponent,
   userDocRefId = undefined,
   forumDocRefId = undefined,
+  isInRouteView = false,
 }: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
 
@@ -83,7 +85,7 @@ const Feed = ({
           {posts?.map((post, index) => {
             return (
               <VStack key={post.getId()} pt={4}>
-                <Post post={post} />
+                <Post post={post} isInRouteView={isInRouteView} />
                 {index < posts.length - 1 ? <Divider /> : null}
               </VStack>
             );

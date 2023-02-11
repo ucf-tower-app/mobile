@@ -17,10 +17,9 @@ const PostWrapper = () => {
   return (
     <ScrollView w="full" bg={baseBgColor}>
       <Divider mb={4} />
-      <Post post={postMock} />
-      {padifyPost(<Post post={postMockNoVideo} />)}
-      {padifyPost(<Post post={postMockNoImage} />)}
-      {padifyPost(<Post post={undefined} />)}
+      <Post post={postMock} context="Mock" />
+      {padifyPost(<Post post={postMockNoVideo} context="Mock" />)}
+      {padifyPost(<Post post={postMockNoImage} context="Mock" />)}
       <Divider mt={4} />
     </ScrollView>
   );
