@@ -292,7 +292,9 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        {previewPost !== undefined ? <Post post={previewPost} preview /> : null}
+        {previewPost !== undefined ? (
+          <Post post={previewPost} isPreview />
+        ) : null}
       </Box>
     </Box>
   );
