@@ -1,4 +1,4 @@
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Flex, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
 import { useRecoilValue } from 'recoil';
@@ -16,7 +16,7 @@ const tabBarStyle = {
 };
 
 // Tabs used for bottom tray, stack for in-tab nav
-const Tabs = createMaterialBottomTabNavigator<TabParamList>();
+const Tabs = createBottomTabNavigator<TabParamList>();
 
 /**
  * [EnsureAuth] is a wrapper component for the main tab navigator.
