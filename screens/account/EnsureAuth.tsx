@@ -1,4 +1,4 @@
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Flex, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
 import { useRecoilValue } from 'recoil';
@@ -10,13 +10,8 @@ import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
 import NotifyBanned from './NotifyBanned';
 
-// Style for tab bar
-const tabBarStyle = {
-  backgroundColor: 'white',
-};
-
 // Tabs used for bottom tray, stack for in-tab nav
-const Tabs = createMaterialBottomTabNavigator<TabParamList>();
+const Tabs = createBottomTabNavigator<TabParamList>();
 
 /**
  * [EnsureAuth] is a wrapper component for the main tab navigator.
@@ -53,8 +48,9 @@ const EnsureAuth = () => {
   return (
     <Tabs.Navigator
       initialRouteName="HomeTab"
-      barStyle={tabBarStyle}
-      labeled={false}
+      screenOptions={{
+        headerShown: false,
+      }}
     >
       {tabRoutes.map((route) => (
         <Tabs.Screen
@@ -63,6 +59,7 @@ const EnsureAuth = () => {
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? route.focusedIcon : route.unfocusedIcon,
+              tabBarShowLabel: false,
           }}
           key={route.name}
         />
