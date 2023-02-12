@@ -9,38 +9,34 @@ import {
   useColorModeValue,
   VStack,
 } from 'native-base';
-import { User } from '../../xplat/types/user';
-import Tintable from '../util/Tintable';
-import { TabGlobalNavigationProp } from '../../utils/types';
-import { userAtom } from '../../utils/atoms';
-import { useRecoilValue } from 'recoil';
-import { navigateToUserProfile } from '../../utils/nav';
 import { useQuery } from 'react-query';
-import { buildUserFetcher } from '../../utils/queries';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../../utils/atoms';
+import { navigateToUserProfile } from '../../utils/nav';
+import { TabGlobalNavigationProp } from '../../utils/types';
+import { User } from '../../xplat/types/user';
+import Timestamp from '../media/Timestamp';
+import Tintable from '../util/Tintable';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg';
 const sizedStyles = {
   xs: {
     avatarSize: 8,
-    preloadTextWidth: 12,
     displayNameSize: 'xs',
     usernameSize: 'xs',
   },
   sm: {
     avatarSize: 8,
-    preloadTextWidth: 18,
     displayNameSize: 'sm',
     usernameSize: 'xs',
   },
   md: {
     avatarSize: 12,
-    preloadTextWidth: 24,
     displayNameSize: 'md',
     usernameSize: 'sm',
   },
   lg: {
     avatarSize: 16,
-    preloadTextWidth: 32,
     displayNameSize: 'lg',
     usernameSize: 'md',
   },
@@ -59,7 +55,7 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
           h={sizedStyles[size].avatarSize}
           rounded="full"
         />
-        <Box pl={2} w={sizedStyles[size].preloadTextWidth}>
+        <Box pl={2} w={24}>
           <Skeleton.Text
             fontSize={sizedStyles[size].displayNameSize}
             lines={2}
@@ -73,8 +69,17 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
 type Props = {
   user: User;
   size?: Size;
+  mini?: boolean;
+  timestamp?: Date;
+  isNavigationDisabled?: boolean;
 };
-const UserTag = ({ user, size = 'md' }: Props) => {
+const UserTag = ({
+  user,
+  size = 'md',
+  mini = false,
+  timestamp,
+  isNavigationDisabled = false,
+}: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -83,7 +88,7 @@ const UserTag = ({ user, size = 'md' }: Props) => {
 
   const { isLoading, isError, data, error } = useQuery(
     user.getId(),
-    buildUserFetcher(user)
+    user.buildFetcher()
   );
 
   if (isLoading) {
@@ -105,33 +110,61 @@ const UserTag = ({ user, size = 'md' }: Props) => {
     }
   };
 
-  return (
-    <Pressable onPress={tryNavigate}>
-      {({ isHovered, isPressed }) => {
-        return (
-          <Box rounded="full" bg={baseBgColor}>
+  if (mini) {
+    return (
+      <Pressable onPress={tryNavigate} disabled={isNavigationDisabled}>
+        {({ isHovered, isPressed }) => (
+          <HStack alignItems="center">
             <Tintable tinted={isHovered || isPressed} rounded />
-            <HStack alignItems="center" pr={3}>
-              <Avatar
-                w={sizedStyles[size].avatarSize}
-                h={sizedStyles[size].avatarSize}
-                source={{ uri: data.avatarUrl }}
-              />
-              <VStack pl={2}>
-                <Text
-                  fontSize={sizedStyles[size].displayNameSize}
-                  fontWeight="bold"
-                >
-                  {data.displayName}
-                </Text>
+            <Text
+              fontSize={sizedStyles[size].displayNameSize}
+              fontWeight="bold"
+            >
+              {data.displayName}
+            </Text>
+            {timestamp !== undefined ? (
+              <Box ml={2}>
+                <Timestamp relative date={timestamp} />
+              </Box>
+            ) : null}
+          </HStack>
+        )}
+      </Pressable>
+    );
+  }
+
+  return (
+    <Pressable onPress={tryNavigate} disabled={isNavigationDisabled}>
+      {({ isHovered, isPressed }) => (
+        <Box rounded="full" bg={baseBgColor}>
+          <Tintable tinted={isHovered || isPressed} rounded />
+          <HStack alignItems="center" pr={3}>
+            <Avatar
+              w={sizedStyles[size].avatarSize}
+              h={sizedStyles[size].avatarSize}
+              source={{ uri: data.avatarUrl }}
+            />
+            <VStack pl={2}>
+              <Text
+                fontSize={sizedStyles[size].displayNameSize}
+                fontWeight="bold"
+              >
+                {data.displayName}
+              </Text>
+              <HStack alignItems="center">
                 <Text fontSize={sizedStyles[size].usernameSize} color="grey">
                   @{data.username}
                 </Text>
-              </VStack>
-            </HStack>
-          </Box>
-        );
-      }}
+                {timestamp !== undefined ? (
+                  <Box ml={2}>
+                    <Timestamp relative date={timestamp} />
+                  </Box>
+                ) : null}
+              </HStack>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
     </Pressable>
   );
 };

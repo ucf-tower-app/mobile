@@ -12,22 +12,23 @@ import {
   Text,
   VStack,
   useToken,
+  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import { useQuery } from 'react-query';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import Feed from '../../components/media/Feed';
 import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
-import { userAtom } from '../../utils/atoms';
-import { buildRouteFetcherFromDocRefId } from '../../utils/queries';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { Post, QueryCursor, RouteStatus } from '../../xplat/types';
+import { Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -36,11 +37,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
-  const [user] = useRecoilState(userAtom);
-
-  const [postsCursor, setPostsCursor] = useState<QueryCursor<Post> | undefined>(
-    undefined
-  );
+  const user = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
   const [_userHasRated, setUserHasRated] = useState<boolean>(false);
   const [isRating, setIsRating] = useState<boolean>(false);
@@ -54,25 +52,25 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const { isLoading, isError, data, error } = useQuery(
     routeDocRefId,
-    buildRouteFetcherFromDocRefId(routeDocRefId)
+    Route.buildFetcherFromDocRefId(routeDocRefId)
   );
 
   useEffect(() => {
     if (user === undefined || data === undefined) return;
 
     data.routeObject.getSendByUser(user).then((send) => {
+      setIsSending(false);
       if (send === undefined) return;
       setUserHasSent(true);
-      setIsSending(false);
-    });
-
-    data.routeObject.getForum().then((forum) => {
-      setPostsCursor(forum.getPostsCursor());
     });
   }, [data, user]);
 
   if (isLoading) {
-    return null;
+    return (
+      <Center>
+        <Spinner size="lg" />
+      </Center>
+    );
   }
 
   if (isError || data === undefined) {
@@ -99,12 +97,12 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const post = () => {
     navigation.push('CreatePost', {
-      routeName: data.name,
+      routeDocRefId: data.routeObject.getId(),
     });
   };
 
   const routeViewComponent = (
-    <Box w="full" h={600} bg={backgroundHex}>
+    <Box w="full" bg={backgroundHex}>
       <ImageBackground
         style={styles.thumbnail}
         resizeMode={ResizeMode.COVER}
@@ -114,11 +112,11 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           style={styles.gradient}
           colors={[backgroundHex + '00', backgroundHex]}
         />
-        <Flex direction="column" h="full" w="full" mt={4}>
+        <Flex direction="column" h="full" w="full" bg={backgroundHex}>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
             <Heading size="2xl">{data.name}</Heading>
             <Heading size="2xl" color="grey">
-              {data.grade}
+              {data.gradeDisplayString}
             </Heading>
           </HStack>
           <Text fontSize="2xl" color="grey" mx={4}>
@@ -126,7 +124,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           </Text>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow="unset">
+              <VStack justifyContent="flex-start" flexGrow={0}>
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
@@ -152,20 +150,30 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                 <Text fontSize="md">Rope {data.rope}</Text>
               ) : null}
             </Box>
-            <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+            {permissionLevelCanWrite(userPermissionLevel) ? (
+              <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+            ) : null}
           </HStack>
-          <Button
-            mx={4}
-            mt={4}
-            onPress={send}
-            isDisabled={userHasSent}
-            isLoading={isSending}
-          >
-            {userHasSent ? 'Sent!' : 'Send it!'}
-          </Button>
-          <Button mx={4} mt={4} onPress={post}>
-            Post to this route
-          </Button>
+          {permissionLevelCanWrite(userPermissionLevel) ? (
+            <>
+              <Button
+                mx={4}
+                mt={4}
+                onPress={send}
+                isDisabled={userHasSent}
+                isLoading={isSending}
+              >
+                {userHasSent ? 'Sent!' : 'Send it!'}
+              </Button>
+              <Button mx={4} mt={4} onPress={post}>
+                Post to this route
+              </Button>
+            </>
+          ) : null}
+          <Center mt={4} mb={2}>
+            <Heading>Posts</Heading>
+          </Center>
+          <Divider />
         </Flex>
       </ImageBackground>
     </Box>
@@ -180,16 +188,11 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           setUserHasRated(true);
         }}
       />
-      {postsCursor !== undefined ? (
-        <Feed
-          forumDocRefId={data.forumDocRefID}
-          topComponent={routeViewComponent}
-        />
-      ) : (
-        <Center>
-          <Spinner size="lg" />
-        </Center>
-      )}
+      <Feed
+        forumDocRefId={data.forumDocRefID}
+        topComponent={routeViewComponent}
+        isInRouteView
+      />
     </>
   );
 };
@@ -198,10 +201,10 @@ const styles = StyleSheet.create({
   thumbnail: {
     flex: 1,
     width: '100%',
-    height: FORCED_THUMBNAIL_HEIGHT,
+    minHeight: FORCED_THUMBNAIL_HEIGHT,
   },
   gradient: {
-    height: FORCED_THUMBNAIL_HEIGHT,
+    minHeight: FORCED_THUMBNAIL_HEIGHT,
   },
 });
 

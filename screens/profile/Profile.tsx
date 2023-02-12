@@ -14,16 +14,20 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
+import ContextMenu, {
+  ContextOptions,
+} from '../../components/media/ContextMenu';
 import Feed from '../../components/media/Feed';
+import Reportable from '../../components/media/Reportable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
-import { userAtom } from '../../utils/atoms';
-import { buildUserFetcherFromDocRefId } from '../../utils/queries';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { containsRef } from '../../xplat/types';
+import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -34,6 +38,8 @@ import { containsRef } from '../../xplat/types';
  */
 const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const signedInUser = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
+
   const profileIsMine = route.params?.userDocRefId === undefined;
   const userDocRefId = route.params?.userDocRefId ?? signedInUser?.docRef!.id;
 
@@ -42,18 +48,34 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     'lightMode.secondary',
     'darkMode.secondary'
   );
+
+  const [contextOptions, setContextOptions] = useState<ContextOptions>({});
+  const [isReporting, setIsReporting] = useState<boolean>(false);
+
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
   const { isLoading, isError, data, error } = useQuery(
     userDocRefId!,
-    buildUserFetcherFromDocRefId(userDocRefId!),
+    User.buildFetcherFromDocRefId(userDocRefId!),
     { enabled: userDocRefId !== undefined }
   );
 
+  useEffect(() => {
+    const _contextOptions: ContextOptions = {};
+    if (
+      signedInUser !== undefined &&
+      signedInUser?.getId() !== data?.userObject.getId()
+    )
+      _contextOptions.Report = () => {
+        setIsReporting(true);
+      };
+    setContextOptions(_contextOptions);
+  }, [signedInUser, data, setContextOptions]);
+
   const signedInUserIQResult = useQuery(
     [signedInUser?.getId()],
-    buildUserFetcherFromDocRefId(signedInUser!.getId()),
+    signedInUser!.buildFetcher(),
     {
       enabled:
         signedInUser !== undefined && signedInUser.getId() !== userDocRefId,
@@ -81,16 +103,18 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     if (profileIsMine) {
       setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
+      setIsFollowing(false);
       await signedInUser.unfollowUser(data.userObject).then(() => {
+        invalidateDocRefId(signedInUser.getId());
         queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
       });
-      setIsFollowing(false);
     } else {
+      setIsFollowing(true);
       if (data.userObject !== undefined && signedInUser !== undefined) {
         await signedInUser.followUser(data.userObject).then(() => {
+          invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
         });
-        setIsFollowing(true);
       }
     }
   };
@@ -100,84 +124,101 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   };
 
   const profileComponent = (
-    <VStack space="xs" w="full" bg={baseBgColor}>
-      <EditProfileModal
-        isOpen={showModal}
-        onClose={onClose}
-        fetchedUser={data}
-      />
-      <Box>
-        <Box p="5">
-          <ProfileBanner fetchedUser={data} />
+    <Reportable
+      isConfirming={isReporting}
+      media={data.userObject}
+      close={() => {
+        setIsReporting(false);
+      }}
+    >
+      <VStack space="xs" w="full" bg={baseBgColor}>
+        <EditProfileModal
+          isOpen={showModal}
+          onClose={onClose}
+          fetchedUser={data}
+        />
+        <Box w="full">
+          <HStack w="full" justifyContent="flex-end" px={4}>
+            <ContextMenu contextOptions={contextOptions} />
+          </HStack>
+          <Box p={5} pt={2}>
+            <ProfileBanner fetchedUser={data} />
+          </Box>
+          <Center>
+            <HStack space="md">
+              {permissionLevelCanWrite(userPermissionLevel) ? (
+                <Button
+                  variant="subtle"
+                  size="md"
+                  bg={secondaryBgColor}
+                  rounded="2xl"
+                  _text={{ color: 'black' }}
+                  onPress={handleButtonPress}
+                >
+                  {profileIsMine
+                    ? 'Edit Profile'
+                    : isFollowing
+                    ? 'Unfollow'
+                    : 'Follow'}
+                </Button>
+              ) : null}
+              <Center>
+                <Pressable
+                  onPress={async () => {
+                    navigation.push('Follows', {
+                      userDocRefId: userDocRefId!,
+                    });
+                  }}
+                >
+                  {({ isHovered, isPressed }) => {
+                    return (
+                      <Box>
+                        <Tintable tinted={isHovered || isPressed} rounded />
+                        <Icon
+                          as={<Ionicons name="md-people" />}
+                          size="lg"
+                          color="black"
+                        />
+                      </Box>
+                    );
+                  }}
+                </Pressable>
+              </Center>
+            </HStack>
+          </Center>
         </Box>
-        <Center>
+        <Center w="full" pb={4}>
           <HStack space="md">
-            <Button
-              variant="subtle"
-              size="md"
-              bg={secondaryBgColor}
-              rounded="2xl"
-              _text={{ color: 'black' }}
-              onPress={handleButtonPress}
-            >
-              {profileIsMine
-                ? 'Edit Profile'
-                : isFollowing
-                ? 'Unfollow'
-                : 'Follow'}
-            </Button>
-            <Center>
-              <Pressable
-                onPress={async () => {
-                  navigation.push('Follows', {
-                    userDocRefId: userDocRefId!,
-                  });
-                }}
-              >
-                {({ isHovered, isPressed }) => {
-                  return (
-                    <Box>
-                      <Tintable tinted={isHovered || isPressed} rounded />
-                      <Icon
-                        as={<Ionicons name="md-people" />}
-                        size="lg"
-                        color="black"
-                      />
-                    </Box>
-                  );
-                }}
-              </Pressable>
-            </Center>
+            <StatBox
+              stat="Boulder"
+              value={
+                data.bestBoulder ? data.bestBoulder?.displayString : 'None'
+              }
+              onPress={() => {
+                return;
+              }}
+            />
+            <StatBox
+              stat="Top-Rope"
+              value={
+                data.bestToprope ? data.bestToprope?.displayString : 'None'
+              }
+              onPress={() => {
+                return;
+              }}
+            />
+            <StatBox
+              stat="Sends"
+              value={data.totalSends.toString()}
+              onPress={() => {
+                return;
+              }}
+            />
           </HStack>
         </Center>
-      </Box>
-      <Center w="full" pb={4}>
-        <HStack space="md">
-          <StatBox
-            stat="Boulder"
-            value={data.bestBoulder ? data.bestBoulder?.displayString : 'None'}
-            onPress={() => {
-              return;
-            }}
-          />
-          <StatBox
-            stat="Top-Rope"
-            value={data.bestToprope ? data.bestToprope?.displayString : 'None'}
-            onPress={() => {
-              return;
-            }}
-          />
-          <StatBox
-            stat="Sends"
-            value={data.totalSends.toString()}
-            onPress={() => {
-              return;
-            }}
-          />
-        </HStack>
-      </Center>
-      <Divider width="full" />
-    </VStack>
+        <Divider width="full" />
+      </VStack>
+    </Reportable>
   );
 
   return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
