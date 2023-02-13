@@ -1,18 +1,26 @@
 import { Button, Center, Heading, Input, Text, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { userPermissionLevelAtom } from '../../utils/atoms';
 import { auth } from '../../xplat/Firebase';
 import { confirmEmailCode, sendEmailCode } from '../../xplat/api';
+import { UserStatus } from '../../xplat/types';
 
 const VerifyEmail = () => {
-  const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
+  const [userPermissionLevel, setUserPermissionLevel] = useRecoilState(
+    userPermissionLevelAtom
+  );
   const [targCode, setTargCode] = useState<number>();
   const [attemptCode, setAttemptCode] = useState<string>('');
 
   useEffect(() => {
-    if (targCode !== undefined) sendEmailCode().then(setTargCode);
-  }, [targCode]);
+    if (
+      userPermissionLevel !== undefined &&
+      userPermissionLevel <= UserStatus.Unverified
+    ) {
+      if (targCode !== undefined) sendEmailCode().then(setTargCode);
+    }
+  }, [targCode, userPermissionLevel]);
 
   useEffect(() => {
     if (targCode?.toString() === attemptCode) {
