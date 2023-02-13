@@ -79,7 +79,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         [],
         [],
         imageContent,
-        true,
+        false,
         videoContent
       )
     );
@@ -96,11 +96,12 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         aspect: [4, 3],
       });
 
-      if (result.cancelled) return;
+      const asset = result.assets?.at(0);
+      if (result.canceled || asset === undefined) return;
 
       // Get the first frame as a thumbnail
       const thumbnailResult = await VideoThumbnails.getThumbnailAsync(
-        result.uri
+        asset.uri
       );
 
       setVideoContent(
@@ -108,7 +109,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           'mock/path',
           'mock/path',
           thumbnailResult.uri,
-          result.uri
+          asset.uri
         )
       );
     } finally {
@@ -127,12 +128,12 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         aspect: [4, 3],
       });
 
-      if (result.cancelled) return;
+      if (result.canceled) return;
 
       setImageContent(
-        result.selected.map(
+        result.assets?.map(
           (info) => new LazyStaticImage('mock/path', info.uri)
-        )
+        ) ?? []
       );
     } finally {
       setIsPickingImages(false);
@@ -287,12 +288,14 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         </VStack>
       </ScrollView>
 
-      <Box mt="auto" pb={2}>
-        <Heading mt={4} px={2}>
+      <Box mt="auto" pb={1}>
+        <Heading mt={1} px={2}>
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        {previewPost !== undefined ? <Post post={previewPost} /> : null}
+        {previewPost !== undefined ? (
+          <Post post={previewPost} isPreview />
+        ) : null}
       </Box>
     </Box>
   );

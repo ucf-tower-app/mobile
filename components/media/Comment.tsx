@@ -65,7 +65,7 @@ const Comment = ({ comment }: Props) => {
     >
       <VStack w="full" p={2} alignItems="flex-start">
         <HStack w="full" justifyContent="space-between">
-          <UserTag user={data.author} size="sm" />
+          <UserTag user={data.author} size="sm" timestamp={data.timestamp} />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         <HStack w="full" justifyContent="space-between">

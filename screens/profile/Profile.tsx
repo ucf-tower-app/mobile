@@ -27,7 +27,7 @@ import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { User, containsRef } from '../../xplat/types';
+import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -103,16 +103,18 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     if (profileIsMine) {
       setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
+      setIsFollowing(false);
       await signedInUser.unfollowUser(data.userObject).then(() => {
+        invalidateDocRefId(signedInUser.getId());
         queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
       });
-      setIsFollowing(false);
     } else {
+      setIsFollowing(true);
       if (data.userObject !== undefined && signedInUser !== undefined) {
         await signedInUser.followUser(data.userObject).then(() => {
+          invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
         });
-        setIsFollowing(true);
       }
     }
   };
