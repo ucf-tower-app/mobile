@@ -11,7 +11,7 @@ const VerifyEmail = () => {
   const [attemptCode, setAttemptCode] = useState<string>('');
 
   useEffect(() => {
-    if (!targCode) sendEmailCode().then(setTargCode);
+    if (targCode !== undefined) sendEmailCode().then(setTargCode);
   }, [targCode]);
 
   useEffect(() => {
