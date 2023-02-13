@@ -5,8 +5,8 @@ import {
   userAtom,
   userPermissionLevelAtom,
 } from '../../utils/atoms';
-import { getCurrentUser } from '../../xplat/api';
 import { auth } from '../../xplat/Firebase';
+import { getCurrentUser } from '../../xplat/api';
 
 type Props = {
   children: React.ReactNode;

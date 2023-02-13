@@ -6,9 +6,9 @@ import { isSignedInAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import { UserStatus } from '../../xplat/types';
+import NotifyBanned from './NotifyBanned';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
-import NotifyBanned from './NotifyBanned';
 
 // Tabs used for bottom tray, stack for in-tab nav
 const Tabs = createBottomTabNavigator<TabParamList>();
