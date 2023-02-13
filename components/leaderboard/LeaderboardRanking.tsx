@@ -18,7 +18,6 @@ import { navigateToUserProfile } from '../../utils/nav';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedUser } from '../../xplat/types';
 
-//TODO: Change props once we know what leaderboard APIs will return
 type Props = {
   ranking: number;
   fetchedUser: FetchedUser;

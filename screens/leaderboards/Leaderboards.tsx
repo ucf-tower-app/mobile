@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import Leaderboard from '../../components/leaderboard/Leaderboard';
 import { userAtom } from '../../utils/atoms';
-import type { LeaderboardsScreenProps } from '../../utils/types';
 import {
   LeaderboardEntry,
   getRQParams_MonthlyLeaderboard,
@@ -15,7 +14,7 @@ import { containsRef } from '../../xplat/types';
 type LeaderboardTab = 'Monthly' | 'Semesterly';
 type FilterType = 'Anyone' | 'Following';
 
-const Leaderboards = ({}: LeaderboardsScreenProps<'Leaderboards'>) => {
+const Leaderboards = () => {
   const signedInUser = useRecoilValue(userAtom);
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [tabViewed, setTabViewed] = useState<LeaderboardTab>('Monthly');

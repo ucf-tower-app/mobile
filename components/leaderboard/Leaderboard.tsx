@@ -14,10 +14,7 @@ import LeaderboardRanking from './LeaderboardRanking';
 import LeaderboardRow from './LeaderboardRow';
 
 /**
- * A feed of posts. The posts are pulled in strides of POST_STRIDE from the
- * postsCursor, and the callee can provide an optional component to place on top.
- * New feed items are only loaded when the user is within 20 pixels of the bottom of
- * the screen.
+ * A list of leaderboard rankings with the signed in user's big card at the top
  */
 type Props = {
   data: LeaderboardEntry[];
