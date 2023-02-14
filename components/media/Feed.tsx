@@ -60,8 +60,8 @@ const Feed = ({
       ListFooterComponent={renderSpinner}
       ItemSeparatorComponent={Divider}
       bgColor={baseBgColor}
-      keyExtractor={(item, index) => {
-        return index.toString();
+      keyExtractor={(item) => {
+        return item.getId();
       }}
       renderItem={({ item }) => (
         <Post post={item} isInRouteView={isInRouteView} />
