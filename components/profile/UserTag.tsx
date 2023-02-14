@@ -71,8 +71,15 @@ type Props = {
   size?: Size;
   mini?: boolean;
   timestamp?: Date;
+  isNavigationDisabled?: boolean;
 };
-const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
+const UserTag = ({
+  user,
+  size = 'md',
+  mini = false,
+  timestamp,
+  isNavigationDisabled = false,
+}: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
@@ -105,55 +112,59 @@ const UserTag = ({ user, size = 'md', mini = false, timestamp }: Props) => {
 
   if (mini) {
     return (
-      <Pressable onPress={tryNavigate}>
-        <HStack alignItems="center">
-          <Text fontSize={sizedStyles[size].displayNameSize} fontWeight="bold">
-            {data.displayName}
-          </Text>
-          {timestamp !== undefined ? (
-            <Box ml={2}>
-              <Timestamp relative date={timestamp} />
-            </Box>
-          ) : null}
-        </HStack>
+      <Pressable onPress={tryNavigate} disabled={isNavigationDisabled}>
+        {({ isHovered, isPressed }) => (
+          <HStack alignItems="center">
+            <Tintable tinted={isHovered || isPressed} rounded />
+            <Text
+              fontSize={sizedStyles[size].displayNameSize}
+              fontWeight="bold"
+            >
+              {data.displayName}
+            </Text>
+            {timestamp !== undefined ? (
+              <Box ml={2}>
+                <Timestamp relative date={timestamp} />
+              </Box>
+            ) : null}
+          </HStack>
+        )}
       </Pressable>
     );
   }
 
   return (
-    <Pressable onPress={tryNavigate}>
-      {({ isHovered, isPressed }) => {
-        return (
-          <Box rounded="full" bg={baseBgColor}>
-            <Tintable tinted={isHovered || isPressed} rounded />
-            <HStack alignItems="center" pr={3}>
-              <Avatar
-                w={sizedStyles[size].avatarSize}
-                h={sizedStyles[size].avatarSize}
-                source={{ uri: data.avatarUrl }}
-              />
-              <VStack pl={2}>
-                <Text
-                  fontSize={sizedStyles[size].displayNameSize}
-                  fontWeight="bold"
-                >
-                  {data.displayName}
+    <Pressable onPress={tryNavigate} disabled={isNavigationDisabled}>
+      {({ isHovered, isPressed }) => (
+        <Box rounded="full" bg={baseBgColor}>
+          <Tintable tinted={isHovered || isPressed} rounded />
+          <HStack alignItems="center" pr={3}>
+            <Avatar
+              w={sizedStyles[size].avatarSize}
+              h={sizedStyles[size].avatarSize}
+              source={{ uri: data.avatarUrl }}
+            />
+            <VStack pl={2}>
+              <Text
+                fontSize={sizedStyles[size].displayNameSize}
+                fontWeight="bold"
+              >
+                {data.displayName}
+              </Text>
+              <HStack alignItems="center">
+                <Text fontSize={sizedStyles[size].usernameSize} color="grey">
+                  @{data.username}
                 </Text>
-                <HStack alignItems="center">
-                  <Text fontSize={sizedStyles[size].usernameSize} color="grey">
-                    @{data.username}
-                  </Text>
-                  {timestamp !== undefined ? (
-                    <Box ml={2}>
-                      <Timestamp relative date={timestamp} />
-                    </Box>
-                  ) : null}
-                </HStack>
-              </VStack>
-            </HStack>
-          </Box>
-        );
-      }}
+                {timestamp !== undefined ? (
+                  <Box ml={2}>
+                    <Timestamp relative date={timestamp} />
+                  </Box>
+                ) : null}
+              </HStack>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
     </Pressable>
   );
 };
