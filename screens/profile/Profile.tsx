@@ -25,6 +25,7 @@ import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useEarlyLoad } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
@@ -37,6 +38,8 @@ import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
  * will be rendered for the signed in user.
  */
 const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
+  const isEarly = useEarlyLoad();
+
   const signedInUser = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -91,7 +94,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
   }, [data, signedInUser, signedInUserIQResult.data]);
 
-  if (isLoading) return <LoadingProfile />;
+  if (isEarly || isLoading) return <LoadingProfile />;
   if (isError || data === undefined) {
     console.error(error);
     return null;
