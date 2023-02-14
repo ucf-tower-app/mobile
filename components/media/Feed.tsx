@@ -1,4 +1,10 @@
-import { Divider, FlatList, Spinner, useColorModeValue } from 'native-base';
+import {
+  Divider,
+  Box,
+  FlatList,
+  Spinner,
+  useColorModeValue,
+} from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
@@ -7,13 +13,11 @@ import { Post as PostObj } from '../../xplat/types';
 import Post from './Post';
 
 /**
- * A feed of posts. The posts are pulled in strides of POST_STRIDE from the
- * postsCursor, and the callee can provide an optional component to place on top.
- * New feed items are only loaded when the user is within 20 pixels of the bottom of
- * the screen.
+ * A feed of posts. The callee can provide an optional component to place on top.
+ * userDocRefId or forumDocRefId are required.
  */
 type Props = {
-  topComponent?: JSX.Element;
+  topComponent?: () => JSX.Element;
   userDocRefId?: string;
   forumDocRefId?: string;
   isInRouteView?: boolean;
@@ -64,38 +68,11 @@ const Feed = ({
         return item.getId();
       }}
       renderItem={({ item }) => (
-        <Post post={item} isInRouteView={isInRouteView} />
+        <Box mt={4} mb={2}>
+          <Post post={item} isInRouteView={isInRouteView} />
+        </Box>
       )}
     />
-    // <ScrollView
-    //   w="full"
-    //   bg={baseBgColor}
-    //   onScroll={({ nativeEvent }) => {
-    //     if (hasNextPage && isCloseToBottom(nativeEvent)) {
-    //       loadNextPosts();
-    //     }
-    //   }}
-    //   scrollEventThrottle={1000}
-    // >
-    //   <Center w="full">
-    //     {topComponent}
-    //     <VStack w="full">
-    //       {posts?.map((post, index) => {
-    //         return (
-    //           <VStack key={post.getId()} pt={4}>
-    //             <Post post={post} isInRouteView={isInRouteView} />
-    //             {index < posts.length - 1 ? <Divider /> : null}
-    //           </VStack>
-    //         );
-    //       })}
-    //       {hasNextPage ? (
-    //         <Center pt={4}>
-    //           <Spinner size="lg" />
-    //         </Center>
-    //       ) : null}
-    //     </VStack>
-    //   </Center>
-    // </ScrollView>
   );
 };
 

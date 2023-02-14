@@ -101,59 +101,38 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     });
   };
 
-  const routeViewComponent = (
-    <Box w="full" bg={backgroundHex} key="routeview">
+  const routeViewComponent = () => (
+    <Box w="full" bg={backgroundHex}>
       <ImageBackground
-        key="thumbnail"
         style={styles.thumbnail}
         resizeMode={ResizeMode.COVER}
         source={{ uri: data.thumbnailUrl }}
       >
         <LinearGradient
-          key="blend"
           style={styles.gradient}
           colors={[backgroundHex + '00', backgroundHex]}
         />
-        <Flex direction="column" h="full" w="full" bg={backgroundHex} key="top">
-          <HStack
-            flexWrap="wrap"
-            justifyContent="space-between"
-            mx={4}
-            key="headings"
-          >
-            <Heading size="2xl" key="name">
-              {data.name}
-            </Heading>
-            <Heading size="2xl" color="grey" key="grade">
+        <Flex direction="column" h="full" w="full" bg={backgroundHex}>
+          <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
+            <Heading size="2xl">{data.name}</Heading>
+            <Heading size="2xl" color="grey">
               {data.gradeDisplayString}
             </Heading>
           </HStack>
-          <Text fontSize="2xl" color="grey" mx={4} key="tags">
+          <Text fontSize="2xl" color="grey" mx={4}>
             {data.stringifiedTags}
           </Text>
-          <HStack
-            flexWrap="wrap"
-            justifyContent="space-between"
-            mx={4}
-            mt={2}
-            key="setter"
-          >
+          <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow={0} key="setterdisp">
-                <Text
-                  fontSize="lg"
-                  color="grey"
-                  fontWeight="bold"
-                  mb={2}
-                  key="setter"
-                >
+              <VStack justifyContent="flex-start" flexGrow={0}>
+                <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
-                <UserTag user={data.setter} size="sm" key="settag" />
+                <UserTag user={data.setter} size="sm" />
               </VStack>
             ) : null}
           </HStack>
-          <Text fontSize="lg" mx={4} mt={2} key="desc">
+          <Text fontSize="lg" mx={4} mt={2}>
             {data.description}
           </Text>
           <HStack
@@ -162,9 +141,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
             alignItems="flex-end"
             mx={4}
             mt={4}
-            key="statstack"
           >
-            <Box key="status">
+            <Box>
               <Text fontSize="lg" italic bold>
                 {RouteStatus[data.status]}
               </Text>
@@ -173,34 +151,29 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
               ) : null}
             </Box>
             {permissionLevelCanWrite(userPermissionLevel) ? (
-              <LikeButton
-                likes={data.likes}
-                onSetIsLiked={onSetIsLiked}
-                key="like"
-              />
+              <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
             ) : null}
           </HStack>
           {permissionLevelCanWrite(userPermissionLevel) ? (
-            <VStack key="buttons">
+            <VStack>
               <Button
                 mx={4}
                 mt={4}
                 onPress={send}
                 isDisabled={userHasSent}
                 isLoading={isSending}
-                key="send"
               >
                 {userHasSent ? 'Sent!' : 'Send it!'}
               </Button>
-              <Button mx={4} mt={4} onPress={post} key="post">
+              <Button mx={4} mt={4} onPress={post}>
                 Post to this route
               </Button>
             </VStack>
           ) : null}
-          <Center mt={4} mb={2} key="postshead">
-            <Heading key="posts">Posts</Heading>
+          <Center mt={4} mb={2}>
+            <Heading>Posts</Heading>
           </Center>
-          <Divider key="divid" />
+          <Divider />
         </Flex>
       </ImageBackground>
     </Box>
