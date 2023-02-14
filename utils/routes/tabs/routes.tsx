@@ -8,7 +8,6 @@ import { ParamList as HomeParamList } from '../home/paramList';
 import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
 import { ParamList as ProfileParamList } from '../profile/paramList';
 import { tabNameToRouteData } from '../routes';
-import { ParamList as SandboxParamList } from '../sandbox/paramList';
 import { ParamList as SearchParamList } from '../search/paramList';
 import { Name as TabName } from './names';
 
@@ -119,19 +118,6 @@ export const routes: Route[] = [
     stack: buildStack(
       'ProfileTab',
       createNativeStackNavigator<ProfileParamList>()
-    ),
-  },
-  {
-    name: 'SandboxTab',
-    focusedIcon: (
-      <Icon as={<Feather name="codesandbox" />} color="black" size="xl" />
-    ),
-    unfocusedIcon: (
-      <Icon as={<Feather name="codesandbox" />} color="black" size="xl" />
-    ),
-    stack: buildStack(
-      'SandboxTab',
-      createNativeStackNavigator<SandboxParamList>()
     ),
   },
 ];
