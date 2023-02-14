@@ -126,7 +126,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     setShowModal(false);
   };
 
-  const profileComponent = (
+  const profileComponent = () => (
     <Reportable
       isConfirming={isReporting}
       media={data.userObject}
