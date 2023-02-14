@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Flex,
   HStack,
   Heading,
@@ -12,7 +13,6 @@ import {
   Text,
   VStack,
   useToken,
-  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
@@ -102,37 +102,58 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const routeViewComponent = (
-    <Box w="full" bg={backgroundHex}>
+    <Box w="full" bg={backgroundHex} key="routeview">
       <ImageBackground
+        key="thumbnail"
         style={styles.thumbnail}
         resizeMode={ResizeMode.COVER}
         source={{ uri: data.thumbnailUrl }}
       >
         <LinearGradient
+          key="blend"
           style={styles.gradient}
           colors={[backgroundHex + '00', backgroundHex]}
         />
-        <Flex direction="column" h="full" w="full" bg={backgroundHex}>
-          <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
-            <Heading size="2xl">{data.name}</Heading>
-            <Heading size="2xl" color="grey">
+        <Flex direction="column" h="full" w="full" bg={backgroundHex} key="top">
+          <HStack
+            flexWrap="wrap"
+            justifyContent="space-between"
+            mx={4}
+            key="headings"
+          >
+            <Heading size="2xl" key="name">
+              {data.name}
+            </Heading>
+            <Heading size="2xl" color="grey" key="grade">
               {data.gradeDisplayString}
             </Heading>
           </HStack>
-          <Text fontSize="2xl" color="grey" mx={4}>
+          <Text fontSize="2xl" color="grey" mx={4} key="tags">
             {data.stringifiedTags}
           </Text>
-          <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
+          <HStack
+            flexWrap="wrap"
+            justifyContent="space-between"
+            mx={4}
+            mt={2}
+            key="setter"
+          >
             {data.setter !== undefined ? (
-              <VStack justifyContent="flex-start" flexGrow={0}>
-                <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
+              <VStack justifyContent="flex-start" flexGrow={0} key="setterdisp">
+                <Text
+                  fontSize="lg"
+                  color="grey"
+                  fontWeight="bold"
+                  mb={2}
+                  key="setter"
+                >
                   Setter
                 </Text>
-                <UserTag user={data.setter} size="sm" />
+                <UserTag user={data.setter} size="sm" key="settag" />
               </VStack>
             ) : null}
           </HStack>
-          <Text fontSize="lg" mx={4} mt={2}>
+          <Text fontSize="lg" mx={4} mt={2} key="desc">
             {data.description}
           </Text>
           <HStack
@@ -141,8 +162,9 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
             alignItems="flex-end"
             mx={4}
             mt={4}
+            key="statstack"
           >
-            <Box>
+            <Box key="status">
               <Text fontSize="lg" italic bold>
                 {RouteStatus[data.status]}
               </Text>
@@ -151,29 +173,34 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
               ) : null}
             </Box>
             {permissionLevelCanWrite(userPermissionLevel) ? (
-              <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
+              <LikeButton
+                likes={data.likes}
+                onSetIsLiked={onSetIsLiked}
+                key="like"
+              />
             ) : null}
           </HStack>
           {permissionLevelCanWrite(userPermissionLevel) ? (
-            <>
+            <VStack key="buttons">
               <Button
                 mx={4}
                 mt={4}
                 onPress={send}
                 isDisabled={userHasSent}
                 isLoading={isSending}
+                key="send"
               >
                 {userHasSent ? 'Sent!' : 'Send it!'}
               </Button>
-              <Button mx={4} mt={4} onPress={post}>
+              <Button mx={4} mt={4} onPress={post} key="post">
                 Post to this route
               </Button>
-            </>
+            </VStack>
           ) : null}
-          <Center mt={4} mb={2}>
-            <Heading>Posts</Heading>
+          <Center mt={4} mb={2} key="postshead">
+            <Heading key="posts">Posts</Heading>
           </Center>
-          <Divider />
+          <Divider key="divid" />
         </Flex>
       </ImageBackground>
     </Box>
