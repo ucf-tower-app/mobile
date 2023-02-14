@@ -14,7 +14,6 @@ const RatingModal = ({ isOpen, close, onSubmit }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={close}>
       <Modal.Content>
-        <Modal.CloseButton />
         <Modal.Header>
           Nice send! Please consider rating the route if you liked it!
         </Modal.Header>

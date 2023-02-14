@@ -216,6 +216,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           isOpen={isSharing}
           close={() => setIsSharing(false)}
           onShare={shareSend}
+          routeInfo={{
+            name: data.name,
+            gradeDisplayString: data.gradeDisplayString,
+          }}
         />
       )}
       <Feed
