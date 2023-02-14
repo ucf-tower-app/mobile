@@ -1,11 +1,13 @@
-import { Button, Center, FlatList, Text } from 'native-base';
-import { useEffect, useState } from 'react';
+import { Button, Center, Divider, FlatList } from 'native-base';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import Post from '../../components/media/Post';
+import Post, { PostSkeleton } from '../../components/media/Post';
 import { userAtom } from '../../utils/atoms';
 import { getQueryCursor } from '../../xplat/queries/feed';
 import { PostCursorMerger, Post as PostObj } from '../../xplat/types';
+
+const STRIDE = 2;
 
 const HomeFeed = () => {
   const signedInUser = useRecoilValue(userAtom);
@@ -18,44 +20,63 @@ const HomeFeed = () => {
     process.env.NODE_ENV !== 'development'
   );
   const [cursor, setCursor] = useState<PostCursorMerger>();
+  const [exhausted, setExhausted] = useState<boolean>(false);
   const [posts, setPosts] = useState<PostObj[]>([]);
 
   useEffect(() => {
     if (enabled && signedInUser !== undefined && userQuery.data !== undefined) {
-      console.log("Ok let's get it goin!");
       const newCursor = getQueryCursor(userQuery.data.followingList);
-      console.log('Got a cursor');
       setCursor(newCursor);
+      setExhausted(false);
     }
   }, [enabled, signedInUser, userQuery.data]);
 
-  const getPost = async () => {
+  const getNextPosts = useCallback(async () => {
+    console.log('Get more posts');
     if (cursor === undefined) {
-      console.log('No more posts');
+      setExhausted(true);
       return;
     }
-    if (await cursor.hasNext()) {
-      const nxt = await cursor.pollNext();
-      const nxtPosts = [...posts, nxt];
-      setPosts(nxtPosts);
-      console.log(nxtPosts.map((post) => post.getId()));
-      console.log('Got nxt!', nxt.getId());
-    } else {
-      console.log('So sad');
+    if (exhausted) return;
+
+    const newPosts = [];
+    while (newPosts.length < STRIDE && (await cursor.hasNext())) {
+      newPosts.push(await cursor.pollNext());
     }
+    const hasNext = await cursor.hasNext();
+    setExhausted(!hasNext);
+    setPosts([...posts, ...newPosts]);
+  }, [cursor, exhausted, posts]);
+
+  useEffect(() => {
+    if (cursor) getNextPosts();
+  }, [cursor, getNextPosts]);
+
+  const header = () => (
+    <Center>
+      {enabled ? null : (
+        <Button onPress={() => setEnabled(true)}>Enable</Button>
+      )}
+    </Center>
+  );
+
+  const renderSpinner = () => {
+    if (!exhausted) return <PostSkeleton />;
+    else return null;
   };
 
+  const renderDivider = () => <Divider />;
+
   return (
-    <>
-      <Center>
-        {enabled ? null : (
-          <Button onPress={() => setEnabled(true)}>Enable</Button>
-        )}
-        <Text>Welcome Home!</Text>
-        <Button onPress={getPost}>Get 'Em!</Button>
-      </Center>
-      <FlatList data={posts} renderItem={({ item }) => <Post post={item} />} />
-    </>
+    <FlatList
+      ListHeaderComponent={header}
+      data={posts}
+      extraData={cursor}
+      onEndReached={getNextPosts}
+      ItemSeparatorComponent={renderDivider}
+      ListFooterComponent={renderSpinner}
+      renderItem={({ item }) => <Post post={item} />}
+    />
   );
 };
 

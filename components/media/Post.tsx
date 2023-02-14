@@ -25,7 +25,7 @@ import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import Reportable from './Reportable';
 
-const PostSkeleton = () => {
+export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
