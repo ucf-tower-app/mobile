@@ -122,7 +122,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel}>
+    <Modal isOpen={isOpen} onClose={handleCancel} key="editProfile">
       <Modal.Content maxWidth="lg">
         <Modal.CloseButton />
         <Modal.Header>Edit Profile</Modal.Header>

@@ -1,32 +1,10 @@
-import {
-  Center,
-  Divider,
-  ScrollView,
-  Spinner,
-  VStack,
-  useColorModeValue,
-} from 'native-base';
+import { Divider, FlatList, Spinner, useColorModeValue } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery } from 'react-query';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
 import { getIQParams_ForumPosts } from '../../xplat/queries/forum';
 import { Post as PostObj } from '../../xplat/types';
 import Post from './Post';
-
-// const POST_STRIDE = 3;
-
-const isCloseToBottom = ({
-  layoutMeasurement,
-  contentOffset,
-  contentSize,
-}: NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
-};
 
 /**
  * A feed of posts. The posts are pulled in strides of POST_STRIDE from the
@@ -68,36 +46,56 @@ const Feed = ({
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const renderSpinner = () => {
+    if (hasNextPage) return <Spinner size="lg" />;
+    else return null;
+  };
+
   return (
-    <ScrollView
-      w="full"
-      bg={baseBgColor}
-      onScroll={({ nativeEvent }) => {
-        if (hasNextPage && isCloseToBottom(nativeEvent)) {
-          loadNextPosts();
-        }
+    <FlatList
+      ListHeaderComponent={topComponent}
+      data={posts}
+      onEndReached={loadNextPosts}
+      onEndReachedThreshold={0.1}
+      ListFooterComponent={renderSpinner}
+      ItemSeparatorComponent={Divider}
+      bgColor={baseBgColor}
+      keyExtractor={(item, index) => {
+        return index.toString();
       }}
-      scrollEventThrottle={1000}
-    >
-      <Center w="full">
-        {topComponent}
-        <VStack w="full">
-          {posts?.map((post, index) => {
-            return (
-              <VStack key={post.getId()} pt={4}>
-                <Post post={post} isInRouteView={isInRouteView} />
-                {index < posts.length - 1 ? <Divider /> : null}
-              </VStack>
-            );
-          })}
-          {hasNextPage ? (
-            <Center pt={4}>
-              <Spinner size="lg" />
-            </Center>
-          ) : null}
-        </VStack>
-      </Center>
-    </ScrollView>
+      renderItem={({ item }) => (
+        <Post post={item} isInRouteView={isInRouteView} />
+      )}
+    />
+    // <ScrollView
+    //   w="full"
+    //   bg={baseBgColor}
+    //   onScroll={({ nativeEvent }) => {
+    //     if (hasNextPage && isCloseToBottom(nativeEvent)) {
+    //       loadNextPosts();
+    //     }
+    //   }}
+    //   scrollEventThrottle={1000}
+    // >
+    //   <Center w="full">
+    //     {topComponent}
+    //     <VStack w="full">
+    //       {posts?.map((post, index) => {
+    //         return (
+    //           <VStack key={post.getId()} pt={4}>
+    //             <Post post={post} isInRouteView={isInRouteView} />
+    //             {index < posts.length - 1 ? <Divider /> : null}
+    //           </VStack>
+    //         );
+    //       })}
+    //       {hasNextPage ? (
+    //         <Center pt={4}>
+    //           <Spinner size="lg" />
+    //         </Center>
+    //       ) : null}
+    //     </VStack>
+    //   </Center>
+    // </ScrollView>
   );
 };
 

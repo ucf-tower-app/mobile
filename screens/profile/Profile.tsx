@@ -130,14 +130,16 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       close={() => {
         setIsReporting(false);
       }}
+      key="profileComponent"
     >
       <VStack space="xs" w="full" bg={baseBgColor}>
         <EditProfileModal
           isOpen={showModal}
           onClose={onClose}
           fetchedUser={data}
+          key="editModal"
         />
-        <Box w="full">
+        <Box w="full" key="profile">
           <HStack w="full" justifyContent="flex-end" px={4}>
             <ContextMenu contextOptions={contextOptions} />
           </HStack>
@@ -152,6 +154,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
                   size="md"
                   bg={secondaryBgColor}
                   rounded="2xl"
+                  key="editFollow"
                   _text={{ color: 'black' }}
                   onPress={handleButtonPress}
                 >
@@ -162,7 +165,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
                     : 'Follow'}
                 </Button>
               ) : null}
-              <Center>
+              <Center key="followers">
                 <Pressable
                   onPress={async () => {
                     navigation.push('Follows', {
@@ -187,9 +190,10 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             </HStack>
           </Center>
         </Box>
-        <Center w="full" pb={4}>
+        <Center w="full" pb={4} key="stats">
           <HStack space="md">
             <StatBox
+              key="bstats"
               stat="Boulder"
               value={
                 data.bestBoulder ? data.bestBoulder?.displayString : 'None'
@@ -199,6 +203,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
               }}
             />
             <StatBox
+              key="trstats"
               stat="Top-Rope"
               value={
                 data.bestToprope ? data.bestToprope?.displayString : 'None'
@@ -208,6 +213,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
               }}
             />
             <StatBox
+              key="sendsstats"
               stat="Sends"
               value={data.totalSends.toString()}
               onPress={() => {
@@ -216,7 +222,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             />
           </HStack>
         </Center>
-        <Divider width="full" />
+        <Divider width="full" key="feedDivider" />
       </VStack>
     </Reportable>
   );
