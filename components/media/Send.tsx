@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
-  Box,
   Center,
   HStack,
   Icon,
+  Skeleton,
   Text,
   useColorModeValue,
   VStack,
@@ -11,19 +11,29 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { FetchedSend, Send as SendObj } from '../../xplat/types';
-import UserTag from '../profile/UserTag';
 import Timestamp from './Timestamp';
+import RouteLink from '../route/RouteLink';
+
+export const SendSkeleton = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <HStack w="full" bg={baseBgColor} space="3" p="3">
+      <Center>
+        <Skeleton rounded="full" />
+      </Center>
+      <Skeleton.Text p={2} lines={3} />
+    </HStack>
+  );
+};
 
 type Props = {
   send: SendObj;
 };
 const Send = ({ send }: Props) => {
-  //const navigation = useNavigation<TabGlobalNavigationProp>();
-
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [sendData, setSendData] = useState<FetchedSend>();
-  const [routeName, setRouteName] = useState<string>();
 
   const realQR = useQuery(send.getId(), send.buildFetcher(), {
     enabled: !send.isMock(),
@@ -31,11 +41,7 @@ const Send = ({ send }: Props) => {
 
   useEffect(() => {
     if (realQR.data) {
-      const getRouteName = async () => {
-        setRouteName(await realQR.data.route.getName());
-      };
       setSendData(realQR.data);
-      getRouteName();
     }
   }, [realQR.data]);
 
@@ -46,17 +52,17 @@ const Send = ({ send }: Props) => {
   }, [send]);
 
   if (send.isMock()) {
-    if (sendData === undefined) return null;
+    if (sendData === undefined) return <SendSkeleton />;
   } else {
     if (realQR.isError) {
       console.error(realQR.error);
       return null;
     }
-    if (realQR.isLoading || sendData === undefined) return null;
+    if (realQR.isLoading || sendData === undefined) return <SendSkeleton />;
   }
 
   return (
-    <HStack w="full" bg={baseBgColor} space="3" p="2">
+    <HStack w="full" bg={baseBgColor} space="3" p="3">
       <Center>
         <Icon
           as={<Ionicons name="trending-up" />}
@@ -65,14 +71,10 @@ const Send = ({ send }: Props) => {
           size="xl"
         />
       </Center>
-
       <VStack>
-        <Box>
-          <UserTag user={sendData.user} mini />
-        </Box>
         <HStack>
-          <Text>Route: {routeName} </Text>
-          <Text bold>{sendData.classifier.displayString}</Text>
+          <RouteLink route={sendData.route} noPadding />
+          <Text bold> {sendData.classifier.displayString}</Text>
         </HStack>
         <Timestamp relative date={sendData.timestamp} />
       </VStack>
