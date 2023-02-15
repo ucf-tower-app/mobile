@@ -12,6 +12,11 @@ export const isSignedInAtom = atom<boolean>({
   default: false,
 });
 
+export const isInitializingAtom = atom<boolean>({
+  key: 'isInitializing',
+  default: true,
+});
+
 export const userPermissionLevelAtom = atom<UserStatus | undefined>({
   key: 'userPermissionLevel',
   default: undefined,
