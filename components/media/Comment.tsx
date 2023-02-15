@@ -1,4 +1,11 @@
-import { VStack, HStack, Text } from 'native-base';
+import {
+  VStack,
+  HStack,
+  Box,
+  Text,
+  useColorModeValue,
+  Skeleton,
+} from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
@@ -7,12 +14,31 @@ import { permissionLevelCanWrite } from '../../utils/permissions';
 import { buildCommentFetcher } from '../../utils/queries';
 import { Comment as CommentObj } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
-import UserTag from '../profile/UserTag';
+import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './actions/Reportable';
 
 const CommentSkeleton = () => {
-  return null;
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
+      <Box pl={2}>
+        <UserTagSkeleton />
+      </Box>
+      <Skeleton.Text p={2} lines={2} />
+    </VStack>
+  );
+};
+
+const DeletedComment = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <Box w="full" bg={baseBgColor} pl={2}>
+      <Text italic>This post has been removed</Text>
+    </Box>
+  );
 };
 
 type Props = {
@@ -24,7 +50,7 @@ const Comment = ({ comment }: Props) => {
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
 
-  const { isLoading, isError, data, error } = useQuery(
+  const { isLoading, isError, data } = useQuery(
     comment.getId(),
     buildCommentFetcher(comment)
   );
@@ -43,10 +69,9 @@ const Comment = ({ comment }: Props) => {
 
   if (isLoading) return <CommentSkeleton />;
 
-  if (isError || data === undefined) {
-    console.error(error);
-    return null;
-  }
+  if (isError || data === undefined) return null;
+
+  if (!data.commentObject.exists) return <DeletedComment />;
 
   const onSetIsLiked = (isLiked: boolean) => {
     if (signedInUser === undefined) return;

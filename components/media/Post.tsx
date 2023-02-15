@@ -50,9 +50,9 @@ const DeletedPost = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
-    <VStack w="full" alignItems="flex-start" bg={baseBgColor} pl={2}>
+    <Box w="full" bg={baseBgColor} pl={2}>
       <Text italic>This post has been removed</Text>
-    </VStack>
+    </Box>
   );
 };
 
