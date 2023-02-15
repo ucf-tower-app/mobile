@@ -12,11 +12,12 @@ import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { buildCommentFetcher } from '../../utils/queries';
-import { Comment as CommentObj } from '../../xplat/types';
+import { Comment as CommentObj, UserStatus } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './actions/Reportable';
+import Deletable from './actions/Deletable';
 
 const CommentSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -36,7 +37,7 @@ const DeletedComment = () => {
 
   return (
     <Box w="full" bg={baseBgColor} pl={2}>
-      <Text italic>This post has been removed</Text>
+      <Text italic>This comment has been removed</Text>
     </Box>
   );
 };
@@ -49,6 +50,7 @@ const Comment = ({ comment }: Props) => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const { isLoading, isError, data } = useQuery(
     comment.getId(),
@@ -56,16 +58,29 @@ const Comment = ({ comment }: Props) => {
   );
 
   useEffect(() => {
-    const _contextOptions: ContextOptions = {};
     if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== data?.author.getId()
+      signedInUser === undefined ||
+      userPermissionLevel === undefined ||
+      data === undefined
     )
+      return;
+
+    const signedInUserOwnsComment =
+      signedInUser.getId() === data.author.getId();
+
+    const _contextOptions = contextOptions;
+    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsComment)
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
+      };
+
+    if (!signedInUserOwnsComment)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, data, setContextOptions]);
+  }, [contextOptions, signedInUser, userPermissionLevel, data]);
 
   if (isLoading) return <CommentSkeleton />;
 
@@ -89,13 +104,20 @@ const Comment = ({ comment }: Props) => {
           setIsReporting(false);
         }}
       />
+      <Deletable
+        isConfirming={isDeleting}
+        media={data.commentObject}
+        close={() => {
+          setIsDeleting(false);
+        }}
+      />
       <VStack w="full" p={2} alignItems="flex-start">
         <HStack w="full" justifyContent="space-between">
           <UserTag user={data.author} size="sm" timestamp={data.timestamp} />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         <HStack w="full" justifyContent="space-between">
-          <Text my={2}>{data.textContent}</Text>
+          <Text mt={2}>{data.textContent}</Text>
           {permissionLevelCanWrite(userPermissionLevel) ? (
             <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
           ) : null}
