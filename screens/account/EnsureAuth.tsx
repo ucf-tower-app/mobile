@@ -22,6 +22,7 @@ const Loading = () => (
       h="full"
       resizeMode={ResizeMode.COVER}
       source={require('../../assets/tower_logo.jpeg')}
+      alt="Logo"
     />
   </Center>
 );
