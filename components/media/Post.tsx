@@ -16,7 +16,12 @@ import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
+import {
+  FetchedPost,
+  Post as PostObj,
+  Route,
+  UserStatus,
+} from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
@@ -25,6 +30,7 @@ import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import Reportable from './actions/Reportable';
 import Timestamp from './Timestamp';
+import Deletable from './actions/Deletable';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -63,6 +69,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
@@ -79,16 +86,39 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   // Set up the context menu
   useEffect(() => {
-    const _contextOptions: ContextOptions = {};
     if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== postData?.author.getId()
+      signedInUser === undefined ||
+      userPermissionLevel === undefined ||
+      postData === undefined
     )
+      return;
+
+    const signedInUserOwnsPost =
+      signedInUser.getId() === postData.author.getId();
+
+    const _contextOptions = contextOptions;
+    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
+      };
+
+    if (!signedInUserOwnsPost)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, postData]);
+  }, [contextOptions, signedInUser, userPermissionLevel, postData]);
+
+  useEffect(() => {
+    if (
+      userPermissionLevel === undefined ||
+      userPermissionLevel < UserStatus.Employee
+    )
+      return;
+    const _contextOptions = contextOptions;
+    setContextOptions(_contextOptions);
+  }, [userPermissionLevel, contextOptions]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {
@@ -179,6 +209,13 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
         media={postData.postObject}
         close={() => {
           setIsReporting(false);
+        }}
+      />
+      <Deletable
+        isConfirming={isDeleting}
+        media={postData.postObject}
+        close={() => {
+          setIsDeleting(false);
         }}
       />
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
