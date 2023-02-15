@@ -3,7 +3,11 @@ import { ResizeMode } from 'expo-av';
 import { Center, Flex, Image, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
 import { useRecoilValue } from 'recoil';
-import { isSignedInAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import {
+  isInitializingAtom,
+  isSignedInAtom,
+  userPermissionLevelAtom,
+} from '../../utils/atoms';
 import { useEarlyLoad } from '../../utils/hooks';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
@@ -20,7 +24,7 @@ const Loading = () => (
     <Image
       w="full"
       h="full"
-      resizeMode={ResizeMode.COVER}
+      resizeMode={ResizeMode.CONTAIN}
       source={require('../../assets/tower_logo.jpeg')}
       alt="Logo"
     />
@@ -38,16 +42,11 @@ const Loading = () => (
 const EnsureAuth = () => {
   const isSignedIn = useRecoilValue(isSignedInAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
-  const isEarly = useEarlyLoad(2000);
+  const isInitializing = useRecoilValue(isInitializingAtom);
 
-  if (isEarly) return <Loading />;
-
-  if (isSignedIn && userPermissionLevel === undefined)
-    return (
-      <Flex w="full" h="full" justifyContent="center" alignItems="center">
-        <Spinner size="lg" />
-      </Flex>
-    );
+  if (isInitializing || (isSignedIn && userPermissionLevel === undefined)) {
+    return <Loading />;
+  }
 
   if (!isSignedIn) {
     return <SignInOrRegister />;
