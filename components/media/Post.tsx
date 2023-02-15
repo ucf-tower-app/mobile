@@ -23,7 +23,7 @@ import RouteLink from '../route/RouteLink';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import Reportable from './Reportable';
+import Reportable from './actions/Reportable';
 import Timestamp from './Timestamp';
 
 const PostSkeleton = () => {
@@ -173,13 +173,14 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   const showRouteLink = !isInRouteView && route !== undefined;
   return (
-    <Reportable
-      isConfirming={isReporting}
-      media={postData.postObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={postData.postObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
         <HStack
           w="full"
@@ -235,7 +236,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           </HStack>
         ) : null}
       </VStack>
-    </Reportable>
+    </>
   );
 };
 

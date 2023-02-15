@@ -9,7 +9,7 @@ import { Comment as CommentObj } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag from '../profile/UserTag';
 import ContextMenu, { ContextOptions } from './ContextMenu';
-import Reportable from './Reportable';
+import Reportable from './actions/Reportable';
 
 const CommentSkeleton = () => {
   return null;
@@ -56,13 +56,14 @@ const Comment = ({ comment }: Props) => {
   };
 
   return (
-    <Reportable
-      isConfirming={isReporting}
-      media={data.commentObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={data.commentObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
       <VStack w="full" p={2} alignItems="flex-start">
         <HStack w="full" justifyContent="space-between">
           <UserTag user={data.author} size="sm" timestamp={data.timestamp} />
@@ -75,7 +76,7 @@ const Comment = ({ comment }: Props) => {
           ) : null}
         </HStack>
       </VStack>
-    </Reportable>
+    </>
   );
 };
 
