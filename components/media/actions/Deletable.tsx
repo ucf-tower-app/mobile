@@ -1,8 +1,13 @@
 import { Button, Modal, useToast } from 'native-base';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { queryClient } from '../../../App';
 import { userAtom } from '../../../utils/atoms';
-import { Post as PostObj, Comment as CommentObj } from '../../../xplat/types';
+import {
+  Post as PostObj,
+  Comment as CommentObj,
+  invalidateDocRefId,
+} from '../../../xplat/types';
 
 type Props = {
   isConfirming: boolean;
@@ -21,16 +26,15 @@ const Deletable = ({ isConfirming, media, close }: Props) => {
     setIsLoading(true);
     media
       .delete()
-      .then(
-        () =>
-          toast.show({
-            title: 'Content deleted',
-            placement: 'top',
-          })
-        // TODO: Invalidate places that this shows up? How do we do this...
-        // idea, flag the content as shouldBeHidden and then invalidate the content itself.
-        // the content won't be shown on any surfaces anymore! We
-      )
+      .then(() => {
+        toast.show({
+          title: 'Content deleted',
+          placement: 'top',
+        });
+
+        invalidateDocRefId(media.getId());
+        queryClient.invalidateQueries(media.getId());
+      })
       .catch((error) => {
         console.error(error);
         toast.show({

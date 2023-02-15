@@ -46,6 +46,16 @@ const PostSkeleton = () => {
   );
 };
 
+const DeletedPost = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <VStack w="full" alignItems="flex-start" bg={baseBgColor} pl={2}>
+      <Text italic>This post has been removed</Text>
+    </VStack>
+  );
+};
+
 /**
  * A Post is a modular component that displays all relevant information about a user's post
  *
@@ -167,16 +177,15 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   if (post.isMock()) {
     if (postData === undefined) return <PostSkeleton />;
   } else {
-    if (realQR.isError) {
-      console.error(realQR.error);
-      return null;
-    }
+    if (realQR.isError) return null;
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
+  if (!postData.postObject.exists) return <DeletedPost />;
+
   if (postData.isSend) {
     return (
-      <HStack w="full" justifyItems="center" bg={baseBgColor} mb={2} px={2}>
+      <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
         <Box pl={1.5} pr={1}>
           <UserTag
             user={postData.author}
