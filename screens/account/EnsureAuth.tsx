@@ -1,25 +1,35 @@
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Flex, Spinner } from 'native-base';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { ResizeMode } from 'expo-av';
+import { Center, Flex, Image, Spinner } from 'native-base';
 import 'react-native-gesture-handler';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import {
-  isEmailVerifiedAtom,
   isInitializingAtom,
   isSignedInAtom,
+  userPermissionLevelAtom,
 } from '../../utils/atoms';
+import { useEarlyLoad } from '../../utils/hooks';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
+import { UserStatus } from '../../xplat/types';
+import NotifyBanned from './NotifyBanned';
 import SignInOrRegister from './SignInOrRegister';
 import VerifyEmail from './VerifyEmail';
 
-// Style for tab bar
-const tabBarStyle = {
-  backgroundColor: 'white',
-};
-
 // Tabs used for bottom tray, stack for in-tab nav
-const Tabs = createMaterialBottomTabNavigator<TabParamList>();
+const Tabs = createBottomTabNavigator<TabParamList>();
 
+const Loading = () => (
+  <Center h="full" w="full">
+    <Image
+      w="full"
+      h="full"
+      resizeMode={ResizeMode.CONTAIN}
+      source={require('../../assets/tower_logo.jpeg')}
+      alt="Logo"
+    />
+  </Center>
+);
 /**
  * [EnsureAuth] is a wrapper component for the main tab navigator.
  * It listens to auth events from Firebase, and updates the UI accordingly.
@@ -30,30 +40,32 @@ const Tabs = createMaterialBottomTabNavigator<TabParamList>();
  * 3. Logged in, email verified --> Render tab navigator
  */
 const EnsureAuth = () => {
-  const [isInitializing] = useRecoilState(isInitializingAtom);
-  const [isSignedIn] = useRecoilState(isSignedInAtom);
-  const [isEmailVerified] = useRecoilState(isEmailVerifiedAtom);
+  const isSignedIn = useRecoilValue(isSignedInAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
+  const isInitializing = useRecoilValue(isInitializingAtom);
 
-  if (isInitializing)
-    return (
-      <Flex w="full" h="full" justifyContent="center" alignItems="center">
-        <Spinner size="lg" />
-      </Flex>
-    );
+  if (isInitializing || (isSignedIn && userPermissionLevel === undefined)) {
+    return <Loading />;
+  }
 
   if (!isSignedIn) {
     return <SignInOrRegister />;
   }
 
-  if (!isEmailVerified) {
+  if (userPermissionLevel === UserStatus.Banned) {
+    return <NotifyBanned />;
+  }
+
+  if (userPermissionLevel === UserStatus.Unverified) {
     return <VerifyEmail />;
   }
 
   return (
     <Tabs.Navigator
       initialRouteName="HomeTab"
-      barStyle={tabBarStyle}
-      labeled={false}
+      screenOptions={{
+        headerShown: false,
+      }}
     >
       {tabRoutes.map((route) => (
         <Tabs.Screen
@@ -62,6 +74,7 @@ const EnsureAuth = () => {
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? route.focusedIcon : route.unfocusedIcon,
+            tabBarShowLabel: false,
           }}
           key={route.name}
         />

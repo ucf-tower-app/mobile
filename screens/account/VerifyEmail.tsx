@@ -1,28 +1,34 @@
-import { Button, Center, Heading, Text, VStack } from 'native-base';
-import { useEffect } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import {
-  isEmailVerifiedAtom,
-  userPermissionLevelAtom,
-} from '../../utils/atoms';
-import { sendAuthEmail, startWaitForVerificationPoll } from '../../xplat/api';
+import { Button, Center, Heading, Input, Text, VStack } from 'native-base';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { userPermissionLevelAtom } from '../../utils/atoms';
 import { auth } from '../../xplat/Firebase';
+import { confirmEmailCode, sendEmailCode } from '../../xplat/api';
 import { UserStatus } from '../../xplat/types';
 
 const VerifyEmail = () => {
-  const setIsEmailVerified = useSetRecoilState(isEmailVerifiedAtom);
   const [userPermissionLevel, setUserPermissionLevel] = useRecoilState(
     userPermissionLevelAtom
   );
+  const [targCode, setTargCode] = useState<number>();
+  const [attemptCode, setAttemptCode] = useState<string>('');
 
   useEffect(() => {
-    if (userPermissionLevel === UserStatus.Unverified) {
-      startWaitForVerificationPoll((user) => {
-        setIsEmailVerified(true);
+    if (
+      userPermissionLevel !== undefined &&
+      userPermissionLevel <= UserStatus.Unverified
+    ) {
+      if (targCode !== undefined) sendEmailCode().then(setTargCode);
+    }
+  }, [targCode, userPermissionLevel]);
+
+  useEffect(() => {
+    if (targCode?.toString() === attemptCode) {
+      confirmEmailCode().then((user) => {
         user.getStatus().then(setUserPermissionLevel);
       });
     }
-  }, [userPermissionLevel, setIsEmailVerified, setUserPermissionLevel]);
+  }, [attemptCode, setUserPermissionLevel, targCode]);
 
   return (
     <Center>
@@ -38,7 +44,12 @@ const VerifyEmail = () => {
         <Text fontSize="md" color="gray.600">
           Verify your email to continue
         </Text>
-        <Button mt={16} variant="link" onPress={sendAuthEmail}>
+        <Input onChangeText={setAttemptCode} />
+        <Button
+          mt={16}
+          variant="link"
+          onPress={() => sendEmailCode().then(setTargCode)}
+        >
           Didn't get the email? Send another
         </Button>
         <Button mt={4} variant="outline" onPress={() => auth.signOut()}>

@@ -3,25 +3,28 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
-  Center,
   HStack,
   Icon,
   Skeleton,
   Text,
-  useColorModeValue,
   VStack,
+  useColorModeValue,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj } from '../../xplat/types';
+import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
+import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
+import RouteLink from '../route/RouteLink';
+import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './Reportable';
+import Timestamp from './Timestamp';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -50,11 +53,14 @@ const PostSkeleton = () => {
  */
 type Props = {
   post: PostObj;
+  isInRouteView?: boolean;
+  isPreview?: boolean;
 };
-const Post = ({ post }: Props) => {
+const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
 
@@ -65,6 +71,7 @@ const Post = ({ post }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
+  const [route, setRoute] = useState<Route>();
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
@@ -84,7 +91,18 @@ const Post = ({ post }: Props) => {
   }, [signedInUser, postData]);
 
   useEffect(() => {
-    if (realQR.data) setPostData(realQR.data);
+    if (realQR.data !== undefined) {
+      setPostData(realQR.data);
+
+      const updateRoute = async () => {
+        const _route = await (
+          await realQR.data.postObject.getForum()
+        )?.getRoute();
+        setRoute(_route);
+      };
+
+      updateRoute();
+    }
   }, [realQR.data]);
 
   useEffect(() => {
@@ -108,6 +126,14 @@ const Post = ({ post }: Props) => {
     setMediaList(newMediaList);
   }, [post, postData]);
 
+  // Like the post
+  const onSetIsLiked = (isLiked: boolean) => {
+    if (signedInUser === undefined || postData === undefined) return;
+
+    if (isLiked) postData.postObject.addLike(signedInUser);
+    else postData.postObject.removeLike(signedInUser);
+  };
+
   if (post.isMock()) {
     if (postData === undefined) return <PostSkeleton />;
   } else {
@@ -123,24 +149,32 @@ const Post = ({ post }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
-        <Icon
-          as={<Ionicons name="trending-up" />}
-          color="black"
-          opacity={75}
-          size="xl"
-        />
+      <HStack w="full" justifyItems="center" bg={baseBgColor} mb={2} px={2}>
+        <Box pl={1.5} pr={1}>
+          <UserTag
+            user={postData.author}
+            mini
+            isNavigationDisabled={isPreview}
+          />
+        </Box>
+        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+        {postData.routeInfo !== undefined && (
+          <Text pl={1}>{postData.routeInfo.name}</Text> // TODO: Make this a link
+        )}
         <Box pl={2}>
-          <UserTag user={postData.author} mini />
+          <Timestamp relative date={postData.timestamp} />
         </Box>
 
-        <Box pl={2}>
-          <Text>{'Sent it on ' + postData.timestamp.toLocaleDateString()}</Text>
-        </Box>
+        {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
+          <Box ml="auto">
+            <LikeButton likes={postData.likes} onSetIsLiked={onSetIsLiked} />
+          </Box>
+        ) : null}
       </HStack>
     );
   }
 
+  const showRouteLink = !isInRouteView && route !== undefined;
   return (
     <Reportable
       isConfirming={isReporting}
@@ -150,30 +184,59 @@ const Post = ({ post }: Props) => {
       }}
     >
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
-        <HStack w="full" px={2} justifyContent="space-between">
-          <UserTag user={postData.author} />
+        <HStack
+          w="full"
+          px={2}
+          justifyContent="space-between"
+          mb={showRouteLink ? 0 : 2}
+        >
+          <UserTag
+            user={postData.author}
+            timestamp={postData.timestamp}
+            isNavigationDisabled={isPreview}
+          />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
-        <Box p={2}>
+        {showRouteLink ? (
+          <Box mb={2}>
+            <RouteLink route={route!} />
+          </Box>
+        ) : null}
+        <Box p={isPreview ? 1 : 2} pt={0}>
           <Text>{postData.textContent}</Text>
         </Box>
         {mediaList === undefined ? null : (
-          <Box w="full" pt={2}>
-            <MediaCarousel mediaList={mediaList} />
+          <Box w="full" pt={isPreview ? 0 : 2}>
+            <MediaCarousel mediaList={mediaList} preview={isPreview} />
           </Box>
         )}
-        <Center w="full">
-          <Button
-            variant="link"
-            onPress={() =>
-              navigation.push('Comments', {
-                postDocRefId: postData.postObject.getId(),
-              })
-            }
+        {!isPreview ? (
+          <HStack
+            w="full"
+            justifyContent="center"
+            alignItems="center"
+            position="relative"
           >
-            Comments
-          </Button>
-        </Center>
+            <Button
+              variant="link"
+              onPress={() =>
+                navigation.push('Comments', {
+                  postDocRefId: postData.postObject.getId(),
+                })
+              }
+            >
+              Comments
+            </Button>
+            {permissionLevelCanWrite(userPermissionLevel) ? (
+              <Box position="absolute" right={2}>
+                <LikeButton
+                  likes={postData.likes}
+                  onSetIsLiked={onSetIsLiked}
+                />
+              </Box>
+            ) : null}
+          </HStack>
+        ) : null}
       </VStack>
     </Reportable>
   );

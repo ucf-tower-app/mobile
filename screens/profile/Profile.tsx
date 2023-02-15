@@ -25,9 +25,10 @@ import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useEarlyLoad } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { User, containsRef } from '../../xplat/types';
+import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -37,6 +38,8 @@ import { User, containsRef } from '../../xplat/types';
  * will be rendered for the signed in user.
  */
 const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
+  const isEarly = useEarlyLoad();
+
   const signedInUser = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -91,7 +94,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
   }, [data, signedInUser, signedInUserIQResult.data]);
 
-  if (isLoading) return <LoadingProfile />;
+  if (isEarly || isLoading) return <LoadingProfile />;
   if (isError || data === undefined) {
     console.error(error);
     return null;
@@ -103,16 +106,18 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     if (profileIsMine) {
       setShowModal(true);
     } else if (isFollowing && signedInUser !== undefined) {
+      setIsFollowing(false);
       await signedInUser.unfollowUser(data.userObject).then(() => {
+        invalidateDocRefId(signedInUser.getId());
         queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
       });
-      setIsFollowing(false);
     } else {
+      setIsFollowing(true);
       if (data.userObject !== undefined && signedInUser !== undefined) {
         await signedInUser.followUser(data.userObject).then(() => {
+          invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
         });
-        setIsFollowing(true);
       }
     }
   };
@@ -121,7 +126,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     setShowModal(false);
   };
 
-  const profileComponent = (
+  const profileComponent = () => (
     <Reportable
       isConfirming={isReporting}
       media={data.userObject}
