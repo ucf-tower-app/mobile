@@ -36,12 +36,6 @@ const SendShareModal = ({ isOpen, close, onShare, routeInfo }: Props) => {
     if (signedInUserRQResult.data)
       setPreview(
         <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
-          <Icon
-            as={<Ionicons name="trending-up" />}
-            color="black"
-            opacity={75}
-            size="lg"
-          />
           <Box pl="2">
             <Text fontSize="sm" fontWeight={'bold'}>
               {signedInUserRQResult.data.displayName.length <= 18
@@ -49,6 +43,12 @@ const SendShareModal = ({ isOpen, close, onShare, routeInfo }: Props) => {
                 : signedInUserRQResult.data.displayName.slice(0, 15) + '...'}
             </Text>
           </Box>
+          <Icon
+            as={<Ionicons name="trending-up" />}
+            color="black"
+            opacity={75}
+            size="lg"
+          />
           <Text pl={1}>{routeInfo.name}</Text>
           <Box pl={2}>
             <Timestamp relative date={new Date(Date.now())} />

@@ -106,6 +106,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
         author: user,
         forum: getForumById(data.forumDocRefID),
         textContent: '',
+        routeInfo: {
+          name: data.name,
+          grade: data.gradeDisplayString,
+        },
         isSend: true,
       }).then(() => {
         queryClient.invalidateQueries({
