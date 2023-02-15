@@ -125,7 +125,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     });
   };
 
-  const routeViewComponent = (
+  const routeViewComponent = () => (
     <Box w="full" bg={backgroundHex}>
       <ImageBackground
         style={styles.thumbnail}
@@ -179,7 +179,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
             ) : null}
           </HStack>
           {permissionLevelCanWrite(userPermissionLevel) ? (
-            <>
+            <VStack>
               <Button
                 mx={4}
                 mt={4}
@@ -194,7 +194,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
               <Button mx={4} mt={4} onPress={post}>
                 Post to this route
               </Button>
-            </>
+            </VStack>
           ) : null}
           <Center mt={4} mb={2}>
             <Heading>Posts</Heading>
