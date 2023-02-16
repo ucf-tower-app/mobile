@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
-  Center,
   HStack,
   Icon,
   Skeleton,
@@ -14,17 +13,26 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
+import {
+  FetchedPost,
+  Post as PostObj,
+  Route,
+  UserStatus,
+} from '../../xplat/types';
+import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import Reportable from './Reportable';
+import Reportable from './actions/Reportable';
+import Timestamp from './Timestamp';
+import Deletable from './actions/Deletable';
 
-const PostSkeleton = () => {
+export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
@@ -35,6 +43,16 @@ const PostSkeleton = () => {
       <Skeleton.Text p={2} lines={2} />
       <Skeleton w="full" pt={2} h={40} />
     </VStack>
+  );
+};
+
+const DeletedPost = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <Box w="full" bg={baseBgColor} pl={2}>
+      <Text italic>This post has been removed</Text>
+    </Box>
   );
 };
 
@@ -52,14 +70,16 @@ const PostSkeleton = () => {
 type Props = {
   post: PostObj;
   isInRouteView?: boolean;
-  preview?: boolean;
+  isPreview?: boolean;
 };
-const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
+const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
+  const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
@@ -76,16 +96,39 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
 
   // Set up the context menu
   useEffect(() => {
-    const _contextOptions: ContextOptions = {};
     if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== postData?.author.getId()
+      signedInUser === undefined ||
+      userPermissionLevel === undefined ||
+      postData === undefined
     )
+      return;
+
+    const signedInUserOwnsPost =
+      signedInUser.getId() === postData.author.getId();
+
+    const _contextOptions = contextOptions;
+    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
+      };
+
+    if (!signedInUserOwnsPost)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, postData]);
+  }, [contextOptions, signedInUser, userPermissionLevel, postData]);
+
+  useEffect(() => {
+    if (
+      userPermissionLevel === undefined ||
+      userPermissionLevel < UserStatus.Employee
+    )
+      return;
+    const _contextOptions = contextOptions;
+    setContextOptions(_contextOptions);
+  }, [userPermissionLevel, contextOptions]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {
@@ -123,40 +166,67 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
     setMediaList(newMediaList);
   }, [post, postData]);
 
+  // Like the post
+  const onSetIsLiked = (isLiked: boolean) => {
+    if (signedInUser === undefined || postData === undefined) return;
+
+    if (isLiked) postData.postObject.addLike(signedInUser);
+    else postData.postObject.removeLike(signedInUser);
+  };
+
   if (post.isMock()) {
     if (postData === undefined) return <PostSkeleton />;
   } else {
-    if (realQR.isError) {
-      console.error(realQR.error);
-      return null;
-    }
+    if (realQR.isError) return null;
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
+  if (!postData.postObject.exists) return <DeletedPost />;
+
   if (postData.isSend) {
     return (
-      <HStack w="full" alignItems="center" bg={baseBgColor} mb={2} px={2}>
+      <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
+        <Box pl={1.5} pr={1}>
+          <UserTag
+            user={postData.author}
+            mini
+            isNavigationDisabled={isPreview}
+          />
+        </Box>
         <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+        {postData.routeInfo !== undefined && (
+          <Text pl={1}>{postData.routeInfo.name}</Text> // TODO: Make this a link
+        )}
         <Box pl={2}>
-          <UserTag user={postData.author} mini />
+          <Timestamp relative date={postData.timestamp} />
         </Box>
 
-        <Text pl={2}>
-          {'Sent it on ' + postData.timestamp.toLocaleDateString()}
-        </Text>
+        {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
+          <Box ml="auto">
+            <LikeButton likes={postData.likes} onSetIsLiked={onSetIsLiked} />
+          </Box>
+        ) : null}
       </HStack>
     );
   }
 
   const showRouteLink = !isInRouteView && route !== undefined;
   return (
-    <Reportable
-      isConfirming={isReporting}
-      media={postData.postObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={postData.postObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
+      <Deletable
+        isConfirming={isDeleting}
+        media={postData.postObject}
+        close={() => {
+          setIsDeleting(false);
+        }}
+      />
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
         <HStack
           w="full"
@@ -167,7 +237,7 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
           <UserTag
             user={postData.author}
             timestamp={postData.timestamp}
-            isNavigationDisabled={preview}
+            isNavigationDisabled={isPreview}
           />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
@@ -176,16 +246,21 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
             <RouteLink route={route!} />
           </Box>
         ) : null}
-        <Box p={preview ? 1 : 2} pt={0}>
+        <Box p={isPreview ? 1 : 2} pt={0}>
           <Text>{postData.textContent}</Text>
         </Box>
         {mediaList === undefined ? null : (
-          <Box w="full" pt={preview ? 0 : 2}>
-            <MediaCarousel mediaList={mediaList} preview={preview} />
+          <Box w="full" pt={isPreview ? 0 : 2}>
+            <MediaCarousel mediaList={mediaList} preview={isPreview} />
           </Box>
         )}
-        {!preview && (
-          <Center w="full">
+        {!isPreview ? (
+          <HStack
+            w="full"
+            justifyContent="center"
+            alignItems="center"
+            position="relative"
+          >
             <Button
               variant="link"
               onPress={() =>
@@ -196,10 +271,18 @@ const Post = ({ post, isInRouteView = false, preview = false }: Props) => {
             >
               Comments
             </Button>
-          </Center>
-        )}
+            {permissionLevelCanWrite(userPermissionLevel) ? (
+              <Box position="absolute" right={2}>
+                <LikeButton
+                  likes={postData.likes}
+                  onSetIsLiked={onSetIsLiked}
+                />
+              </Box>
+            ) : null}
+          </HStack>
+        ) : null}
       </VStack>
-    </Reportable>
+    </>
   );
 };
 
