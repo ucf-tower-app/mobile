@@ -1,4 +1,4 @@
-import { FlatList, Spacer, VStack } from 'native-base';
+import { Box, FlatList, Spacer, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
@@ -27,13 +27,14 @@ const Leaderboard = ({ data }: Props) => {
       const idx = data.findIndex(
         (entry) => entry.user.getId() === signedInUser?.getId()
       );
-      console.log(idx);
       setTopComponent(
-        <LeaderboardRanking
-          ranking={idx !== -1 ? idx + 1 : undefined}
-          fetchedUser={userQuery.data}
-          numOfSends={idx !== -1 ? data[idx].sends : undefined}
-        />
+        <Box margin={2}>
+          <LeaderboardRanking
+            ranking={idx !== -1 ? idx + 1 : undefined}
+            fetchedUser={userQuery.data}
+            numOfSends={idx !== -1 ? data[idx].sends : undefined}
+          />
+        </Box>
       );
     }
   }, [userQuery.data, data, signedInUser]);
@@ -41,10 +42,8 @@ const Leaderboard = ({ data }: Props) => {
   return (
     <FlatList
       h="full"
-      // bgColor={baseBgColor}
       ListHeaderComponent={topComponent}
       data={data}
-      // ItemSeparatorComponent={Divider}
       renderItem={({ item, index }) => (
         <VStack pt={4}>
           <LeaderboardRow data={item} ranking={index + 1} />
