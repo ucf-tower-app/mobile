@@ -19,6 +19,8 @@ type Props = {
   relativeTo?: Date | number | string;
   options?: FormatOptions;
   autoUpdate?: boolean;
+  fontSize?: string;
+  color?: string;
 };
 
 export default function Timestamp({
@@ -27,6 +29,8 @@ export default function Timestamp({
   relativeTo,
   options,
   autoUpdate,
+  fontSize = 'xs',
+  color = 'grey',
 }: Props) {
   const [minutes, setMinutes] = useState<number>(0);
   useEffect(() => {
@@ -47,7 +51,7 @@ export default function Timestamp({
     : formatDate(possibleDate, options);
 
   return (
-    <Text fontSize="xs" color="grey">
+    <Text fontSize={fontSize} color={color}>
       {text}
     </Text>
   );

@@ -18,7 +18,7 @@ import ContextMenu, {
   ContextOptions,
 } from '../../components/media/ContextMenu';
 import Feed from '../../components/media/Feed';
-import Reportable from '../../components/media/Reportable';
+import Reportable from '../../components/media/actions/Reportable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
@@ -126,14 +126,15 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     setShowModal(false);
   };
 
-  const profileComponent = (
-    <Reportable
-      isConfirming={isReporting}
-      media={data.userObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+  const profileComponent = () => (
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={data.userObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
       <VStack space="xs" w="full" bg={baseBgColor}>
         <EditProfileModal
           isOpen={showModal}
@@ -221,7 +222,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         </Center>
         <Divider width="full" />
       </VStack>
-    </Reportable>
+    </>
   );
 
   return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;

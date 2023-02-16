@@ -11,13 +11,13 @@ import { useEffect, useState } from 'react';
  *
  * if (isEarly) return <Skeleton />;
  */
-export const useEarlyLoad = () => {
+export const useEarlyLoad = (timeoutMs: number = 80) => {
   const [isEarly, setIsEarly] = useState<boolean>(true);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setIsEarly(false), 80);
+    const timeout = setTimeout(() => setIsEarly(false), timeoutMs);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [timeoutMs]);
 
   return isEarly;
 };
