@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../../utils/atoms';
 import {
-  Post as PostObj,
   Comment as CommentObj,
+  Post as PostObj,
+  UserActionError,
   User as UserObj,
 } from '../../../xplat/types';
 
@@ -32,9 +33,12 @@ const Reportable = ({ isConfirming, media, close }: Props) => {
         })
       )
       .catch((error) => {
-        console.error(error);
+        var msg = 'Something went wrong, please try again.';
+        if (error === UserActionError.EmployeeReport) msg = error;
+        else console.error(error);
+
         toast.show({
-          title: 'Something went wrong, please try again.',
+          title: msg,
           placement: 'top',
         });
       })

@@ -1,15 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
 import {
   ArrowForwardIcon,
+  Box,
   HStack,
   Pressable,
   Text,
   VStack,
   useColorModeValue,
-  Box,
+  useToast,
 } from 'native-base';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { getRouteByName } from '../../xplat/api';
+import { GetRouteByNameError, getRouteByName } from '../../xplat/api';
 import Tintable from '../util/Tintable';
 
 type Props = {
@@ -18,16 +19,29 @@ type Props = {
 const ArchivedRouteRow = ({ title }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const toast = useToast();
 
   return (
     <Pressable
       onPress={async () => {
-        const route = await getRouteByName(title);
-        const id = route?.getId();
-        if (id)
-          navigation.push('RouteView', {
-            routeDocRefId: id,
+        try {
+          const route = await getRouteByName(title);
+          const id = route?.getId();
+          if (id)
+            navigation.push('RouteView', {
+              routeDocRefId: id,
+            });
+        } catch (error: any) {
+          var msg =
+            'An unknown error occurred while trying to find this route.';
+          if (error === GetRouteByNameError.NoSuchRoute) msg = error;
+          else console.error(error);
+
+          toast.show({
+            description: msg,
+            placement: 'top',
           });
+        }
       }}
     >
       {({ isHovered, isPressed }) => {

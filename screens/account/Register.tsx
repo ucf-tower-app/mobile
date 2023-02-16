@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { Platform } from 'react-native';
 import {
   createUser,
+  CreateUserError,
   signIn,
   validDisplayname,
   validUsername,
@@ -91,9 +92,25 @@ const Register = ({ setIsRegistering }: Props) => {
           formData.displayName
         );
         await signIn(formData.email, formData.password);
-      } catch {
+      } catch (error: any) {
+        var msg =
+          'An unknown error occurred while trying to register your account.';
+        if (error === CreateUserError.UsernameTaken) msg = error;
+        else if (error === CreateUserError.InvalidDisplayName) msg = error;
+        else if (error === CreateUserError.InvalidUsername) msg = error;
+        else if (error.code !== undefined) {
+          // Firebase errors have such a property
+          console.log(error.code);
+          if (error.code === 'auth/email-already-in-use')
+            msg =
+              'This email is already in use! Please try logging in instead.';
+          else msg = 'An unknown error occurred: ' + error.code;
+        } else {
+          console.error(error);
+        }
+
         toast.show({
-          description: 'Oops, this email already exists. Please try again.',
+          description: msg,
           placement: 'top',
         });
       } finally {

@@ -12,6 +12,7 @@ import {
   Spinner,
   Text,
   VStack,
+  useToast,
   useToken,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -31,7 +32,7 @@ import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { createPost, getForumById } from '../../xplat/api';
+import { CreatePostError, createPost, getForumById } from '../../xplat/api';
 import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
@@ -41,6 +42,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
+  const toast = useToast();
   const user = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -101,23 +103,34 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     }
   };
 
-  const shareSend = () => {
+  const shareSend = async () => {
     if (data !== undefined && user !== undefined) {
       setIsSharing(false);
-      createPost({
-        author: user,
-        forum: getForumById(data.forumDocRefID),
-        textContent: '',
-        routeInfo: {
-          name: data.name,
-          grade: data.gradeDisplayString,
-        },
-        isSend: true,
-      }).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: ['posts', data.forumDocRefID],
+      try {
+        await createPost({
+          author: user,
+          forum: getForumById(data.forumDocRefID),
+          textContent: '',
+          routeInfo: {
+            name: data.name,
+            grade: data.gradeDisplayString,
+          },
+          isSend: true,
+        }).then(() => {
+          queryClient.invalidateQueries({
+            queryKey: ['posts', data.forumDocRefID],
+          });
         });
-      });
+      } catch (e: any) {
+        var msg = 'An unknown error occurred while trying to create this post.';
+        if (e === CreatePostError.TooLarge) msg = e;
+        else console.error(e);
+
+        toast.show({
+          description: msg,
+          placement: 'top',
+        });
+      }
     }
   };
 

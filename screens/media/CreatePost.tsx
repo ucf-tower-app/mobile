@@ -12,6 +12,7 @@ import {
   ScrollView,
   VStack,
   useColorModeValue,
+  useToast,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -22,7 +23,7 @@ import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 import { userAtom } from '../../utils/atoms';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession } from '../../utils/utils';
-import { createPost, getForumById } from '../../xplat/api';
+import { CreatePostError, createPost, getForumById } from '../../xplat/api';
 import {
   FetchedRoute,
   LazyStaticImage,
@@ -53,6 +54,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
   const [selectedRoute, setSelectedRoute] = useState<FetchedRoute>();
   const [isProcessingPost, setIsProcessingPost] = useState<boolean>(false);
   const [previewPost, setPreviewPost] = useState<PostMock>();
+  const toast = useToast();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -160,7 +162,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
       );
 
       const forum = selectedRoute && getForumById(selectedRoute.forumDocRefID);
-      createPost({
+      await createPost({
         author: user,
         textContent: textContent,
         forum: forum,
@@ -178,10 +180,6 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         if (forum)
           queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
       });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsProcessingPost(false);
       // Leave the "Posting" screen
       navigation.goBack();
       navigation.navigate('Tabs', {
@@ -191,6 +189,17 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           params: {},
         },
       });
+    } catch (error: any) {
+      var msg = 'An unknown error occurred while trying to create this post.';
+      if (error === CreatePostError.TooLarge) msg = error;
+      else console.error(error);
+
+      toast.show({
+        description: msg,
+        placement: 'top',
+      });
+    } finally {
+      setIsProcessingPost(false);
     }
   };
 
