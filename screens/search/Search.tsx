@@ -44,51 +44,56 @@ const Search = () => {
   const activeRoutesQuery = useActiveRoutes();
 
   useEffect(() => {
-    if (
-      userMatcherQuery.data === undefined ||
-      archivedMatcherQuery.data === undefined
-    )
-      return;
-    if (query === '') {
-      setArchivedRoutesSearchResults([]);
-      return;
-    }
     if (tabViewed === 'archived') {
-      setIsLoadingResults(true);
+      if (archivedMatcherQuery.data === undefined) {
+        setIsLoadingResults(true);
+        return;
+      }
+      if (query === '') {
+        setArchivedRoutesSearchResults([]);
+        return;
+      }
+      setIsLoadingResults(false);
       setArchivedRoutesSearchResults(
         archivedMatcherQuery.data.getMatches(query)
       );
+    } else if (tabViewed === 'users') {
+      if (userMatcherQuery.data === undefined) {
+        setIsLoadingResults(true);
+        return;
+      }
       setIsLoadingResults(false);
-    }
-    if (tabViewed === 'users') {
-      setIsLoadingResults(true);
+      if (query === '') {
+        setUserSearchResults([]);
+        return;
+      }
       setUserSearchResults(userMatcherQuery.data.getMatches(query));
-      setIsLoadingResults(false);
     }
   }, [archivedMatcherQuery.data, query, tabViewed, userMatcherQuery.data]);
 
   useEffect(() => {
-    if (activeRoutesQuery.data === undefined) return;
+    if (tabViewed !== 'active') return;
+    if (activeRoutesQuery.data === undefined) {
+      setIsLoadingResults(true);
+      return;
+    }
+    setIsLoadingResults(false);
     if (query === '') {
       setDisplayedRouteIndices([]);
       return;
     }
-    if (tabViewed === 'active') {
-      setIsLoadingResults(true);
-      const newDisplayedRouteIndices: number[] = [];
-      activeRoutesQuery.data.activeRoutes.forEach((route, index) => {
-        const corpus = [
-          route.name,
-          route.gradeDisplayString,
-          route.stringifiedTags,
-        ]
-          .join('$')
-          .toLowerCase();
-        if (corpus.includes(query)) newDisplayedRouteIndices.push(index);
-      });
-      setDisplayedRouteIndices(newDisplayedRouteIndices);
-      setIsLoadingResults(false);
-    }
+    const newDisplayedRouteIndices: number[] = [];
+    activeRoutesQuery.data.activeRoutes.forEach((route, index) => {
+      const corpus = [
+        route.name,
+        route.gradeDisplayString,
+        route.stringifiedTags,
+      ]
+        .join('$')
+        .toLowerCase();
+      if (corpus.includes(query)) newDisplayedRouteIndices.push(index);
+    });
+    setDisplayedRouteIndices(newDisplayedRouteIndices);
   }, [activeRoutesQuery.data, query, tabViewed]);
 
   if (userMatcherQuery.isError) console.error(userMatcherQuery.error);
@@ -103,7 +108,7 @@ const Search = () => {
             queryHandler={{
               onChangeQuery: (newQuery: string) =>
                 setQuery(newQuery.toLowerCase()),
-              onChangeQueryDebounceSession: new DebounceSession(500),
+              onChangeQueryDebounceSession: new DebounceSession(100),
             }}
           />
           <HStack w="full" justifyContent="space-around" p="3" space="md">
