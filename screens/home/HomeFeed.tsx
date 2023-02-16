@@ -1,4 +1,11 @@
-import { Button, Center, Divider, FlatList } from 'native-base';
+import {
+  Button,
+  Center,
+  Divider,
+  FlatList,
+  VStack,
+  useColorModeValue,
+} from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
@@ -8,9 +15,11 @@ import { getQueryCursor } from '../../xplat/queries/feed';
 import { PostCursorMerger, Post as PostObj } from '../../xplat/types';
 
 const STRIDE = 2;
+const INITIAL_STRIDE = 5;
 
 const HomeFeed = () => {
   const signedInUser = useRecoilValue(userAtom);
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useQuery(
     signedInUser !== undefined ? signedInUser.getId() : 'nullQuery',
     signedInUser === undefined ? () => undefined : signedInUser.buildFetcher(),
@@ -32,7 +41,6 @@ const HomeFeed = () => {
   }, [enabled, signedInUser, userQuery.data]);
 
   const getNextPosts = useCallback(async () => {
-    console.log('Get more posts');
     if (cursor === undefined) {
       setExhausted(true);
       return;
@@ -40,7 +48,8 @@ const HomeFeed = () => {
     if (exhausted) return;
 
     const newPosts = [];
-    while (newPosts.length < STRIDE && (await cursor.hasNext())) {
+    const stride = posts.length === 0 ? INITIAL_STRIDE : STRIDE;
+    while (newPosts.length < stride && (await cursor.hasNext())) {
       newPosts.push(await cursor.pollNext());
     }
     const hasNext = await cursor.hasNext();
@@ -61,21 +70,32 @@ const HomeFeed = () => {
   );
 
   const renderSpinner = () => {
-    if (!exhausted) return <PostSkeleton />;
+    if (!exhausted)
+      return (
+        <VStack>
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+        </VStack>
+      );
     else return null;
   };
 
-  const renderDivider = () => <Divider />;
-
   return (
     <FlatList
+      bgColor={baseBgColor}
       ListHeaderComponent={header}
       data={posts}
       extraData={cursor}
       onEndReached={getNextPosts}
-      ItemSeparatorComponent={renderDivider}
+      ItemSeparatorComponent={Divider}
       ListFooterComponent={renderSpinner}
-      renderItem={({ item }) => <Post post={item} />}
+      renderItem={({ item }) => (
+        <Center>
+          <Post post={item} />
+        </Center>
+      )}
+      keyExtractor={(item) => item.getId()}
     />
   );
 };
