@@ -18,7 +18,7 @@ const VerifyEmail = () => {
       userPermissionLevel !== undefined &&
       userPermissionLevel <= UserStatus.Unverified
     ) {
-      if (targCode !== undefined) sendEmailCode().then(setTargCode);
+      if (targCode === undefined) sendEmailCode().then(setTargCode);
     }
   }, [targCode, userPermissionLevel]);
 
