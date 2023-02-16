@@ -60,11 +60,31 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   useEffect(() => {
     if (commentsQuery.data === undefined) return;
-    setComments(
-      commentsQuery.data.pages.flatMap((page) =>
+
+    // Filters out media that shouldn't be shown and updates state
+    const readAndFilterComments = async () => {
+      let _comments = commentsQuery.data.pages.flatMap((page) =>
         constructPageData(CommentObj, page)
-      )
-    );
+      );
+
+      // Get the data, so that `exists` is properly mapped for cache-invalidated data
+      await Promise.all(_comments.map((comment) => comment.getData()));
+
+      // Filter out the bad data
+      const shouldBeOmittedResults = await Promise.all(
+        _comments.map(
+          (comment) => !comment.exists || comment.checkShouldBeHidden()
+        )
+      );
+
+      _comments = _comments.filter(
+        (_, index) => !shouldBeOmittedResults[index]
+      );
+
+      setComments(_comments);
+    };
+
+    readAndFilterComments();
   }, [commentsQuery.data]);
 
   useEffect(() => {

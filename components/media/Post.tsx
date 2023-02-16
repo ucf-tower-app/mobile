@@ -31,6 +31,7 @@ import MediaCarousel from './MediaCarousel';
 import Reportable from './actions/Reportable';
 import Timestamp from './Timestamp';
 import Deletable from './actions/Deletable';
+import ActionedMedia from './actions/ActionedMedia';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -181,10 +182,8 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
-  // uh oh this post is scary
-  if (postData.shouldBeHidden) return <DeletedPost />;
-
-  if (!postData.postObject.exists) return <DeletedPost />;
+  if (postData.shouldBeHidden) return <ActionedMedia action="hidden" />;
+  if (!postData.postObject.exists) return <ActionedMedia action="deleted" />;
 
   if (postData.isSend) {
     return (

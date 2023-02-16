@@ -40,8 +40,27 @@ const Feed = ({
     );
 
   useEffect(() => {
-    if (data)
-      setPosts(data.pages.flatMap((page) => constructPageData(PostObj, page)));
+    if (data === undefined) return;
+
+    // Filters out media that shouldn't be shown and updates state
+    const readAndFilterPosts = async () => {
+      let _posts = data.pages.flatMap((page) =>
+        constructPageData(PostObj, page)
+      );
+
+      // Get the data, so that `exists` is properly mapped for cache-invalidated data
+      await Promise.all(_posts.map((post) => post.getData()));
+
+      // Filter out the bad data
+      const shouldBeOmittedResults = await Promise.all(
+        _posts.map((post) => !post.exists || post.checkShouldBeHidden())
+      );
+      _posts = _posts.filter((_, index) => !shouldBeOmittedResults[index]);
+
+      setPosts(_posts);
+    };
+
+    readAndFilterPosts();
   }, [data]);
 
   const loadNextPosts = useCallback(async () => {
