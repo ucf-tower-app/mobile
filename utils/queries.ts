@@ -1,9 +1,11 @@
 import { useQuery } from 'react-query';
 import {
+  buildMatcher,
+  buildSet,
   buildUserCacheMap,
   buildUserSubstringMatcher,
   getActiveRoutesCursor,
-  getArchivedRoutesSubstringMatcher,
+  getArchivedRouteNames,
   getUserCache,
 } from '../xplat/api';
 import { Comment, FetchedRoute, Post, User } from '../xplat/types';
@@ -60,7 +62,16 @@ export const useUserSubstringMatcher = () => {
 };
 
 export const useArchivedSubstringMatcher = () => {
-  return useQuery('archived-routes', getArchivedRoutesSubstringMatcher, {
+  return useQuery('archived-routes', getArchivedRouteNames, {
+    select: buildMatcher,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
+};
+
+export const useArchivedSet = () => {
+  return useQuery('archived-routes', getArchivedRouteNames, {
+    select: buildSet,
     staleTime: TWO_HOURS,
     cacheTime: TWO_HOURS,
   });
