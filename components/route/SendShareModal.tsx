@@ -9,9 +9,7 @@ import {
   useColorModeValue,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import Timestamp from '../media/Timestamp';
 
 type Props = {
@@ -25,22 +23,19 @@ type Props = {
 };
 const SendShareModal = ({ isOpen, close, onShare, routeInfo }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-  const user = useRecoilValue(userAtom);
-  const signedInUserRQResult = useQuery([user?.getId()], user!.buildFetcher(), {
-    enabled: user !== undefined,
-  });
+  const userQuery = useSignedInUserQuery();
 
   const [preview, setPreview] = useState<JSX.Element>();
 
   useEffect(() => {
-    if (signedInUserRQResult.data)
+    if (userQuery.data)
       setPreview(
         <HStack w="full" alignItems="flex-start" bg={baseBgColor}>
           <Box pl="2">
             <Text fontSize="sm" fontWeight={'bold'}>
-              {signedInUserRQResult.data.displayName.length <= 18
-                ? signedInUserRQResult.data.displayName
-                : signedInUserRQResult.data.displayName.slice(0, 15) + '...'}
+              {userQuery.data.displayName.length <= 18
+                ? userQuery.data.displayName
+                : userQuery.data.displayName.slice(0, 15) + '...'}
             </Text>
           </Box>
           <Icon
@@ -55,7 +50,7 @@ const SendShareModal = ({ isOpen, close, onShare, routeInfo }: Props) => {
           </Box>
         </HStack>
       );
-  }, [baseBgColor, signedInUserRQResult.data, routeInfo]);
+  }, [baseBgColor, userQuery.data, routeInfo]);
 
   return (
     <Modal isOpen={isOpen} onClose={close} size="xl">

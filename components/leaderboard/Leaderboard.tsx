@@ -1,8 +1,8 @@
 import { Box, FlatList, Spacer, VStack } from 'native-base';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import { LeaderboardEntry } from '../../xplat/queries';
 import LeaderboardRanking from './LeaderboardRanking';
 import LeaderboardRow from './LeaderboardRow';
@@ -15,11 +15,7 @@ type Props = {
 };
 const Leaderboard = ({ data }: Props) => {
   const signedInUser = useRecoilValue(userAtom);
-  const userQuery = useQuery(
-    signedInUser !== undefined ? signedInUser.getId() : 'nullQuery',
-    signedInUser === undefined ? () => undefined : signedInUser.buildFetcher(),
-    { enabled: signedInUser !== undefined }
-  );
+  const userQuery = useSignedInUserQuery();
   const [topComponent, setTopComponent] = useState<JSX.Element>(<></>);
 
   useEffect(() => {

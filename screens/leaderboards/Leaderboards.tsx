@@ -10,6 +10,7 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import Leaderboard from '../../components/leaderboard/Leaderboard';
 import { userAtom } from '../../utils/atoms';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import {
   LeaderboardEntry,
   getRQParams_MonthlyLeaderboard,
@@ -30,22 +31,18 @@ const Leaderboards = () => {
   const semesterRQResult = useQuery(
     getRQParams_SemesterLeaderboard(new Date())
   );
-  const curUserRQResult = useQuery(
-    [signedInUser?.getId()],
-    signedInUser!.buildFetcher(),
-    { enabled: signedInUser !== undefined }
-  );
+  const userQuery = useSignedInUserQuery();
 
   useEffect(() => {
     var newData =
       tabViewed === 'Monthly'
         ? monthlyRQResult.data ?? []
         : semesterRQResult.data ?? [];
-    if (filter === 'Following' && curUserRQResult.data !== undefined) {
+    if (filter === 'Following' && userQuery.data !== undefined) {
       newData = newData.filter(
         (entry) =>
           entry.user.getId() === signedInUser?.getId() ||
-          containsRef(curUserRQResult.data.followingList, entry.user)
+          containsRef(userQuery.data!.followingList, entry.user)
       );
     }
     newData.sort((a, b) =>
@@ -53,7 +50,7 @@ const Leaderboards = () => {
     );
     setData(newData);
   }, [
-    curUserRQResult.data,
+    userQuery.data,
     filter,
     monthlyRQResult.data,
     semesterRQResult.data,
