@@ -8,6 +8,7 @@ import {
   Spinner,
   useColorModeValue,
   VStack,
+  Text,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import UserRow from '../../components/profile/UserRow';
@@ -100,6 +101,37 @@ const Search = () => {
   if (archivedMatcherQuery.isError) console.error(archivedMatcherQuery.error);
   if (activeRoutesQuery.isError) console.error(activeRoutesQuery.error);
 
+  const results =
+    tabViewed === 'users'
+      ? userSearchResults.map((userSearchResult) => {
+          return (
+            <Box key={userSearchResult.user.getId()}>
+              <UserRow user={userSearchResult.user} />
+              <Divider my="3" />
+            </Box>
+          );
+        })
+      : tabViewed === 'archived'
+      ? archivedRoutesSearchResults.map((routeTitle) => {
+          return (
+            <Box key={routeTitle.toString()}>
+              <ArchivedRouteRow title={routeTitle.toString()} />
+              <Divider my="3" />
+            </Box>
+          );
+        })
+      : activeRoutesQuery.data !== undefined
+      ? displayedRouteIndices.map((index) => {
+          return (
+            <Box key={index}>
+              <RouteRow
+                route={activeRoutesQuery.data.activeRoutes[index].routeObject}
+              />
+              <Divider />
+            </Box>
+          );
+        })
+      : null;
   return (
     <ScrollView w="full" bg={baseBgColor} p="2">
       <Center w="full">
@@ -139,38 +171,15 @@ const Search = () => {
           <Spinner mt={8} size="lg" />
         ) : (
           <VStack w="full">
-            {tabViewed === 'users'
-              ? userSearchResults.map((userSearchResult) => {
-                  return (
-                    <Box key={userSearchResult.user.getId()}>
-                      <UserRow user={userSearchResult.user} />
-                      <Divider my="3" />
-                    </Box>
-                  );
-                })
-              : tabViewed === 'archived'
-              ? archivedRoutesSearchResults.map((routeTitle) => {
-                  return (
-                    <Box key={routeTitle.toString()}>
-                      <ArchivedRouteRow title={routeTitle.toString()} />
-                      <Divider my="3" />
-                    </Box>
-                  );
-                })
-              : activeRoutesQuery.data !== undefined
-              ? displayedRouteIndices.map((index) => {
-                  return (
-                    <Box key={index}>
-                      <RouteRow
-                        route={
-                          activeRoutesQuery.data.activeRoutes[index].routeObject
-                        }
-                      />
-                      <Divider />
-                    </Box>
-                  );
-                })
-              : null}
+            {results?.length === 0 ? (
+              <Center>
+                <Text mt={2} color="grey">
+                  No results
+                </Text>
+              </Center>
+            ) : (
+              results
+            )}
           </VStack>
         )}
       </Center>
