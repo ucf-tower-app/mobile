@@ -20,6 +20,7 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
 import Feed from '../../components/media/Feed';
+import Timestamp from '../../components/media/Timestamp';
 import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
@@ -31,7 +32,7 @@ import {
   TabGlobalScreenProps,
 } from '../../utils/types';
 import { createPost, getForumById } from '../../xplat/api';
-import { Route, RouteStatus } from '../../xplat/types';
+import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -47,7 +48,9 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const [isRating, setIsRating] = useState<boolean>(false);
   const [isSharing, setIsSharing] = useState<boolean>(false);
 
-  const [userHasSent, setUserHasSent] = useState<boolean>(false);
+  const [fetchedSend, setFetchedSend] = useState<FetchedSend | undefined>(
+    undefined
+  );
 
   // Start as true so that the send button is disabled until the route is loaded
 
@@ -63,8 +66,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
     data.routeObject.getSendByUser(user).then((send) => {
       setIsSending(false);
-      if (send === undefined) return;
-      setUserHasSent(true);
+      if (send !== undefined) send.fetch().then(setFetchedSend);
     });
   }, [data, user]);
 
@@ -91,10 +93,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const sendIt = async (stars: number | undefined) => {
     if (data !== undefined && user !== undefined) {
       setIsRating(false);
-      data.routeObject.FUCKINSENDIT(user, stars).then(() => {
+      data.routeObject.FUCKINSENDIT(user, stars).then((send) => {
         setIsSending(false);
         setIsSharing(true);
-        setUserHasSent(true);
+        send.fetch().then(setFetchedSend);
       });
     }
   };
@@ -186,10 +188,23 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                 onPress={() => {
                   if (data && user) setIsRating(true);
                 }}
-                isDisabled={userHasSent}
+                isDisabled={fetchedSend !== undefined}
                 isLoading={isSending}
+                variant={fetchedSend === undefined ? 'solid' : 'outline'}
               >
-                {userHasSent ? 'Sent!' : 'Send it!'}
+                {fetchedSend !== undefined ? (
+                  <Text>
+                    Sent{' '}
+                    <Timestamp
+                      relative
+                      date={fetchedSend.timestamp}
+                      fontSize="sm"
+                      color="black"
+                    />
+                  </Text>
+                ) : (
+                  'Send it!'
+                )}
               </Button>
               <Button mx={4} mt={4} onPress={post}>
                 Post to this route
