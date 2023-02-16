@@ -91,9 +91,9 @@ const HomeFeed = () => {
       ItemSeparatorComponent={Divider}
       ListFooterComponent={renderSpinner}
       renderItem={({ item }) => (
-        <Center>
+        <Box my={2}>
           <Post post={item} />
-        </Center>
+        </Box>
       )}
       keyExtractor={(item) => item.getId()}
     />
