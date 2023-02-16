@@ -1,6 +1,6 @@
 import {
   Button,
-  Center,
+  Box,
   Divider,
   FlatList,
   VStack,
