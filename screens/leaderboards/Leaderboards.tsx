@@ -1,4 +1,10 @@
-import { Button, Center, Divider, HStack } from 'native-base';
+import {
+  Button,
+  Center,
+  Divider,
+  HStack,
+  useColorModeValue,
+} from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
@@ -16,6 +22,7 @@ type FilterType = 'Anyone' | 'Following';
 
 const Leaderboards = () => {
   const signedInUser = useRecoilValue(userAtom);
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [tabViewed, setTabViewed] = useState<LeaderboardTab>('Monthly');
   const [filter, setFilter] = useState<FilterType>('Anyone');
@@ -55,7 +62,7 @@ const Leaderboards = () => {
   ]);
 
   return (
-    <Center>
+    <Center bgColor={baseBgColor}>
       <HStack space="1" p={1} mt={1}>
         <Button
           onPress={() => setTabViewed('Monthly')}
