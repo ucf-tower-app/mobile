@@ -10,5 +10,4 @@ export type ParamList = {
   ActiveRoutesTab: NavigatorScreenParams<ActiveRoutesParamList>;
   SearchTab: NavigatorScreenParams<SearchParamList>;
   ProfileTab: NavigatorScreenParams<ProfileParamList>;
-  SandboxTab: undefined;
 };

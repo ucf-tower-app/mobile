@@ -16,14 +16,21 @@ import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { FetchedPost, Post as PostObj, Route } from '../../xplat/types';
+import {
+  FetchedPost,
+  Post as PostObj,
+  Route,
+  UserStatus,
+} from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import Reportable from './Reportable';
+import Reportable from './actions/Reportable';
+import Timestamp from './Timestamp';
+import Deletable from './actions/Deletable';
 
 const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -36,6 +43,16 @@ const PostSkeleton = () => {
       <Skeleton.Text p={2} lines={2} />
       <Skeleton w="full" pt={2} h={40} />
     </VStack>
+  );
+};
+
+const DeletedPost = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <Box w="full" bg={baseBgColor} pl={2}>
+      <Text italic>This post has been removed</Text>
+    </Box>
   );
 };
 
@@ -62,6 +79,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [mediaList, setMediaList] = useState<MediaType[] | undefined>(
     undefined
@@ -78,16 +96,39 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   // Set up the context menu
   useEffect(() => {
-    const _contextOptions: ContextOptions = {};
     if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== postData?.author.getId()
+      signedInUser === undefined ||
+      userPermissionLevel === undefined ||
+      postData === undefined
     )
+      return;
+
+    const signedInUserOwnsPost =
+      signedInUser.getId() === postData.author.getId();
+
+    const _contextOptions = contextOptions;
+    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
+      };
+
+    if (!signedInUserOwnsPost)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, postData]);
+  }, [contextOptions, signedInUser, userPermissionLevel, postData]);
+
+  useEffect(() => {
+    if (
+      userPermissionLevel === undefined ||
+      userPermissionLevel < UserStatus.Employee
+    )
+      return;
+    const _contextOptions = contextOptions;
+    setContextOptions(_contextOptions);
+  }, [userPermissionLevel, contextOptions]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {
@@ -136,28 +177,29 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   if (post.isMock()) {
     if (postData === undefined) return <PostSkeleton />;
   } else {
-    if (realQR.isError) {
-      console.error(realQR.error);
-      return null;
-    }
+    if (realQR.isError) return null;
     if (realQR.isLoading || postData === undefined) return <PostSkeleton />;
   }
 
+  if (!postData.postObject.exists) return <DeletedPost />;
+
   if (postData.isSend) {
     return (
-      <HStack w="full" alignItems="center" bg={baseBgColor} mb={2} px={2}>
-        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
-        <Box pl={2}>
+      <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
+        <Box pl={1.5} pr={1}>
           <UserTag
             user={postData.author}
             mini
             isNavigationDisabled={isPreview}
           />
         </Box>
-
-        <Text pl={2}>
-          {'Sent it on ' + postData.timestamp.toLocaleDateString()}
-        </Text>
+        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+        {postData.routeInfo !== undefined && (
+          <Text pl={1}>{postData.routeInfo.name}</Text> // TODO: Make this a link
+        )}
+        <Box pl={2}>
+          <Timestamp relative date={postData.timestamp} />
+        </Box>
 
         {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
           <Box ml="auto">
@@ -170,13 +212,21 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   const showRouteLink = !isInRouteView && route !== undefined;
   return (
-    <Reportable
-      isConfirming={isReporting}
-      media={postData.postObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={postData.postObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
+      <Deletable
+        isConfirming={isDeleting}
+        media={postData.postObject}
+        close={() => {
+          setIsDeleting(false);
+        }}
+      />
       <VStack w="full" alignItems="flex-start" bg={baseBgColor}>
         <HStack
           w="full"
@@ -232,7 +282,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           </HStack>
         ) : null}
       </VStack>
-    </Reportable>
+    </>
   );
 };
 

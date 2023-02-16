@@ -18,13 +18,14 @@ import ContextMenu, {
   ContextOptions,
 } from '../../components/media/ContextMenu';
 import Feed from '../../components/media/Feed';
-import Reportable from '../../components/media/Reportable';
+import Reportable from '../../components/media/actions/Reportable';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useEarlyLoad } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
@@ -37,6 +38,8 @@ import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
  * will be rendered for the signed in user.
  */
 const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
+  const isEarly = useEarlyLoad();
+
   const signedInUser = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -91,7 +94,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
   }, [data, signedInUser, signedInUserIQResult.data]);
 
-  if (isLoading) return <LoadingProfile />;
+  if (isEarly || isLoading) return <LoadingProfile />;
   if (isError || data === undefined) {
     console.error(error);
     return null;
@@ -123,14 +126,15 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     setShowModal(false);
   };
 
-  const profileComponent = (
-    <Reportable
-      isConfirming={isReporting}
-      media={data.userObject}
-      close={() => {
-        setIsReporting(false);
-      }}
-    >
+  const profileComponent = () => (
+    <>
+      <Reportable
+        isConfirming={isReporting}
+        media={data.userObject}
+        close={() => {
+          setIsReporting(false);
+        }}
+      />
       <VStack space="xs" w="full" bg={baseBgColor}>
         <EditProfileModal
           isOpen={showModal}
@@ -218,7 +222,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         </Center>
         <Divider width="full" />
       </VStack>
-    </Reportable>
+    </>
   );
 
   return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
