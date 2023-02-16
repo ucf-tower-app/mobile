@@ -68,7 +68,7 @@ const Feed = ({
         return item.getId();
       }}
       renderItem={({ item }) => (
-        <Box mt={4} mb={2}>
+        <Box my={2}>
           <Post post={item} isInRouteView={isInRouteView} />
         </Box>
       )}
