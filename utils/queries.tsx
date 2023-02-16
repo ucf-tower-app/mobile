@@ -1,14 +1,17 @@
 import { useQuery } from 'react-query';
 import {
-  buildMatcher,
-  buildSet,
-  buildUserCacheMap,
-  buildUserSubstringMatcher,
   getActiveRoutesCursor,
-  getArchivedRouteNames,
-  getUserCache,
+  getArchivedRoutesSubstringMatcher,
+  getUserSubstringMatcher,
+  UserSearchResult,
 } from '../xplat/api';
-import { Comment, FetchedRoute, Post, User } from '../xplat/types';
+import {
+  Post,
+  SubstringMatcher,
+  User,
+  Comment,
+  FetchedRoute,
+} from '../xplat/types';
 
 /**
  * When fetching active routes, use the provided cache key
@@ -45,36 +48,25 @@ export const useActiveRoutes = () => {
   );
 };
 
-export const useUserCacheMap = () => {
-  return useQuery('user-cache', getUserCache, {
-    select: buildUserCacheMap,
-    staleTime: TWO_HOURS,
-    cacheTime: TWO_HOURS,
-  });
+export type FetchedSearchSubstringMatchers = {
+  userSubstringMatcher: SubstringMatcher<UserSearchResult[]>;
+  archivedRoutesSubstringMatcher: SubstringMatcher<String>;
 };
-
-export const useUserSubstringMatcher = () => {
-  return useQuery('user-cache', getUserCache, {
-    select: buildUserSubstringMatcher,
-    staleTime: TWO_HOURS,
-    cacheTime: TWO_HOURS,
-  });
+const SEARCH_SUBSTRING_MATCHER_CACHE_KEY = 'search-substring-matcher';
+const fetchSearchSubstringMatchers = async () => {
+  const userSubstringMatcher = await getUserSubstringMatcher();
+  const archivedRoutesSubstringMatcher =
+    await getArchivedRoutesSubstringMatcher();
+  return {
+    userSubstringMatcher: userSubstringMatcher,
+    archivedRoutesSubstringMatcher: archivedRoutesSubstringMatcher,
+  } as FetchedSearchSubstringMatchers;
 };
-
-export const useArchivedSubstringMatcher = () => {
-  return useQuery('archived-routes', getArchivedRouteNames, {
-    select: buildMatcher,
-    staleTime: TWO_HOURS,
-    cacheTime: TWO_HOURS,
-  });
-};
-
-export const useArchivedSet = () => {
-  return useQuery('archived-routes', getArchivedRouteNames, {
-    select: buildSet,
-    staleTime: TWO_HOURS,
-    cacheTime: TWO_HOURS,
-  });
+export const useSearchSubstringMatchers = () => {
+  return useQuery(
+    SEARCH_SUBSTRING_MATCHER_CACHE_KEY,
+    fetchSearchSubstringMatchers
+  );
 };
 
 export type FetchedComment = {

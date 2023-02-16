@@ -50,10 +50,7 @@ const SignInOrRegister = () => {
       process.env.NODE_ENV === 'development' &&
       formData.usernameOrEmail === ''
     ) {
-      setIsServerProcessing(true);
-      signIn('jacobsteinebronn@knights.ucf.edu', 'password').finally(() =>
-        setIsServerProcessing(false)
-      );
+      signIn('lkf53414@xcoxc.com', 'newpassword');
       return;
     }
 

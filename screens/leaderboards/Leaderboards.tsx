@@ -1,100 +1,35 @@
-import {
-  Button,
-  Center,
-  Divider,
-  HStack,
-  useColorModeValue,
-} from 'native-base';
-import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useRecoilValue } from 'recoil';
-import Leaderboard from '../../components/leaderboard/Leaderboard';
-import { userAtom } from '../../utils/atoms';
-import {
-  LeaderboardEntry,
-  getRQParams_MonthlyLeaderboard,
-  getRQParams_SemesterLeaderboard,
-} from '../../xplat/queries/leaderboard';
-import { containsRef } from '../../xplat/types';
+import { Center, Pressable, VStack } from 'native-base';
+import LeaderboardCard from '../../components/leaderboard/LeaderboardCard';
+import type { LeaderboardsScreenProps } from '../../utils/types';
 
-type LeaderboardTab = 'Monthly' | 'Semesterly';
-type FilterType = 'Anyone' | 'Following';
-
-const Leaderboards = () => {
-  const signedInUser = useRecoilValue(userAtom);
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-  const [data, setData] = useState<LeaderboardEntry[]>([]);
-  const [tabViewed, setTabViewed] = useState<LeaderboardTab>('Monthly');
-  const [filter, setFilter] = useState<FilterType>('Anyone');
-  const monthlyRQResult = useQuery(getRQParams_MonthlyLeaderboard(new Date()));
-  const semesterRQResult = useQuery(
-    getRQParams_SemesterLeaderboard(new Date())
-  );
-  const curUserRQResult = useQuery(
-    [signedInUser?.getId()],
-    signedInUser!.buildFetcher(),
-    { enabled: signedInUser !== undefined }
-  );
-
-  useEffect(() => {
-    var newData =
-      tabViewed === 'Monthly'
-        ? monthlyRQResult.data ?? []
-        : semesterRQResult.data ?? [];
-    if (filter === 'Following' && curUserRQResult.data !== undefined) {
-      newData = newData.filter(
-        (entry) =>
-          entry.user.getId() === signedInUser?.getId() ||
-          containsRef(curUserRQResult.data.followingList, entry.user)
-      );
-    }
-    newData.sort((a, b) =>
-      a.points === b.points ? b.sends - a.sends : b.points - a.points
-    );
-    setData(newData);
-  }, [
-    curUserRQResult.data,
-    filter,
-    monthlyRQResult.data,
-    semesterRQResult.data,
-    signedInUser,
-    tabViewed,
-  ]);
-
+const Leaderboards = ({
+  navigation,
+}: LeaderboardsScreenProps<'Leaderboards'>) => {
   return (
-    <Center bgColor={baseBgColor}>
-      <HStack space="1" p={1} mt={1}>
-        <Button
-          onPress={() => setTabViewed('Monthly')}
-          variant={tabViewed === 'Monthly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Monthly
-        </Button>
-        <Button
-          onPress={() => setTabViewed('Semesterly')}
-          variant={tabViewed === 'Semesterly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Semesterly
-        </Button>
-        <Divider orientation="vertical" />
-        <Button
-          onPress={() => setFilter('Anyone')}
-          variant={filter === 'Anyone' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Anyone
-        </Button>
-        <Button
-          onPress={() => setFilter('Following')}
-          variant={filter === 'Following' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Following
-        </Button>
-      </HStack>
-      <Leaderboard data={data} />
+    <Center>
+      <VStack space={3}>
+        <Pressable onPress={() => navigation.navigate('AllTimeLeaderboard')}>
+          <LeaderboardCard
+            leaderboardTitle="All Time"
+            topNumOfSends={20}
+            avatarUrl="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+          />
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate('MonthlyLeaderboard')}>
+          <LeaderboardCard
+            leaderboardTitle="Monthly"
+            topNumOfSends={20}
+            avatarUrl="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+          />
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate('FriendsLeaderboard')}>
+          <LeaderboardCard
+            leaderboardTitle="Friends"
+            topNumOfSends={20}
+            avatarUrl="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+          />
+        </Pressable>
+      </VStack>
     </Center>
   );
 };

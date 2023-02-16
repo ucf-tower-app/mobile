@@ -5,5 +5,6 @@ export const names = [
   'ActiveRoutesTab',
   'SearchTab',
   'ProfileTab',
+  'SandboxTab',
 ] as const;
 export type Name = (typeof names)[number];

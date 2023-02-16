@@ -116,10 +116,11 @@ const UserTag = ({
         {({ isHovered, isPressed }) => (
           <HStack alignItems="center">
             <Tintable tinted={isHovered || isPressed} rounded />
-            <Text fontSize={sizedStyles.sm.displayNameSize} fontWeight="bold">
-              {data.displayName.length <= 18
-                ? data.displayName
-                : data.displayName.slice(0, 15) + '...'}
+            <Text
+              fontSize={sizedStyles[size].displayNameSize}
+              fontWeight="bold"
+            >
+              {data.displayName}
             </Text>
             {timestamp !== undefined ? (
               <Box ml={2}>

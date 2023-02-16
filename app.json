@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Tower",
-    "slug": "tower",
+    "name": "mobile",
+    "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,22 +14,15 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.tyler.hm.tower",
-      "buildNumber": "3"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,11 +34,6 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "98b6f262-c882-45f0-9e19-0e6e9f8e6e56"
-      }
-    }
+    ]
   }
 }

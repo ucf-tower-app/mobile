@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { Platform } from 'react-native';
 import {
   createUser,
+  sendAuthEmail,
   signIn,
   validDisplayname,
   validUsername,
@@ -90,7 +91,9 @@ const Register = ({ setIsRegistering }: Props) => {
           formData.username,
           formData.displayName
         );
+
         await signIn(formData.email, formData.password);
+        await sendAuthEmail();
       } catch {
         toast.show({
           description: 'Oops, this email already exists. Please try again.',

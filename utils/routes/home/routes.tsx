@@ -1,7 +1,7 @@
 // Route metadata for the home tab
-import HomeFeed from '../../../screens/home/HomeFeed';
-import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
+import { View } from 'native-base';
 import { Name } from './names';
+import { routes as tabGlobalRoutes } from '../tabGlobal/routes';
 
 export type Route = {
   name: Name;
@@ -11,7 +11,7 @@ export type Route = {
 export const routes: Route[] = [
   {
     name: 'Home',
-    component: HomeFeed,
+    component: View,
   },
   ...tabGlobalRoutes,
 ];

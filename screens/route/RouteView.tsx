@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Flex,
   HStack,
   Heading,
@@ -13,26 +12,23 @@ import {
   Text,
   VStack,
   useToken,
+  Divider,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { queryClient } from '../../App';
 import Feed from '../../components/media/Feed';
-import Timestamp from '../../components/media/Timestamp';
 import LikeButton from '../../components/misc/LikeButton';
 import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
-import SendShareModal from '../../components/route/SendShareModal';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { createPost, getForumById } from '../../xplat/api';
-import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
+import { Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
@@ -44,15 +40,13 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const user = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
-  const [isSending, setIsSending] = useState<boolean>(true);
+  const [_userHasRated, setUserHasRated] = useState<boolean>(false);
   const [isRating, setIsRating] = useState<boolean>(false);
-  const [isSharing, setIsSharing] = useState<boolean>(false);
 
-  const [fetchedSend, setFetchedSend] = useState<FetchedSend | undefined>(
-    undefined
-  );
+  const [userHasSent, setUserHasSent] = useState<boolean>(false);
 
   // Start as true so that the send button is disabled until the route is loaded
+  const [isSending, setIsSending] = useState<boolean>(true);
 
   const backgroundHex = useToken('colors', 'lightMode.base');
 
@@ -66,7 +60,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
     data.routeObject.getSendByUser(user).then((send) => {
       setIsSending(false);
-      if (send !== undefined) send.fetch().then(setFetchedSend);
+      if (send === undefined) return;
+      setUserHasSent(true);
     });
   }, [data, user]);
 
@@ -90,34 +85,13 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     else data.routeObject.removeLike(user);
   };
 
-  const sendIt = async (stars: number | undefined) => {
+  const send = async () => {
     if (data !== undefined && user !== undefined) {
-      setIsRating(false);
-      data.routeObject.FUCKINSENDIT(user, stars).then((send) => {
-        setIsSending(false);
-        setIsSharing(true);
-        send.fetch().then(setFetchedSend);
-      });
-    }
-  };
-
-  const shareSend = () => {
-    if (data !== undefined && user !== undefined) {
-      setIsSharing(false);
-      createPost({
-        author: user,
-        forum: getForumById(data.forumDocRefID),
-        textContent: '',
-        routeInfo: {
-          name: data.name,
-          grade: data.gradeDisplayString,
-        },
-        isSend: true,
-      }).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: ['posts', data.forumDocRefID],
-        });
-      });
+      setIsSending(true);
+      // TODO: Prompt the user for a rating if they haven't rated
+      await data.routeObject.FUCKINSENDIT(user, undefined);
+      setUserHasSent(true);
+      setIsSending(false);
     }
   };
 
@@ -127,7 +101,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     });
   };
 
-  const routeViewComponent = () => (
+  const routeViewComponent = (
     <Box w="full" bg={backgroundHex}>
       <ImageBackground
         style={styles.thumbnail}
@@ -138,7 +112,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           style={styles.gradient}
           colors={[backgroundHex + '00', backgroundHex]}
         />
-        <Flex direction="column" h="full" w="full" bg={backgroundHex} pb="0">
+        <Flex direction="column" h="full" w="full" bg={backgroundHex}>
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
             <Heading size="2xl">{data.name}</Heading>
             <Heading size="2xl" color="grey">
@@ -181,35 +155,20 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
             ) : null}
           </HStack>
           {permissionLevelCanWrite(userPermissionLevel) ? (
-            <VStack>
+            <>
               <Button
                 mx={4}
                 mt={4}
-                onPress={() => {
-                  if (data && user) setIsRating(true);
-                }}
-                isDisabled={fetchedSend !== undefined}
+                onPress={send}
+                isDisabled={userHasSent}
                 isLoading={isSending}
-                variant={fetchedSend === undefined ? 'solid' : 'outline'}
               >
-                {fetchedSend !== undefined ? (
-                  <Text>
-                    Sent{' '}
-                    <Timestamp
-                      relative
-                      date={fetchedSend.timestamp}
-                      fontSize="sm"
-                      color="black"
-                    />
-                  </Text>
-                ) : (
-                  'Send it!'
-                )}
+                {userHasSent ? 'Sent!' : 'Send it!'}
               </Button>
               <Button mx={4} mt={4} onPress={post}>
                 Post to this route
               </Button>
-            </VStack>
+            </>
           ) : null}
           <Center mt={4} mb={2}>
             <Heading>Posts</Heading>
@@ -225,22 +184,10 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
       <RatingModal
         isOpen={isRating}
         close={() => {
-          setIsSending(false);
           setIsRating(false);
+          setUserHasRated(true);
         }}
-        onSubmit={sendIt}
       />
-      {user && (
-        <SendShareModal
-          isOpen={isSharing}
-          close={() => setIsSharing(false)}
-          onShare={shareSend}
-          routeInfo={{
-            name: data.name,
-            gradeDisplayString: data.gradeDisplayString,
-          }}
-        />
-      )}
       <Feed
         forumDocRefId={data.forumDocRefID}
         topComponent={routeViewComponent}

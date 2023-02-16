@@ -96,12 +96,11 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         aspect: [4, 3],
       });
 
-      const asset = result.assets?.at(0);
-      if (result.canceled || asset === undefined) return;
+      if (result.cancelled) return;
 
       // Get the first frame as a thumbnail
       const thumbnailResult = await VideoThumbnails.getThumbnailAsync(
-        asset.uri
+        result.uri
       );
 
       setVideoContent(
@@ -109,7 +108,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           'mock/path',
           'mock/path',
           thumbnailResult.uri,
-          asset.uri
+          result.uri
         )
       );
     } finally {
@@ -128,12 +127,12 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         aspect: [4, 3],
       });
 
-      if (result.canceled) return;
+      if (result.cancelled) return;
 
       setImageContent(
-        result.assets?.map(
+        result.selected.map(
           (info) => new LazyStaticImage('mock/path', info.uri)
-        ) ?? []
+        )
       );
     } finally {
       setIsPickingImages(false);
@@ -293,9 +292,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           Post preview
         </Heading>
         <Divider my={2} px={2} />
-        {previewPost !== undefined ? (
-          <Post post={previewPost} isPreview />
-        ) : null}
+        {previewPost !== undefined ? <Post post={previewPost} preview /> : null}
       </Box>
     </Box>
   );
