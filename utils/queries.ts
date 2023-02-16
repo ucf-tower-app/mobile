@@ -1,17 +1,14 @@
 import { useQuery } from 'react-query';
 import {
+  buildMatcher,
+  buildSet,
+  buildUserCacheMap,
+  buildUserSubstringMatcher,
   getActiveRoutesCursor,
-  getArchivedRoutesSubstringMatcher,
-  getUserSubstringMatcher,
-  UserSearchResult,
+  getArchivedRouteNames,
+  getUserCache,
 } from '../xplat/api';
-import {
-  Post,
-  SubstringMatcher,
-  User,
-  Comment,
-  FetchedRoute,
-} from '../xplat/types';
+import { Comment, FetchedRoute, Post, User } from '../xplat/types';
 
 /**
  * When fetching active routes, use the provided cache key
@@ -48,25 +45,36 @@ export const useActiveRoutes = () => {
   );
 };
 
-export type FetchedSearchSubstringMatchers = {
-  userSubstringMatcher: SubstringMatcher<UserSearchResult[]>;
-  archivedRoutesSubstringMatcher: SubstringMatcher<String>;
+export const useUserCacheMap = () => {
+  return useQuery('user-cache', getUserCache, {
+    select: buildUserCacheMap,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
 };
-const SEARCH_SUBSTRING_MATCHER_CACHE_KEY = 'search-substring-matcher';
-const fetchSearchSubstringMatchers = async () => {
-  const userSubstringMatcher = await getUserSubstringMatcher();
-  const archivedRoutesSubstringMatcher =
-    await getArchivedRoutesSubstringMatcher();
-  return {
-    userSubstringMatcher: userSubstringMatcher,
-    archivedRoutesSubstringMatcher: archivedRoutesSubstringMatcher,
-  } as FetchedSearchSubstringMatchers;
+
+export const useUserSubstringMatcher = () => {
+  return useQuery('user-cache', getUserCache, {
+    select: buildUserSubstringMatcher,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
 };
-export const useSearchSubstringMatchers = () => {
-  return useQuery(
-    SEARCH_SUBSTRING_MATCHER_CACHE_KEY,
-    fetchSearchSubstringMatchers
-  );
+
+export const useArchivedSubstringMatcher = () => {
+  return useQuery('archived-routes', getArchivedRouteNames, {
+    select: buildMatcher,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
+};
+
+export const useArchivedSet = () => {
+  return useQuery('archived-routes', getArchivedRouteNames, {
+    select: buildSet,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
 };
 
 export type FetchedComment = {

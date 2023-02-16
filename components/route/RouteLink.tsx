@@ -5,9 +5,8 @@ import { Route, RouteStatus } from '../../xplat/types';
 
 type Props = {
   route: Route;
-  noPadding?: boolean;
 };
-const RouteLink = ({ route, noPadding = false }: Props) => {
+const RouteLink = ({ route }: Props) => {
   const navigation = useNavigation();
 
   const { isLoading, isError, data, error } = useQuery(
@@ -40,12 +39,7 @@ const RouteLink = ({ route, noPadding = false }: Props) => {
   }
 
   return (
-    <Button
-      variant="link"
-      onPress={navigateToRoute}
-      _text={{ fontSize: 'xs' }}
-      p={noPadding ? '0' : this}
-    >
+    <Button variant="link" onPress={navigateToRoute} _text={{ fontSize: 'xs' }}>
       {data.name}
     </Button>
   );

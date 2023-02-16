@@ -1,9 +1,8 @@
 // All valid tab-global route names
 export const names = [
-  'UserProfile',
   'Follows',
   'Sends',
-  'MyProfile',
+  'Profile',
   'RouteView',
   'CreatePost',
   'Comments',
