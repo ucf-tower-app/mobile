@@ -32,7 +32,7 @@ import Reportable from './actions/Reportable';
 import Timestamp from './Timestamp';
 import Deletable from './actions/Deletable';
 
-const PostSkeleton = () => {
+export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   return (
