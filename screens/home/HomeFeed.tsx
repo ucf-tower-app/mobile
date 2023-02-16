@@ -62,11 +62,11 @@ const HomeFeed = () => {
   }, [cursor, getNextPosts]);
 
   const header = () => (
-    <Center>
+    <Box>
       {enabled ? null : (
         <Button onPress={() => setEnabled(true)}>Enable</Button>
       )}
-    </Center>
+    </Box>
   );
 
   const renderSpinner = () => {
