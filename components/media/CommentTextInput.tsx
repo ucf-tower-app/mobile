@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Keyboard } from 'react-native';
 
 type Props = {
-  onSubmitComment: (comment: string) => Promise<void>;
+  onSubmitComment: (comment: string) => Promise<boolean>;
   isLoading: boolean;
 };
 const CommentTextInput = ({ onSubmitComment, isLoading }: Props) => {
@@ -20,9 +20,10 @@ const CommentTextInput = ({ onSubmitComment, isLoading }: Props) => {
       />
       <Button
         onPress={async () => {
-          await onSubmitComment(commentText);
-          setCommentText('');
-          Keyboard.dismiss();
+          if (await onSubmitComment(commentText)) {
+            setCommentText('');
+            Keyboard.dismiss();
+          }
         }}
         isDisabled={commentText === ''}
         isLoading={isLoading}

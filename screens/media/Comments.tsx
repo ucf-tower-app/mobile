@@ -6,6 +6,8 @@ import {
   useColorModeValue,
   Text,
   Divider,
+  useToast,
+  FlatList,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
@@ -15,8 +17,10 @@ import { queryClient } from '../../App';
 import Comment from '../../components/media/Comment';
 import CommentTextInput from '../../components/media/CommentTextInput';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useGenericErrorToast } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
+import { wordFilter } from '../../utils/utils';
 import { constructPageData } from '../../xplat/queries';
 import { getIQParams_PostComments } from '../../xplat/queries/post';
 import { Comment as CommentObj, Post } from '../../xplat/types';
@@ -43,6 +47,9 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentObj[]>([]);
+
+  const toast = useToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const postQuery = useQuery(
     postDocRefId,
@@ -94,54 +101,71 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
   }
 
   const postComment = async (comment: string) => {
-    if (user === undefined) return;
+    if (user === undefined) return false;
 
     setIsPostingComment(true);
 
-    await postQuery.data.postObject.addComment(user, comment);
+    // Don't allow profane comment through
+    if (wordFilter.isProfane(comment)) {
+      toast.show({ title: 'Please use inclusive language', placement: 'top' });
+      setIsPostingComment(false);
+      return false;
+    }
 
-    queryClient.invalidateQueries({
-      queryKey: ['comments', postDocRefId],
-    });
+    return postQuery.data.postObject
+      .addComment(user, comment)
+      .then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ['comments', postDocRefId],
+        });
 
-    setIsPostingComment(false);
+        setIsPostingComment(false);
+        return true;
+      })
+      .catch(() => {
+        showGenericErrorToast;
+        return false;
+      });
+  };
+
+  const renderSpinner = () => {
+    if (commentsQuery.hasNextPage)
+      return (
+        <Center mt={2}>
+          <Spinner size="lg" />
+        </Center>
+      );
+    else return null;
   };
 
   return (
-    <Box w="full" h="full" bg={baseBgColor}>
-      {permissionLevelCanWrite(userPermissionLevel) ? (
-        <CommentTextInput
-          onSubmitComment={postComment}
-          isLoading={isPostingComment}
-        />
-      ) : null}
-      <ScrollView
-        onScroll={({ nativeEvent }) => {
-          if (commentsQuery.hasNextPage && isCloseToBottom(nativeEvent)) {
-            loadNextComments();
-          }
-        }}
-        scrollEventThrottle={1000}
-      >
-        {comments.length === 0 ? (
-          <Center mt={4}>
-            <Text color="gray.500">Nothing here yet...!</Text>
-          </Center>
-        ) : (
-          comments.map((commentObj, index) => (
-            <Box key={commentObj.getId()}>
-              <Comment comment={commentObj} />
-              {index < comments.length - 1 ? <Divider /> : null}
-            </Box>
-          ))
-        )}
-        {commentsQuery.hasNextPage ? (
-          <Center mt={4}>
-            <Spinner size="lg" />
-          </Center>
-        ) : null}
-      </ScrollView>
-    </Box>
+    <FlatList
+      w="full"
+      h="full"
+      bg={baseBgColor}
+      ListHeaderComponent={
+        permissionLevelCanWrite(userPermissionLevel) ? (
+          <CommentTextInput
+            onSubmitComment={postComment}
+            isLoading={isPostingComment}
+          />
+        ) : null
+      }
+      ListEmptyComponent={
+        <Center mt={4}>
+          <Text color="grey">Nothing here yet...</Text>
+        </Center>
+      }
+      data={comments}
+      onEndReached={loadNextComments}
+      onEndReachedThreshold={0.1}
+      ListFooterComponent={renderSpinner}
+      ItemSeparatorComponent={Divider}
+      keyExtractor={(item) => {
+        return item.getId();
+      }}
+      renderItem={({ item }) => <Comment comment={item} />}
+    />
   );
 };
 

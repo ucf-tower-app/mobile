@@ -1,3 +1,4 @@
+import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 
 /**
@@ -20,4 +21,13 @@ export const useEarlyLoad = (timeoutMs: number = 80) => {
   }, [timeoutMs]);
 
   return isEarly;
+};
+
+const genericToastParams: IToastProps = {
+  title: 'Oops, we encountered an unexpected error. Please try again.',
+  placement: 'top',
+};
+export const useGenericErrorToast = () => {
+  const toast = useToast();
+  return () => toast.show(genericToastParams);
 };
