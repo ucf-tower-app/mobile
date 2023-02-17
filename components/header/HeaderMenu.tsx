@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { userPermissionLevelAtom } from '../../utils/atoms';
 import { auth } from '../../xplat/Firebase';
 import { UserStatus } from '../../xplat/types';
-import ChangeEmail from '../profile/ChangeEmail';
+import ChangeEmailModal from '../profile/ChangeEmailModal';
 
 type Props = {
   navigate: Function;
@@ -44,7 +44,7 @@ const HeaderMenu = ({ navigate }: Props) => {
           <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
         </Menu>
       </HStack>
-      <ChangeEmail
+      <ChangeEmailModal
         isConfirming={changeEmail}
         close={() => setChangeEmail(false)}
       />

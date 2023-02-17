@@ -16,7 +16,7 @@ import { userAtom } from '../../utils/atoms';
 import { DebounceSession } from '../../utils/utils';
 import { validBio, validDisplayname } from '../../xplat/api';
 import { FetchedUser } from '../../xplat/types';
-import ChangeEmail from './ChangeEmail';
+import ChangeEmailModal from './ChangeEmailModal';
 import ChangePassword from './ChangePassword';
 import UploadImage from './UploadImage';
 
@@ -208,7 +208,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-      <ChangeEmail
+      <ChangeEmailModal
         isConfirming={viewChangeEmail}
         close={() => {
           setViewChangeEmail(false);

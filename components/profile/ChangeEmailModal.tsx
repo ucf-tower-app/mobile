@@ -9,12 +9,11 @@ type Props = {
   isConfirming: boolean;
   close: () => void;
 };
-const ChangeEmail = ({ isConfirming, close }: Props) => {
+const ChangeEmailModal = ({ isConfirming, close }: Props) => {
   const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
   const signedInUser = useRecoilValue(userAtom);
 
   const verify = () => {
-    return;
     if (signedInUser === undefined) return;
     setUserPermissionLevel(UserStatus.Unverified);
     close();
@@ -42,4 +41,4 @@ const ChangeEmail = ({ isConfirming, close }: Props) => {
   );
 };
 
-export default ChangeEmail;
+export default ChangeEmailModal;
