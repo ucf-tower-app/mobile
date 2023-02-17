@@ -40,6 +40,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [signedInUser] = useRecoilState(userAtom);
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(isOpen);
 
   const [oldPwd, setOldPwd] = useState<string>();
   const [newPwd, setNewPwd] = useState<string>();
@@ -123,8 +124,8 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   };
 
   return (
-    <Box>
-      <Modal isOpen={isOpen} onClose={handleCancel}>
+    <Center>
+      <Modal isOpen={openModal} onClose={handleCancel}>
         <KeyboardAvoidingView behavior="padding" w="full" alignItems="center">
           <Modal.Content maxWidth="lg">
             <Modal.CloseButton />
@@ -187,6 +188,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
                     <Button
                       onPress={() => {
                         setViewChangeEmail(true);
+                        setOpenModal(false);
                       }}
                       size="sm"
                       bg={secondaryBgColor}
@@ -218,9 +220,15 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
         isConfirming={viewChangeEmail}
         close={() => {
           setViewChangeEmail(false);
+          setOpenModal(true);
+        }}
+        closeAllModals={() => {
+          setViewChangeEmail(false);
+          setOpenModal(false);
+          handleCancel();
         }}
       />
-    </Box>
+    </Center>
   );
 }
 

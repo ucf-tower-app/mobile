@@ -35,8 +35,9 @@ const checkPassword = (password: string, errorData: ChangeEmailErrorData) => {
 type Props = {
   isConfirming: boolean;
   close: () => void;
+  closeAllModals?: () => void;
 };
-const ChangeEmailModal = ({ isConfirming, close }: Props) => {
+const ChangeEmailModal = ({ isConfirming, close, closeAllModals }: Props) => {
   const toast = useToast();
 
   const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
@@ -58,23 +59,25 @@ const ChangeEmailModal = ({ isConfirming, close }: Props) => {
     checkOldEmail(formData.oldEmail, newErrorData);
     checkPassword(formData.password, newErrorData);
 
-    if (!isKnightsEmail(formData.newEmail)) {
-      toast.show({
-        description: 'New email must be a knights email',
-        placement: 'top',
-      });
-      return;
-    }
-
     setErrorData(newErrorData);
 
     if (Object.values(newErrorData).every((value) => !value)) {
+      if (!isKnightsEmail(formData.newEmail)) {
+        toast.show({
+          description: 'New email must be a knights email',
+          placement: 'top',
+        });
+        return;
+      }
       setIsServerProcessing(true);
       signedInUser
         ?.changeEmail(formData.oldEmail, formData.newEmail, formData.password)
         .then(
           () => {
             onClose();
+            if (closeAllModals !== undefined) {
+              closeAllModals();
+            }
             setUserPermissionLevel(UserStatus.Unverified);
           },
           (error) => {
