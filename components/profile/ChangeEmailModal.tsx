@@ -3,41 +3,223 @@ import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { userPermissionLevelAtom } from '../../utils/atoms';
 import { useSetRecoilState } from 'recoil';
-import { UserStatus } from '../../xplat/types';
+import { UserActionError, UserStatus } from '../../xplat/types';
+import { Center, FormControl, Input, useToast, Box } from 'native-base';
+import { useState } from 'react';
+import { isKnightsEmail } from '../../xplat/api';
+
+type ChangeEmailFormData = {
+  password: string;
+  oldEmail: string;
+  newEmail: string;
+};
+
+type ChangeEmailErrorData = {
+  password?: string;
+  oldEmail?: string;
+  newEmail?: string;
+};
+
+const checkOldEmail = (oldEmail: string, errorData: ChangeEmailErrorData) => {
+  if (oldEmail === '') errorData.oldEmail = 'Cannot be empty';
+};
+
+const checkNewEmail = (newEmail: string, errorData: ChangeEmailErrorData) => {
+  if (newEmail === '') errorData.newEmail = 'Cannot be empty';
+};
+
+const checkPassword = (password: string, errorData: ChangeEmailErrorData) => {
+  if (password === '') errorData.password = 'Cannot be empty';
+};
 
 type Props = {
   isConfirming: boolean;
   close: () => void;
 };
 const ChangeEmailModal = ({ isConfirming, close }: Props) => {
+  const toast = useToast();
+
   const setUserPermissionLevel = useSetRecoilState(userPermissionLevelAtom);
   const signedInUser = useRecoilValue(userAtom);
+  const [confirmChangeEmail, setConfirmChangeEmail] = useState<boolean>(false);
 
-  const verify = () => {
-    if (signedInUser === undefined) return;
-    setUserPermissionLevel(UserStatus.Unverified);
+  const [formData, setData] = useState<ChangeEmailFormData>({
+    password: '',
+    oldEmail: '',
+    newEmail: '',
+  });
+  const [errorData, setErrorData] = useState<ChangeEmailErrorData>({});
+  const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
+
+  const onSubmit = () => {
+    setConfirmChangeEmail(false);
+    const newErrorData: ChangeEmailErrorData = {};
+    checkNewEmail(formData.newEmail, newErrorData);
+    checkOldEmail(formData.oldEmail, newErrorData);
+    checkPassword(formData.password, newErrorData);
+
+    if (!isKnightsEmail(formData.newEmail)) {
+      toast.show({
+        description: 'New email must be a knights email',
+        placement: 'top',
+      });
+      return;
+    }
+
+    setErrorData(newErrorData);
+
+    if (Object.values(newErrorData).every((value) => !value)) {
+      setIsServerProcessing(true);
+      signedInUser
+        ?.changeEmail(formData.oldEmail, formData.newEmail, formData.password)
+        .then(
+          () => {
+            onClose();
+            setUserPermissionLevel(UserStatus.Unverified);
+          },
+          (error) => {
+            if (error === UserActionError) {
+              toast.show({
+                description: error,
+                placement: 'top',
+              });
+            } else {
+              toast.show({
+                description: 'Password or old email is incorrect',
+                placement: 'top',
+              });
+            }
+          }
+        )
+        .finally(() => setIsServerProcessing(false));
+    }
+  };
+
+  const onClose = () => {
+    setData({ password: '', oldEmail: '', newEmail: '' });
+    setErrorData({});
+    setConfirmChangeEmail(false);
     close();
   };
 
   return (
-    <Modal isOpen={isConfirming} onClose={close}>
-      <Modal.Content maxWidth="lg">
-        <Modal.CloseButton />
-        <Modal.Header>Change Email</Modal.Header>
-        <Modal.Body>
-          This will lock you out of your account until you verify the new email.
-          Are you sure you want to do this?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onPress={close} variant="unstyled" colorScheme="coolGray">
-            Cancel
-          </Button>
-          <Button onPress={verify} colorScheme="danger">
-            Change Email
-          </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal>
+    <Box>
+      <Modal
+        isOpen={confirmChangeEmail}
+        onClose={() => setConfirmChangeEmail(false)}
+      >
+        <Modal.Content maxWidth="lg">
+          <Modal.CloseButton />
+          <Modal.Header>Confirm Change Email</Modal.Header>
+          <Modal.Body>
+            This will lock you out of your account until you verify the new
+            email. Are you sure you want to do this?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              onPress={() => setConfirmChangeEmail(false)}
+              variant="unstyled"
+              colorScheme="coolGray"
+            >
+              Cancel
+            </Button>
+            <Button onPress={onSubmit} colorScheme="danger">
+              Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
+      <Modal isOpen={isConfirming} onClose={onClose}>
+        <Modal.Content>
+          <Modal.CloseButton />
+          <Modal.Header>Change Email</Modal.Header>
+          <Modal.Body>
+            <Center>
+              <FormControl isRequired isInvalid={'password' in errorData}>
+                <FormControl.Label
+                  _text={{
+                    bold: true,
+                  }}
+                >
+                  Password
+                </FormControl.Label>
+                <Input
+                  placeholder="SenderMcSendIt"
+                  type="password"
+                  onChangeText={(password) =>
+                    setData({ ...formData, password })
+                  }
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+                {'password' in errorData ? (
+                  <FormControl.ErrorMessage>
+                    {errorData.password}
+                  </FormControl.ErrorMessage>
+                ) : null}
+              </FormControl>
+              <FormControl isRequired isInvalid={'oldEmail' in errorData}>
+                <FormControl.Label
+                  _text={{
+                    bold: true,
+                  }}
+                >
+                  Old Email
+                </FormControl.Label>
+                <Input
+                  placeholder="SenderMcSendIt"
+                  onChangeText={(oldEmail) =>
+                    setData({ ...formData, oldEmail })
+                  }
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+                {'oldEmail' in errorData ? (
+                  <FormControl.ErrorMessage>
+                    {errorData.oldEmail}
+                  </FormControl.ErrorMessage>
+                ) : null}
+              </FormControl>
+              <FormControl isRequired isInvalid={'newEmail' in errorData}>
+                <FormControl.Label
+                  _text={{
+                    bold: true,
+                  }}
+                >
+                  New Email
+                </FormControl.Label>
+                <Input
+                  placeholder="mysecretpassword"
+                  onChangeText={(newEmail) =>
+                    setData({ ...formData, newEmail })
+                  }
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+
+                {'newEmail' in errorData ? (
+                  <FormControl.ErrorMessage>
+                    {errorData.newEmail}
+                  </FormControl.ErrorMessage>
+                ) : null}
+              </FormControl>
+            </Center>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onPress={onClose} variant="unstyled" colorScheme="coolGray">
+              Cancel
+            </Button>
+            <Button
+              onPress={() => setConfirmChangeEmail(true)}
+              isLoading={isServerProcessing}
+              colorScheme="danger"
+            >
+              Change Email
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
+    </Box>
   );
 };
 
