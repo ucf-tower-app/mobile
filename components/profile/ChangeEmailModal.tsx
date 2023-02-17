@@ -81,7 +81,12 @@ const ChangeEmailModal = ({ isConfirming, close, closeAllModals }: Props) => {
             setUserPermissionLevel(UserStatus.Unverified);
           },
           (error) => {
-            if (error === UserActionError) {
+            console.log(error);
+            if (
+              error === UserActionError.AlreadyKnights ||
+              error === UserActionError.IncorrectOldEmail ||
+              error === UserActionError.MusntBeManager
+            ) {
               toast.show({
                 description: error,
                 placement: 'top',
