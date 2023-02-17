@@ -1,3 +1,5 @@
+import Filter from 'bad-words';
+
 /**
  * A debounce session provides the `trigger` method which
  * will wait until `cooldown` milliseconds have passed
@@ -15,3 +17,5 @@ export class DebounceSession {
     this.timeoutId = setTimeout(callback, this.cooldown);
   }
 }
+
+export const wordFilter = new Filter();
