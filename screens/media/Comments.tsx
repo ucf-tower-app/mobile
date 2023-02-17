@@ -1,41 +1,28 @@
 import {
-  Box,
-  Center,
-  ScrollView,
   Spinner,
   useColorModeValue,
   Text,
+  Center,
   Divider,
-  useToast,
   FlatList,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
 import Comment from '../../components/media/Comment';
 import CommentTextInput from '../../components/media/CommentTextInput';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
-import { useGenericErrorToast } from '../../utils/hooks';
+import {
+  useGenericErrorToast,
+  useOffensiveLanguageWarningToast,
+} from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { wordFilter } from '../../utils/utils';
 import { constructPageData } from '../../xplat/queries';
 import { getIQParams_PostComments } from '../../xplat/queries/post';
 import { Comment as CommentObj, Post } from '../../xplat/types';
-
-const isCloseToBottom = ({
-  layoutMeasurement,
-  contentOffset,
-  contentSize,
-}: NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
-};
 
 const INITIAL_COMMENTS_LOADED = 15;
 
@@ -48,7 +35,7 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentObj[]>([]);
 
-  const toast = useToast();
+  const showOffensiveLanguageWarningToast = useOffensiveLanguageWarningToast();
   const showGenericErrorToast = useGenericErrorToast();
 
   const postQuery = useQuery(
@@ -107,7 +94,7 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
     // Don't allow profane comment through
     if (wordFilter.isProfane(comment)) {
-      toast.show({ title: 'Please use inclusive language', placement: 'top' });
+      showOffensiveLanguageWarningToast();
       setIsPostingComment(false);
       return false;
     }

@@ -23,11 +23,30 @@ export const useEarlyLoad = (timeoutMs: number = 80) => {
   return isEarly;
 };
 
-const genericToastParams: IToastProps = {
+const genericErrorToastId = 'genericError';
+const genericErrorToastParams: IToastProps = {
   title: 'Oops, we encountered an unexpected error. Please try again.',
   placement: 'top',
+  id: genericErrorToastId,
 };
 export const useGenericErrorToast = () => {
   const toast = useToast();
-  return () => toast.show(genericToastParams);
+  return () => {
+    if (!toast.isActive(genericErrorToastId))
+      toast.show(genericErrorToastParams);
+  };
+};
+
+const offensiveLanguageToastId = 'offensiveLanguage';
+const offensiveLanguageToastParams: IToastProps = {
+  title: "Please don't use offensive language.",
+  placement: 'top',
+  id: offensiveLanguageToastId,
+};
+export const useOffensiveLanguageWarningToast = () => {
+  const toast = useToast();
+  return () => {
+    if (!toast.isActive(offensiveLanguageToastId))
+      toast.show(offensiveLanguageToastParams);
+  };
 };
