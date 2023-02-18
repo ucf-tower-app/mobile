@@ -11,13 +11,13 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
-import { buildCommentFetcher } from '../../utils/queries';
 import { Comment as CommentObj, UserStatus } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import Reportable from './actions/Reportable';
 import Deletable from './actions/Deletable';
+import ActionedMedia from './actions/ActionedMedia';
 
 const CommentSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -29,16 +29,6 @@ const CommentSkeleton = () => {
       </Box>
       <Skeleton.Text p={2} lines={2} />
     </VStack>
-  );
-};
-
-const DeletedComment = () => {
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-
-  return (
-    <Box w="full" bg={baseBgColor} pl={2}>
-      <Text italic>This comment has been removed</Text>
-    </Box>
   );
 };
 
@@ -54,7 +44,7 @@ const Comment = ({ comment }: Props) => {
 
   const { isLoading, isError, data } = useQuery(
     comment.getId(),
-    buildCommentFetcher(comment)
+    comment.buildFetcher()
   );
 
   useEffect(() => {
@@ -86,7 +76,8 @@ const Comment = ({ comment }: Props) => {
 
   if (isError || data === undefined) return null;
 
-  if (!data.commentObject.exists) return <DeletedComment />;
+  if (data.shouldBeHidden) return <ActionedMedia action="hidden" />;
+  if (!data.commentObject.exists) return <ActionedMedia action="deleted" />;
 
   const onSetIsLiked = (isLiked: boolean) => {
     if (signedInUser === undefined) return;
