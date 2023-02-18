@@ -1,3 +1,4 @@
+import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 
 /**
@@ -20,4 +21,32 @@ export const useEarlyLoad = (timeoutMs: number = 80) => {
   }, [timeoutMs]);
 
   return isEarly;
+};
+
+const genericErrorToastId = 'genericError';
+const genericErrorToastParams: IToastProps = {
+  title: 'Oops, we encountered an unexpected error. Please try again.',
+  placement: 'top',
+  id: genericErrorToastId,
+};
+export const useGenericErrorToast = () => {
+  const toast = useToast();
+  return () => {
+    if (!toast.isActive(genericErrorToastId))
+      toast.show(genericErrorToastParams);
+  };
+};
+
+const offensiveLanguageToastId = 'offensiveLanguage';
+const offensiveLanguageToastParams: IToastProps = {
+  title: "Please don't use offensive language.",
+  placement: 'top',
+  id: offensiveLanguageToastId,
+};
+export const useOffensiveLanguageWarningToast = () => {
+  const toast = useToast();
+  return () => {
+    if (!toast.isActive(offensiveLanguageToastId))
+      toast.show(offensiveLanguageToastParams);
+  };
 };

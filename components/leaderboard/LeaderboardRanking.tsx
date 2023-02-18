@@ -19,9 +19,9 @@ import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedUser } from '../../xplat/types';
 
 type Props = {
-  ranking: number;
+  ranking?: number;
   fetchedUser: FetchedUser;
-  numOfSends: number;
+  numOfSends?: number;
 };
 const LeaderboardRanking = ({ ranking, fetchedUser, numOfSends }: Props) => {
   const signedInUser = useRecoilValue(userAtom);
@@ -57,19 +57,25 @@ const LeaderboardRanking = ({ ranking, fetchedUser, numOfSends }: Props) => {
                     mb={3}
                     borderWidth={2}
                   />
-                  <Badge rounded="full" variant="solid" mt={-6} fontSize="lg">
-                    {ranking}
-                  </Badge>
+                  {ranking !== undefined && (
+                    <Badge rounded="full" variant="solid" mt={-6} fontSize="lg">
+                      {ranking}
+                    </Badge>
+                  )}
                 </Center>
               </Pressable>
               <VStack justifyContent="center">
                 <Text fontSize="xl">{fetchedUser.displayName}</Text>
                 <HStack space={3} justifyContent="center">
                   <Text fontSize="md">@{fetchedUser.username}</Text>
-                  <Icon as={<Ionicons name="trending-up" />} size="2xl" />
-                  <Text fontSize="xl" bold>
-                    {numOfSends}
-                  </Text>
+                  {numOfSends !== undefined && (
+                    <Icon as={<Ionicons name="trending-up" />} size="2xl" />
+                  )}
+                  {numOfSends !== undefined && (
+                    <Text fontSize="xl" bold>
+                      {numOfSends}
+                    </Text>
+                  )}
                 </HStack>
               </VStack>
             </HStack>

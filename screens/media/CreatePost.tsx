@@ -20,8 +20,12 @@ import { queryClient } from '../../App';
 import Post from '../../components/media/Post';
 import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 import { userAtom } from '../../utils/atoms';
+import {
+  useGenericErrorToast,
+  useOffensiveLanguageWarningToast,
+} from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { DebounceSession } from '../../utils/utils';
+import { DebounceSession, wordFilter } from '../../utils/utils';
 import { createPost, getForumById } from '../../xplat/api';
 import {
   FetchedRoute,
@@ -55,6 +59,9 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
   const [previewPost, setPreviewPost] = useState<PostMock>();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  const showOffensiveLanguageWarningToast = useOffensiveLanguageWarningToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const { data } = useQuery(
     routeDocRefId!,
@@ -147,6 +154,14 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
     try {
       setIsProcessingPost(true);
 
+      // Make sure the content isn't profane
+      if (wordFilter.isProfane(textContent)) {
+        showOffensiveLanguageWarningToast();
+        setIsProcessingPost(false);
+        return;
+      }
+
+      // Get the videos in blob form
       const videoBlob =
         videoContent !== undefined
           ? {
@@ -155,12 +170,16 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
             }
           : undefined;
 
+      // Get the images in blob form
       const imageBlobs = await Promise.all(
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
+      // Derive the chosen forum
       const forum = selectedRoute && getForumById(selectedRoute.forumDocRefID);
-      createPost({
+
+      // Call create post!
+      await createPost({
         author: user,
         textContent: textContent,
         forum: forum,
@@ -173,15 +192,13 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           },
         }),
         isSend: false,
-      }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
-        if (forum)
-          queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
       });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsProcessingPost(false);
+
+      // Invalidate places where this post could show up locally
+      queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
+      if (forum)
+        queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
+
       // Leave the "Posting" screen
       navigation.goBack();
       navigation.navigate('Tabs', {
@@ -191,6 +208,11 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           params: {},
         },
       });
+    } catch (e) {
+      console.error(e);
+      showGenericErrorToast();
+    } finally {
+      setIsProcessingPost(false);
     }
   };
 

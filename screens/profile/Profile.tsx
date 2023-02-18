@@ -215,7 +215,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
               stat="Sends"
               value={data.totalSends.toString()}
               onPress={() => {
-                return;
+                navigation.push('Sends', { userDocRefId: userDocRefId! });
               }}
             />
           </HStack>

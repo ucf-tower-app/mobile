@@ -2,7 +2,9 @@ export type ParamList = {
   Profile: {
     userDocRefId?: string;
   };
-  Sends: undefined;
+  Sends: {
+    userDocRefId: string;
+  };
   Follows: {
     userDocRefId: string;
   };
