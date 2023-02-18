@@ -23,6 +23,7 @@ import { userAtom } from '../../utils/atoms';
 import {
   useGenericErrorToast,
   useOffensiveLanguageWarningToast,
+  useRouteQuery,
 } from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession, wordFilter } from '../../utils/utils';
@@ -32,7 +33,6 @@ import {
   LazyStaticImage,
   LazyStaticVideo,
   PostMock,
-  Route as RouteObj,
 } from '../../xplat/types';
 
 /**
@@ -63,17 +63,12 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
   const showOffensiveLanguageWarningToast = useOffensiveLanguageWarningToast();
   const showGenericErrorToast = useGenericErrorToast();
 
-  const { data } = useQuery(
-    routeDocRefId!,
-    RouteObj.buildFetcherFromDocRefId(routeDocRefId!),
-    {
-      enabled: routeDocRefId !== undefined,
-    }
-  );
+  const routeQuery = useRouteQuery(routeDocRefId);
 
   useEffect(() => {
-    if (data && selectedRoute === undefined) setSelectedRoute(data);
-  }, [data, selectedRoute]);
+    if (routeQuery.data !== undefined && selectedRoute === undefined)
+      setSelectedRoute(routeQuery.data);
+  }, [routeQuery.data, selectedRoute]);
 
   // Build the preview post whenever relevant state changes
   useEffect(() => {
