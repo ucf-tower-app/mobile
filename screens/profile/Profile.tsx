@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   Pressable,
   VStack,
   useColorModeValue,
+  Select,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -45,6 +46,8 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   const profileIsMine = route.params?.userDocRefId === undefined;
   const userDocRefId = route.params?.userDocRefId ?? signedInUser?.docRef!.id;
+
+  const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
@@ -102,22 +105,36 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   if (userDocRefId === undefined) return null;
 
-  const handleButtonPress = async () => {
-    if (profileIsMine) {
+  const handleButtonPress = async (value: string) => {
+    if (value === 'edit') {
       setShowModal(true);
-    } else if (isFollowing && signedInUser !== undefined) {
+    } else if (value === 'post') {
+      navigation.push('CreatePost', {});
+    }
+  };
+
+  const followOrUnfollow = async () => {
+    if (isFollowing && signedInUser !== undefined) {
+      setIsServerProcessing(true);
       setIsFollowing(false);
-      await signedInUser.unfollowUser(data.userObject).then(() => {
-        invalidateDocRefId(signedInUser.getId());
-        queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-      });
-    } else {
-      setIsFollowing(true);
-      if (data.userObject !== undefined && signedInUser !== undefined) {
-        await signedInUser.followUser(data.userObject).then(() => {
+      await signedInUser
+        .unfollowUser(data.userObject)
+        .then(() => {
           invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-        });
+        })
+        .finally(() => setIsServerProcessing(false));
+    } else {
+      setIsServerProcessing(true);
+      setIsFollowing(true);
+      if (data.userObject !== undefined && signedInUser !== undefined) {
+        await signedInUser
+          .followUser(data.userObject)
+          .then(() => {
+            invalidateDocRefId(signedInUser.getId());
+            queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
+          })
+          .finally(() => setIsServerProcessing(false));
       }
     }
   };
@@ -151,20 +168,35 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           <Center>
             <HStack space="md">
               {permissionLevelCanWrite(userPermissionLevel) ? (
-                <Button
-                  variant="subtle"
-                  size="md"
-                  bg={secondaryBgColor}
-                  rounded="2xl"
-                  _text={{ color: 'black' }}
-                  onPress={handleButtonPress}
-                >
-                  {profileIsMine
-                    ? 'Edit Profile'
-                    : isFollowing
-                    ? 'Unfollow'
-                    : 'Follow'}
-                </Button>
+                profileIsMine ? (
+                  <Select
+                    variant="unstyled"
+                    p="0"
+                    dropdownIcon={
+                      <Icon
+                        as={<AntDesign name="pluscircle" />}
+                        size="2xl"
+                        color={secondaryBgColor}
+                      />
+                    }
+                    onValueChange={handleButtonPress}
+                  >
+                    <Select.Item label="Edit Profile" value={'edit'} />
+                    <Select.Item label="Post" value={'post'} />
+                  </Select>
+                ) : (
+                  <Button
+                    variant="subtle"
+                    size="md"
+                    bg={secondaryBgColor}
+                    rounded="2xl"
+                    _text={{ color: 'black' }}
+                    isLoading={isServerProcessing}
+                    onPress={followOrUnfollow}
+                  >
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                )
               ) : null}
               <Center>
                 <Pressable
