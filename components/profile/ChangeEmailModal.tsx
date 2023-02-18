@@ -103,134 +103,136 @@ const ChangeEmailModal = ({ isConfirming, close, closeAllModals }: Props) => {
   };
 
   const onClose = () => {
-    setData({ password: '', oldEmail: '', newEmail: '' });
-    setErrorData({});
-    setConfirmChangeEmail(false);
-    close();
+    if (confirmChangeEmail) {
+      setConfirmChangeEmail(false);
+    } else {
+      setData({ password: '', oldEmail: '', newEmail: '' });
+      setErrorData({});
+      setConfirmChangeEmail(false);
+      close();
+    }
   };
 
   return (
     <Box>
-      <Modal
-        isOpen={confirmChangeEmail}
-        onClose={() => setConfirmChangeEmail(false)}
-      >
-        <Modal.Content maxWidth="lg">
-          <Modal.CloseButton />
-          <Modal.Header>Confirm Change Email</Modal.Header>
-          <Modal.Body>
-            This will lock you out of your account until you verify the new
-            email. Are you sure you want to do this?
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              onPress={() => setConfirmChangeEmail(false)}
-              variant="unstyled"
-              colorScheme="coolGray"
-            >
-              Cancel
-            </Button>
-            <Button onPress={onSubmit} colorScheme="danger">
-              Confirm
-            </Button>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
       <Modal isOpen={isConfirming} onClose={onClose}>
-        <KeyboardAvoidingView w="full" behavior="padding" alignItems="center">
-          <Modal.Content>
+        {confirmChangeEmail ? (
+          <Modal.Content maxWidth="lg">
             <Modal.CloseButton />
-            <Modal.Header>Change Email</Modal.Header>
+            <Modal.Header>Confirm Change Email</Modal.Header>
             <Modal.Body>
-              <Center>
-                <FormControl isRequired isInvalid={'password' in errorData}>
-                  <FormControl.Label
-                    _text={{
-                      bold: true,
-                    }}
-                  >
-                    Password
-                  </FormControl.Label>
-                  <Input
-                    placeholder="myPassword"
-                    type="password"
-                    onChangeText={(password) =>
-                      setData({ ...formData, password })
-                    }
-                    autoCorrect={false}
-                    autoCapitalize="none"
-                  />
-                  {'password' in errorData ? (
-                    <FormControl.ErrorMessage>
-                      {errorData.password}
-                    </FormControl.ErrorMessage>
-                  ) : null}
-                </FormControl>
-                <FormControl isRequired isInvalid={'oldEmail' in errorData}>
-                  <FormControl.Label
-                    _text={{
-                      bold: true,
-                    }}
-                  >
-                    Old Email
-                  </FormControl.Label>
-                  <Input
-                    placeholder="myemail@mail.com"
-                    onChangeText={(oldEmail) =>
-                      setData({ ...formData, oldEmail })
-                    }
-                    autoCorrect={false}
-                    autoCapitalize="none"
-                  />
-                  {'oldEmail' in errorData ? (
-                    <FormControl.ErrorMessage>
-                      {errorData.oldEmail}
-                    </FormControl.ErrorMessage>
-                  ) : null}
-                </FormControl>
-                <FormControl isRequired isInvalid={'newEmail' in errorData}>
-                  <FormControl.Label
-                    _text={{
-                      bold: true,
-                    }}
-                  >
-                    Knights Email
-                  </FormControl.Label>
-                  <Input
-                    placeholder="myemail@knights.ucf.edu"
-                    onChangeText={(newEmail) =>
-                      setData({ ...formData, newEmail })
-                    }
-                    autoCorrect={false}
-                    autoCapitalize="none"
-                  />
-
-                  {'newEmail' in errorData ? (
-                    <FormControl.ErrorMessage>
-                      {errorData.newEmail}
-                    </FormControl.ErrorMessage>
-                  ) : null}
-                </FormControl>
-              </Center>
+              This will lock you out of your account until you verify the new
+              email. Are you sure you want to do this?
             </Modal.Body>
             <Modal.Footer>
               <Button
-                onPress={onClose}
+                onPress={() => setConfirmChangeEmail(false)}
                 variant="unstyled"
                 colorScheme="coolGray"
               >
                 Cancel
               </Button>
-              <Button
-                onPress={() => setConfirmChangeEmail(true)}
-                isLoading={isServerProcessing}
-                colorScheme="danger"
-              >
-                Change Email
+              <Button onPress={onSubmit} colorScheme="danger">
+                Confirm
               </Button>
             </Modal.Footer>
           </Modal.Content>
-        </KeyboardAvoidingView>
+        ) : (
+          <KeyboardAvoidingView w="full" behavior="padding" alignItems="center">
+            <Modal.Content>
+              <Modal.CloseButton />
+              <Modal.Header>Change Email</Modal.Header>
+              <Modal.Body>
+                <Center>
+                  <FormControl isRequired isInvalid={'password' in errorData}>
+                    <FormControl.Label
+                      _text={{
+                        bold: true,
+                      }}
+                    >
+                      Password
+                    </FormControl.Label>
+                    <Input
+                      placeholder="myPassword"
+                      type="password"
+                      onChangeText={(password) =>
+                        setData({ ...formData, password })
+                      }
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                    />
+                    {'password' in errorData ? (
+                      <FormControl.ErrorMessage>
+                        {errorData.password}
+                      </FormControl.ErrorMessage>
+                    ) : null}
+                  </FormControl>
+                  <FormControl isRequired isInvalid={'oldEmail' in errorData}>
+                    <FormControl.Label
+                      _text={{
+                        bold: true,
+                      }}
+                    >
+                      Old Email
+                    </FormControl.Label>
+                    <Input
+                      placeholder="myemail@mail.com"
+                      onChangeText={(oldEmail) =>
+                        setData({ ...formData, oldEmail })
+                      }
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                    />
+                    {'oldEmail' in errorData ? (
+                      <FormControl.ErrorMessage>
+                        {errorData.oldEmail}
+                      </FormControl.ErrorMessage>
+                    ) : null}
+                  </FormControl>
+                  <FormControl isRequired isInvalid={'newEmail' in errorData}>
+                    <FormControl.Label
+                      _text={{
+                        bold: true,
+                      }}
+                    >
+                      Knights Email
+                    </FormControl.Label>
+                    <Input
+                      placeholder="myemail@knights.ucf.edu"
+                      onChangeText={(newEmail) =>
+                        setData({ ...formData, newEmail })
+                      }
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                    />
+
+                    {'newEmail' in errorData ? (
+                      <FormControl.ErrorMessage>
+                        {errorData.newEmail}
+                      </FormControl.ErrorMessage>
+                    ) : null}
+                  </FormControl>
+                </Center>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  onPress={onClose}
+                  variant="unstyled"
+                  colorScheme="coolGray"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onPress={() => setConfirmChangeEmail(true)}
+                  isLoading={isServerProcessing}
+                  colorScheme="danger"
+                >
+                  Change Email
+                </Button>
+              </Modal.Footer>
+            </Modal.Content>
+          </KeyboardAvoidingView>
+        )}
       </Modal>
     </Box>
   );
