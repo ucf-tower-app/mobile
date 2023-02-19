@@ -11,18 +11,9 @@ import React from 'react';
 import { LeaderboardEntry } from '../../xplat/queries';
 import UserTag from '../profile/UserTag';
 
-const pr = new Intl.PluralRules('en-US', { type: 'ordinal' });
-
-const suffixes = new Map([
-  ['one', 'st'],
-  ['two', 'nd'],
-  ['few', 'rd'],
-  ['other', 'th'],
-]);
+const suffixes = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
 const formatOrdinals = (n: number) => {
-  const rule = pr.select(n);
-  const suffix = suffixes.get(rule);
-  return `${n}${suffix}`;
+  return `${n}${suffixes[n % 10]}`;
 };
 
 type Props = {
