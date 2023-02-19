@@ -8,13 +8,9 @@ import {
   useColorModeValue,
 } from 'native-base';
 import React from 'react';
+import { formatOrdinals } from '../../utils/utils';
 import { LeaderboardEntry } from '../../xplat/queries';
 import UserTag from '../profile/UserTag';
-
-const suffixes = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
-const formatOrdinals = (n: number) => {
-  return `${n}${suffixes[n % 10]}`;
-};
 
 type Props = {
   ranking: number;
