@@ -26,13 +26,8 @@ import {
   useOffensiveLanguageWarningToast,
 } from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
-<<<<<<< HEAD
-import { DebounceSession } from '../../utils/utils';
-import { CreatePostError, createPost, getForumById } from '../../xplat/api';
-=======
 import { DebounceSession, wordFilter } from '../../utils/utils';
-import { createPost, getForumById } from '../../xplat/api';
->>>>>>> main
+import { CreatePostError, createPost, getForumById } from '../../xplat/api';
 import {
   FetchedRoute,
   LazyStaticImage,
