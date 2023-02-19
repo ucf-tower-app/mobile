@@ -1,9 +1,16 @@
-import { Button, Center, Divider, HStack } from 'native-base';
+import {
+  Button,
+  Center,
+  Divider,
+  HStack,
+  useColorModeValue,
+} from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import Leaderboard from '../../components/leaderboard/Leaderboard';
 import { userAtom } from '../../utils/atoms';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import {
   LeaderboardEntry,
   getRQParams_MonthlyLeaderboard,
@@ -16,6 +23,7 @@ type FilterType = 'Anyone' | 'Following';
 
 const Leaderboards = () => {
   const signedInUser = useRecoilValue(userAtom);
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [tabViewed, setTabViewed] = useState<LeaderboardTab>('Monthly');
   const [filter, setFilter] = useState<FilterType>('Anyone');
@@ -23,22 +31,18 @@ const Leaderboards = () => {
   const semesterRQResult = useQuery(
     getRQParams_SemesterLeaderboard(new Date())
   );
-  const curUserRQResult = useQuery(
-    [signedInUser?.getId()],
-    signedInUser!.buildFetcher(),
-    { enabled: signedInUser !== undefined }
-  );
+  const userQuery = useSignedInUserQuery();
 
   useEffect(() => {
     var newData =
       tabViewed === 'Monthly'
         ? monthlyRQResult.data ?? []
         : semesterRQResult.data ?? [];
-    if (filter === 'Following' && curUserRQResult.data !== undefined) {
+    if (filter === 'Following' && userQuery.data !== undefined) {
       newData = newData.filter(
         (entry) =>
           entry.user.getId() === signedInUser?.getId() ||
-          containsRef(curUserRQResult.data.followingList, entry.user)
+          containsRef(userQuery.data!.followingList, entry.user)
       );
     }
     newData.sort((a, b) =>
@@ -46,7 +50,7 @@ const Leaderboards = () => {
     );
     setData(newData);
   }, [
-    curUserRQResult.data,
+    userQuery.data,
     filter,
     monthlyRQResult.data,
     semesterRQResult.data,
@@ -55,7 +59,7 @@ const Leaderboards = () => {
   ]);
 
   return (
-    <Center>
+    <Center bgColor={baseBgColor}>
       <HStack space="1" p={1} mt={1}>
         <Button
           onPress={() => setTabViewed('Monthly')}

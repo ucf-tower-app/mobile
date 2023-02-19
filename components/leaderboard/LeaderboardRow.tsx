@@ -34,7 +34,14 @@ const LeaderboardRow = ({ ranking, data }: Props) => {
 
   return (
     <Center>
-      <HStack rounded="full" width="95%" bg={baseBgColor} alignItems="center">
+      <HStack
+        shadow="1"
+        p={2}
+        rounded="full"
+        width="95%"
+        bg={baseBgColor}
+        alignItems="center"
+      >
         <Box pl={2} width="15%">
           <Text fontSize="lg">{formatOrdinals(ranking)}</Text>
         </Box>

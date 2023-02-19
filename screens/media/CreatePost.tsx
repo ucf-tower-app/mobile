@@ -21,9 +21,18 @@ import { queryClient } from '../../App';
 import Post from '../../components/media/Post';
 import ActiveRoutesDropdown from '../../components/route/ActiveRoutesDropdown';
 import { userAtom } from '../../utils/atoms';
+import {
+  useGenericErrorToast,
+  useOffensiveLanguageWarningToast,
+} from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
+<<<<<<< HEAD
 import { DebounceSession } from '../../utils/utils';
 import { CreatePostError, createPost, getForumById } from '../../xplat/api';
+=======
+import { DebounceSession, wordFilter } from '../../utils/utils';
+import { createPost, getForumById } from '../../xplat/api';
+>>>>>>> main
 import {
   FetchedRoute,
   LazyStaticImage,
@@ -57,6 +66,9 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
   const toast = useToast();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  const showOffensiveLanguageWarningToast = useOffensiveLanguageWarningToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const { data } = useQuery(
     routeDocRefId!,
@@ -149,6 +161,14 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
     try {
       setIsProcessingPost(true);
 
+      // Make sure the content isn't profane
+      if (wordFilter.isProfane(textContent)) {
+        showOffensiveLanguageWarningToast();
+        setIsProcessingPost(false);
+        return;
+      }
+
+      // Get the videos in blob form
       const videoBlob =
         videoContent !== undefined
           ? {
@@ -157,11 +177,15 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
             }
           : undefined;
 
+      // Get the images in blob form
       const imageBlobs = await Promise.all(
         imageContent.map(async (image) => (await fetch(image.imageUrl!)).blob())
       );
 
+      // Derive the chosen forum
       const forum = selectedRoute && getForumById(selectedRoute.forumDocRefID);
+
+      // Call create post!
       await createPost({
         author: user,
         textContent: textContent,
@@ -175,11 +199,13 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           },
         }),
         isSend: false,
-      }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
-        if (forum)
-          queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
       });
+
+      // Invalidate places where this post could show up locally
+      queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
+      if (forum)
+        queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
+
       // Leave the "Posting" screen
       navigation.goBack();
       navigation.navigate('Tabs', {

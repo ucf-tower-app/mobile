@@ -6,6 +6,7 @@ import {
   FormControl,
   HStack,
   Input,
+  KeyboardAvoidingView,
   Modal,
   useColorModeValue,
 } from 'native-base';
@@ -16,7 +17,7 @@ import { userAtom } from '../../utils/atoms';
 import { DebounceSession } from '../../utils/utils';
 import { validBio, validDisplayname } from '../../xplat/api';
 import { FetchedUser } from '../../xplat/types';
-import ChangeEmail from './ChangeEmail';
+import ChangeEmailModal from './ChangeEmailModal';
 import ChangePassword from './ChangePassword';
 import UploadImage from './UploadImage';
 
@@ -39,6 +40,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [signedInUser] = useRecoilState(userAtom);
   const [viewChangePassword, setViewChangePassword] = useState<boolean>(false);
   const [viewChangeEmail, setViewChangeEmail] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(isOpen);
 
   const [oldPwd, setOldPwd] = useState<string>();
   const [newPwd, setNewPwd] = useState<string>();
@@ -122,93 +124,111 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel}>
-      <Modal.Content maxWidth="lg">
-        <Modal.CloseButton />
-        <Modal.Header>Edit Profile</Modal.Header>
-        <Modal.Body>
-          {viewChangePassword ? (
-            <ChangePassword
-              setOldPwd={setOldPwd}
-              setNewPwd={setNewPwd}
-              setConfirmPwd={setConfirmPwd}
-              newPwd={newPwd}
-              confirmPwd={confirmPwd}
-            />
-          ) : viewChangeEmail ? (
-            <ChangeEmail />
-          ) : (
-            <Box>
-              <FormControl isInvalid={invalidDisplayName}>
-                <FormControl.Label>Name</FormControl.Label>
-                <Input
-                  placeholder={signedInUser?.displayName}
-                  onChangeText={(e) =>
-                    dispNameSession.trigger(() => setNewDisplayName(e.trim()))
-                  }
+    <Center>
+      <Modal isOpen={openModal} onClose={handleCancel}>
+        <KeyboardAvoidingView behavior="padding" w="full" alignItems="center">
+          <Modal.Content maxWidth="lg">
+            <Modal.CloseButton />
+            <Modal.Header>Edit Profile</Modal.Header>
+            <Modal.Body>
+              {viewChangePassword ? (
+                <ChangePassword
+                  setOldPwd={setOldPwd}
+                  setNewPwd={setNewPwd}
+                  setConfirmPwd={setConfirmPwd}
+                  newPwd={newPwd}
+                  confirmPwd={confirmPwd}
                 />
-                <FormControl.ErrorMessage>
-                  Display Name must be 5-30 Upper/Lowercase letters, spaces, and
-                  hyphens
-                </FormControl.ErrorMessage>
-              </FormControl>
-              <FormControl mt="3" isInvalid={invalidBio}>
-                <FormControl.Label>Bio</FormControl.Label>
-                <Input
-                  placeholder={signedInUser?.bio}
-                  onChangeText={(e) =>
-                    bioSession.trigger(() => setNewBio(e.trim()))
-                  }
-                />
-                <FormControl.ErrorMessage>
-                  Bio must be at most 200 characters
-                </FormControl.ErrorMessage>
-              </FormControl>
-              <Center>
-                <UploadImage
-                  editAvatar={editAvatar}
-                  setEditAvatar={setEditAvatar}
-                />
-              </Center>
-              <HStack pt="3" space="xs" justifyContent="space-between">
+              ) : (
+                <Box>
+                  <Center>
+                    <UploadImage
+                      editAvatar={editAvatar}
+                      setEditAvatar={setEditAvatar}
+                    />
+                  </Center>
+                  <FormControl isInvalid={invalidDisplayName}>
+                    <FormControl.Label>Name</FormControl.Label>
+                    <Input
+                      placeholder={signedInUser?.displayName}
+                      onChangeText={(e) =>
+                        dispNameSession.trigger(() =>
+                          setNewDisplayName(e.trim())
+                        )
+                      }
+                    />
+                    <FormControl.ErrorMessage>
+                      Display Name must be 5-30 Upper/Lowercase letters, spaces,
+                      and hyphens
+                    </FormControl.ErrorMessage>
+                  </FormControl>
+                  <FormControl mt="3" isInvalid={invalidBio}>
+                    <FormControl.Label>Bio</FormControl.Label>
+                    <Input
+                      placeholder={signedInUser?.bio}
+                      onChangeText={(e) =>
+                        bioSession.trigger(() => setNewBio(e.trim()))
+                      }
+                    />
+                    <FormControl.ErrorMessage>
+                      Bio must be at most 200 characters
+                    </FormControl.ErrorMessage>
+                  </FormControl>
+
+                  <HStack pt="3" space="xs" justifyContent="space-between">
+                    <Button
+                      onPress={() => {
+                        setViewChangePassword(true);
+                      }}
+                      size="sm"
+                      bg={secondaryBgColor}
+                    >
+                      Change Password
+                    </Button>
+                    <Button
+                      onPress={() => {
+                        setViewChangeEmail(true);
+                        setOpenModal(false);
+                      }}
+                      size="sm"
+                      bg={secondaryBgColor}
+                    >
+                      Change Email
+                    </Button>
+                  </HStack>
+                </Box>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button.Group space={2}>
                 <Button
-                  onPress={() => {
-                    setViewChangePassword(true);
-                  }}
-                  size="sm"
-                  bg={secondaryBgColor}
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={handleCancel}
                 >
-                  Change Password
+                  Cancel
                 </Button>
-                <Button
-                  onPress={() => {
-                    setViewChangeEmail(true);
-                  }}
-                  size="sm"
-                  bg={secondaryBgColor}
-                >
-                  Change Email
+                <Button bg={secondaryBgColor} onPress={handleSave}>
+                  Save
                 </Button>
-              </HStack>
-            </Box>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button.Group space={2}>
-            <Button
-              variant="ghost"
-              colorScheme="blueGray"
-              onPress={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button bg={secondaryBgColor} onPress={handleSave}>
-              Save
-            </Button>
-          </Button.Group>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+        </KeyboardAvoidingView>
+      </Modal>
+      <ChangeEmailModal
+        isConfirming={viewChangeEmail}
+        close={() => {
+          setViewChangeEmail(false);
+          setOpenModal(true);
+        }}
+        closeAllModals={() => {
+          setViewChangeEmail(false);
+          setOpenModal(false);
+          handleCancel();
+        }}
+      />
+    </Center>
   );
 }
 
