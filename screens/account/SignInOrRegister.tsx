@@ -93,7 +93,7 @@ const SignInOrRegister = () => {
                 bold: true,
               }}
             >
-              Username or email
+              Email
             </FormControl.Label>
             <Input
               placeholder="SenderMcSendIt"
