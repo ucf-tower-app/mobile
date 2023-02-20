@@ -47,16 +47,6 @@ export const PostSkeleton = () => {
   );
 };
 
-const DeletedPost = () => {
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-
-  return (
-    <Box w="full" bg={baseBgColor} pl={2}>
-      <Text italic>This post has been removed</Text>
-    </Box>
-  );
-};
-
 /**
  * A Post is a modular component that displays all relevant information about a user's post
  *

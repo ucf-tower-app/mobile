@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ResizeMode } from 'expo-av';
-import { Center, Flex, Image, Spinner } from 'native-base';
+import { Center, Image } from 'native-base';
 import 'react-native-gesture-handler';
 import { useRecoilValue } from 'recoil';
 import {
@@ -8,7 +8,6 @@ import {
   isSignedInAtom,
   userPermissionLevelAtom,
 } from '../../utils/atoms';
-import { useEarlyLoad } from '../../utils/hooks';
 import { ParamList as TabParamList } from '../../utils/routes/tabs/paramList';
 import { routes as tabRoutes } from '../../utils/routes/tabs/routes';
 import { UserStatus } from '../../xplat/types';
