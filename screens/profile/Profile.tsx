@@ -46,6 +46,8 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const profileIsMine = route.params?.userDocRefId === undefined;
   const userDocRefId = route.params?.userDocRefId ?? signedInUser?.docRef!.id;
 
+  const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const secondaryBgColor = useColorModeValue(
     'lightMode.secondary',
@@ -69,15 +71,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== profileUserQuery.data?.userObject.getId()
-    )
+    if (signedInUser !== undefined && !profileIsMine)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+    else {
+      _contextOptions.Post = () => {
+        navigation.navigate('CreatePost', {});
+      };
+      _contextOptions.Edit = () => {
+        setShowModal(true);
+      };
+    }
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileUserQuery.data, setContextOptions]);
+  }, [signedInUser, profileIsMine, navigation]);
 
   useEffect(() => {
     if (
@@ -101,19 +109,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   if (userDocRefId === undefined) return null;
 
-  const handleButtonPress = async () => {
+  const followOrUnfollow = async () => {
     if (profileUserQuery.data === undefined) return;
-    if (profileIsMine) {
-      setShowModal(true);
-    } else if (isFollowing && signedInUser !== undefined) {
+
+    if (isFollowing && signedInUser !== undefined) {
+      setIsServerProcessing(true);
       setIsFollowing(false);
       await signedInUser
         .unfollowUser(profileUserQuery.data.userObject)
         .then(() => {
           invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-        });
+        })
+        .finally(() => setIsServerProcessing(false));
     } else {
+      setIsServerProcessing(true);
       setIsFollowing(true);
       if (
         profileUserQuery.data.userObject !== undefined &&
@@ -124,7 +134,8 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           .then(() => {
             invalidateDocRefId(signedInUser.getId());
             queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-          });
+          })
+          .finally(() => setIsServerProcessing(false));
       }
     }
   };
@@ -159,20 +170,18 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             </Box>
             <Center>
               <HStack space="md">
-                {permissionLevelCanWrite(userPermissionLevel) ? (
+                {permissionLevelCanWrite(userPermissionLevel) &&
+                !profileIsMine ? (
                   <Button
                     variant="subtle"
                     size="md"
                     bg={secondaryBgColor}
                     rounded="2xl"
                     _text={{ color: 'black' }}
-                    onPress={handleButtonPress}
+                    isLoading={isServerProcessing}
+                    onPress={followOrUnfollow}
                   >
-                    {profileIsMine
-                      ? 'Edit Profile'
-                      : isFollowing
-                      ? 'Unfollow'
-                      : 'Follow'}
+                    {isFollowing ? 'Unfollow' : 'Follow'}
                   </Button>
                 ) : null}
                 <Center>

@@ -1,6 +1,7 @@
 import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { Route as RouteObj } from '../xplat/types';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from './atoms';
 
@@ -61,4 +62,16 @@ export const useOffensiveLanguageWarningToast = () => {
     if (!toast.isActive(offensiveLanguageToastId))
       toast.show(offensiveLanguageToastParams);
   };
+};
+
+export const useRouteQuery = (routeId: string | undefined) => {
+  return useQuery(
+    routeId !== undefined ? routeId : 'nullRouteQuery',
+    routeId === undefined
+      ? () => undefined
+      : RouteObj.buildFetcherFromDocRefId(routeId),
+    {
+      enabled: routeId !== undefined,
+    }
+  );
 };
