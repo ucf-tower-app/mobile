@@ -12,6 +12,7 @@ import {
   ScrollView,
   VStack,
   useColorModeValue,
+  useToast,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -26,7 +27,7 @@ import {
 } from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession, wordFilter } from '../../utils/utils';
-import { createPost, getForumById } from '../../xplat/api';
+import { CreatePostError, createPost, getForumById } from '../../xplat/api';
 import {
   FetchedRoute,
   LazyStaticImage,
@@ -57,6 +58,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
   const [selectedRoute, setSelectedRoute] = useState<FetchedRoute>();
   const [isProcessingPost, setIsProcessingPost] = useState<boolean>(false);
   const [previewPost, setPreviewPost] = useState<PostMock>();
+  const toast = useToast();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -208,9 +210,17 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
           params: {},
         },
       });
-    } catch (e) {
-      console.error(e);
-      showGenericErrorToast();
+    } catch (error: any) {
+      var msg: string | undefined;
+      if (error === CreatePostError.TooLarge) msg = error;
+      else console.error(error);
+
+      if (msg !== undefined)
+        toast.show({
+          description: msg,
+          placement: 'top',
+        });
+      else showGenericErrorToast();
     } finally {
       setIsProcessingPost(false);
     }
