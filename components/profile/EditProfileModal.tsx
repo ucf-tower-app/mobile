@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { queryClient } from '../../App';
 import { userAtom } from '../../utils/atoms';
+import { USER_CACHE_KEY } from '../../utils/queries';
 import { DebounceSession } from '../../utils/utils';
 import { validBio, validDisplayname } from '../../xplat/api';
 import { FetchedUser } from '../../xplat/types';
@@ -96,6 +97,11 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
           .then(async (imageRes) => fetch(imageRes.uri))
           .then((resp) => resp.blob())
           .then((blob) => fetchedUser.userObject.setAvatar(blob))
+          .then(() =>
+            queryClient.invalidateQueries({
+              queryKey: ['avatar', fetchedUser.userObject.getId()],
+            })
+          )
           .catch(console.error)
       );
     }
@@ -107,6 +113,9 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
       tasks.push(
         fetchedUser.userObject
           .setDisplayName(newDisplayName)
+          .then(() =>
+            queryClient.invalidateQueries({ queryKey: [USER_CACHE_KEY] })
+          )
           .catch(console.error)
       );
 

@@ -10,7 +10,9 @@ import {
 } from 'native-base';
 import { useState } from 'react';
 import { Keyboard, Platform } from 'react-native';
+import { queryClient } from '../../App';
 import { useGenericErrorToast } from '../../utils/hooks';
+import { USER_CACHE_KEY } from '../../utils/queries';
 import {
   createUser,
   CreateUserError,
@@ -87,6 +89,7 @@ const Register = ({ setIsRegistering }: Props) => {
         formData.username,
         formData.displayName
       );
+      queryClient.invalidateQueries({ queryKey: [USER_CACHE_KEY] });
       await signIn(formData.email, formData.password);
     } catch (error: any) {
       var msg: string | undefined;
