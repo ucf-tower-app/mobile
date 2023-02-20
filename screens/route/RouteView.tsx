@@ -27,6 +27,7 @@ import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import SendShareModal from '../../components/route/SendShareModal';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useGenericErrorToast } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
@@ -43,6 +44,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const toast = useToast();
+  const genericToast = useGenericErrorToast();
   const user = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -122,14 +124,16 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
           });
         });
       } catch (e: any) {
-        var msg = 'An unknown error occurred while trying to create this post.';
+        var msg: string | undefined;
         if (e === CreatePostError.TooLarge) msg = e;
         else console.error(e);
 
-        toast.show({
-          description: msg,
-          placement: 'top',
-        });
+        if (msg !== undefined)
+          toast.show({
+            description: msg,
+            placement: 'top',
+          });
+        else genericToast();
       }
     }
   };

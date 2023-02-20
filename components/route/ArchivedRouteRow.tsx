@@ -9,6 +9,7 @@ import {
   useColorModeValue,
   useToast,
 } from 'native-base';
+import { useGenericErrorToast } from '../../utils/hooks';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { GetRouteByNameError, getRouteByName } from '../../xplat/api';
 import Tintable from '../util/Tintable';
@@ -20,6 +21,7 @@ const ArchivedRouteRow = ({ title }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const toast = useToast();
+  const genericToast = useGenericErrorToast();
 
   return (
     <Pressable
@@ -32,15 +34,16 @@ const ArchivedRouteRow = ({ title }: Props) => {
               routeDocRefId: id,
             });
         } catch (error: any) {
-          var msg =
-            'An unknown error occurred while trying to find this route.';
+          var msg: string | undefined;
           if (error === GetRouteByNameError.NoSuchRoute) msg = error;
           else console.error(error);
 
-          toast.show({
-            description: msg,
-            placement: 'top',
-          });
+          if (msg !== undefined)
+            toast.show({
+              description: msg,
+              placement: 'top',
+            });
+          else genericToast();
         }
       }}
     >

@@ -9,14 +9,17 @@ import {
   VStack,
 } from 'native-base';
 import { useState } from 'react';
-import { Platform } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
+import { useGenericErrorToast } from '../../utils/hooks';
 import {
   createUser,
   CreateUserError,
+  isKnightsEmail,
   signIn,
   validDisplayname,
   validUsername,
 } from '../../xplat/api';
+import ConfirmEmailModal from './ConfirmEmailModal';
 
 type RegisterFormData = {
   email: string;
@@ -66,12 +69,51 @@ type Props = {
 };
 const Register = ({ setIsRegistering }: Props) => {
   const toast = useToast();
+  const genericToast = useGenericErrorToast();
 
   const [formData, setData] = useState<RegisterFormData>(emptyFormData);
+  const [confirmingEmail, setConfirmingEmail] = useState(false);
   const [errorData, setErrorData] = useState<RegisterErrorData>({});
   const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
 
+  const register = async () => {
+    setConfirmingEmail(false);
+    // If there are no errors, then we would like to create a user and sign them in
+    setIsServerProcessing(true);
+    try {
+      await createUser(
+        formData.email,
+        formData.password,
+        formData.username,
+        formData.displayName
+      );
+      await signIn(formData.email, formData.password);
+    } catch (error: any) {
+      var msg: string | undefined;
+      if (error === CreateUserError.UsernameTaken) msg = error;
+      else if (error === CreateUserError.InvalidDisplayName) msg = error;
+      else if (error === CreateUserError.InvalidUsername) msg = error;
+      else if (error.code !== undefined) {
+        if (error.code === 'auth/email-already-in-use')
+          msg = 'This email is already in use! Please try logging in instead.';
+        else console.error(error.code);
+      } else {
+        console.error(error);
+      }
+
+      if (msg !== undefined)
+        toast.show({
+          description: msg,
+          placement: 'top',
+        });
+      else genericToast();
+    } finally {
+      setIsServerProcessing(false);
+    }
+  };
+
   const onSubmit = async () => {
+    Keyboard.dismiss();
     const newErrorData: RegisterErrorData = {};
     checkEmail(formData.email, newErrorData);
     checkUsername(formData.username, newErrorData);
@@ -80,42 +122,9 @@ const Register = ({ setIsRegistering }: Props) => {
 
     setErrorData(newErrorData);
 
-    // If there are no errors, then we would like to create a user and sign them in
     if (Object.values(newErrorData).every((value) => !value)) {
-      setIsServerProcessing(true);
-
-      try {
-        await createUser(
-          formData.email,
-          formData.password,
-          formData.username,
-          formData.displayName
-        );
-        await signIn(formData.email, formData.password);
-      } catch (error: any) {
-        var msg =
-          'An unknown error occurred while trying to register your account.';
-        if (error === CreateUserError.UsernameTaken) msg = error;
-        else if (error === CreateUserError.InvalidDisplayName) msg = error;
-        else if (error === CreateUserError.InvalidUsername) msg = error;
-        else if (error.code !== undefined) {
-          // Firebase errors have such a property
-          console.log(error.code);
-          if (error.code === 'auth/email-already-in-use')
-            msg =
-              'This email is already in use! Please try logging in instead.';
-          else msg = 'An unknown error occurred: ' + error.code;
-        } else {
-          console.error(error);
-        }
-
-        toast.show({
-          description: msg,
-          placement: 'top',
-        });
-      } finally {
-        setIsServerProcessing(false);
-      }
+      if (isKnightsEmail(formData.email)) register();
+      else setConfirmingEmail(true);
     }
   };
 
@@ -123,6 +132,11 @@ const Register = ({ setIsRegistering }: Props) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <ConfirmEmailModal
+        isConfirming={confirmingEmail}
+        onClose={() => setConfirmingEmail(false)}
+        onConfirm={register}
+      />
       <Center>
         <VStack w="90%" h="full" mx="3" maxW="300px" justifyContent="center">
           <Heading size="xl">Register</Heading>

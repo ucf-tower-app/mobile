@@ -211,14 +211,16 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         },
       });
     } catch (error: any) {
-      var msg = 'An unknown error occurred while trying to create this post.';
+      var msg: string | undefined;
       if (error === CreatePostError.TooLarge) msg = error;
       else console.error(error);
 
-      toast.show({
-        description: msg,
-        placement: 'top',
-      });
+      if (msg !== undefined)
+        toast.show({
+          description: msg,
+          placement: 'top',
+        });
+      else showGenericErrorToast();
     } finally {
       setIsProcessingPost(false);
     }

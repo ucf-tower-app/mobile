@@ -2,6 +2,7 @@ import { Button, Modal, useToast } from 'native-base';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../../utils/atoms';
+import { useGenericErrorToast } from '../../../utils/hooks';
 import {
   Comment as CommentObj,
   Post as PostObj,
@@ -16,6 +17,7 @@ type Props = {
 };
 const Reportable = ({ isConfirming, media, close }: Props) => {
   const toast = useToast();
+  const genericToast = useGenericErrorToast();
 
   const signedInUser = useRecoilValue(userAtom);
 
@@ -33,14 +35,16 @@ const Reportable = ({ isConfirming, media, close }: Props) => {
         })
       )
       .catch((error) => {
-        var msg = 'Something went wrong, please try again.';
+        var msg: string | undefined;
         if (error === UserActionError.EmployeeReport) msg = error;
         else console.error(error);
 
-        toast.show({
-          title: msg,
-          placement: 'top',
-        });
+        if (msg !== undefined)
+          toast.show({
+            description: msg,
+            placement: 'top',
+          });
+        else genericToast();
       })
       .finally(() => {
         setIsLoading(false);

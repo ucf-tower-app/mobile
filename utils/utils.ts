@@ -18,4 +18,9 @@ export class DebounceSession {
   }
 }
 
+const suffixes = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
+export function formatOrdinals(n: number) {
+  return `${n}${suffixes[n % 10]}`;
+}
+
 export const wordFilter = new Filter();
