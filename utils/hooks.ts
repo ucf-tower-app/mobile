@@ -2,6 +2,9 @@ import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Route as RouteObj } from '../xplat/types';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from './atoms';
+
 /**
  * Should be used to allow an early exit hatch for freshly rendered screens.
  *
@@ -22,6 +25,15 @@ export const useEarlyLoad = (timeoutMs: number = 80) => {
   }, [timeoutMs]);
 
   return isEarly;
+};
+
+export const useSignedInUserQuery = () => {
+  const signedInUser = useRecoilValue(userAtom);
+  return useQuery(
+    signedInUser !== undefined ? signedInUser.getId() : 'nullQuery',
+    signedInUser === undefined ? () => undefined : signedInUser.buildFetcher(),
+    { enabled: signedInUser !== undefined }
+  );
 };
 
 const genericErrorToastId = 'genericError';

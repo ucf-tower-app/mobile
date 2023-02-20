@@ -25,7 +25,7 @@ import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
 import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
-import { useEarlyLoad } from '../../utils/hooks';
+import { useEarlyLoad, useSignedInUserQuery } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
@@ -60,9 +60,12 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-  const { isLoading, isError, data, error } = useQuery(
-    userDocRefId!,
-    User.buildFetcherFromDocRefId(userDocRefId!),
+  const signedInUserQuery = useSignedInUserQuery();
+  const profileUserQuery = useQuery(
+    userDocRefId !== undefined ? userDocRefId : 'nullQuery',
+    userDocRefId !== undefined
+      ? User.buildFetcherFromDocRefId(userDocRefId)
+      : () => undefined,
     { enabled: userDocRefId !== undefined }
   );
 
@@ -82,40 +85,38 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
 
     setContextOptions(_contextOptions);
-  }, [setContextOptions, navigation, signedInUser, profileIsMine]);
-
-  const signedInUserIQResult = useQuery(
-    [signedInUser?.getId()],
-    signedInUser!.buildFetcher(),
-    {
-      enabled:
-        signedInUser !== undefined && signedInUser.getId() !== userDocRefId,
-    }
-  );
+  }, [signedInUser, profileIsMine, navigation]);
 
   useEffect(() => {
-    if (data && signedInUser && signedInUserIQResult.data) {
+    if (
+      profileUserQuery.data !== undefined &&
+      signedInUserQuery.data !== undefined
+    ) {
       setIsFollowing(
-        containsRef(signedInUserIQResult.data.followingList, data.userObject) ??
-          false
+        containsRef(
+          signedInUserQuery.data.followingList,
+          profileUserQuery.data.userObject
+        ) ?? false
       );
     }
-  }, [data, signedInUser, signedInUserIQResult.data]);
+  }, [profileUserQuery.data, signedInUserQuery.data]);
 
-  if (isEarly || isLoading) return <LoadingProfile />;
-  if (isError || data === undefined) {
-    console.error(error);
+  if (isEarly || profileUserQuery.isLoading) return <LoadingProfile />;
+  if (profileUserQuery.isError || profileUserQuery.data === undefined) {
+    console.error(profileUserQuery.error);
     return null;
   }
 
   if (userDocRefId === undefined) return null;
 
   const followOrUnfollow = async () => {
+    if (profileUserQuery.data === undefined) return;
+
     if (isFollowing && signedInUser !== undefined) {
       setIsServerProcessing(true);
       setIsFollowing(false);
       await signedInUser
-        .unfollowUser(data.userObject)
+        .unfollowUser(profileUserQuery.data.userObject)
         .then(() => {
           invalidateDocRefId(signedInUser.getId());
           queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
@@ -124,9 +125,12 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     } else {
       setIsServerProcessing(true);
       setIsFollowing(true);
-      if (data.userObject !== undefined && signedInUser !== undefined) {
+      if (
+        profileUserQuery.data.userObject !== undefined &&
+        signedInUser !== undefined
+      ) {
         await signedInUser
-          .followUser(data.userObject)
+          .followUser(profileUserQuery.data.userObject)
           .then(() => {
             invalidateDocRefId(signedInUser.getId());
             queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
@@ -140,29 +144,32 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     setShowModal(false);
   };
 
-  const profileComponent = () => (
-    <>
-      <Reportable
-        isConfirming={isReporting}
-        media={data.userObject}
-        close={() => {
-          setIsReporting(false);
-        }}
-      />
-      <VStack space="xs" w="full" bg={baseBgColor}>
-        <EditProfileModal
-          isOpen={showModal}
-          onClose={onClose}
-          fetchedUser={data}
+  const profileComponent = () => {
+    if (profileUserQuery.data === undefined) return <LoadingProfile />;
+    return (
+      <>
+        <Reportable
+          isConfirming={isReporting}
+          media={profileUserQuery.data.userObject}
+          close={() => {
+            setIsReporting(false);
+          }}
         />
-        <Box w="full">
-          <HStack w="full" justifyContent="flex-end" px={4}>
-            <ContextMenu contextOptions={contextOptions} />
-          </HStack>
-          <Box p={5} pt={2}>
-            <ProfileBanner fetchedUser={data} />
+        <VStack space="xs" w="full" bg={baseBgColor}>
+          <EditProfileModal
+            isOpen={showModal}
+            onClose={onClose}
+            fetchedUser={profileUserQuery.data}
+          />
+          <Box w="full">
+            <HStack w="full" justifyContent="flex-end" px={4}>
+              <ContextMenu contextOptions={contextOptions} />
+            </HStack>
+            <Box p={5} pt={2}>
+              <ProfileBanner fetchedUser={profileUserQuery.data} />
+            </Box>
           </Box>
-          <Center>
+          <Center w="full" pb={4}>
             <HStack space="md">
               {permissionLevelCanWrite(userPermissionLevel) &&
               !profileIsMine ? (
@@ -200,42 +207,42 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
                   }}
                 </Pressable>
               </Center>
+              <StatBox
+                stat="Boulder"
+                value={
+                  profileUserQuery.data.bestBoulder
+                    ? profileUserQuery.data.bestBoulder?.displayString
+                    : 'None'
+                }
+                onPress={() => {
+                  return;
+                }}
+              />
+              <StatBox
+                stat="Top-Rope"
+                value={
+                  profileUserQuery.data.bestToprope
+                    ? profileUserQuery.data.bestToprope?.displayString
+                    : 'None'
+                }
+                onPress={() => {
+                  return;
+                }}
+              />
+              <StatBox
+                stat="Sends"
+                value={profileUserQuery.data.totalSends.toString()}
+                onPress={() => {
+                  return;
+                }}
+              />
             </HStack>
           </Center>
-        </Box>
-        <Center w="full" pb={4}>
-          <HStack space="md">
-            <StatBox
-              stat="Boulder"
-              value={
-                data.bestBoulder ? data.bestBoulder?.displayString : 'None'
-              }
-              onPress={() => {
-                return;
-              }}
-            />
-            <StatBox
-              stat="Top-Rope"
-              value={
-                data.bestToprope ? data.bestToprope?.displayString : 'None'
-              }
-              onPress={() => {
-                return;
-              }}
-            />
-            <StatBox
-              stat="Sends"
-              value={data.totalSends.toString()}
-              onPress={() => {
-                navigation.push('Sends', { userDocRefId: userDocRefId! });
-              }}
-            />
-          </HStack>
-        </Center>
-        <Divider width="full" />
-      </VStack>
-    </>
-  );
+          <Divider width="full" />
+        </VStack>
+      </>
+    );
+  };
 
   return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
 };

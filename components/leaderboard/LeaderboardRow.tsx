@@ -8,22 +8,9 @@ import {
   useColorModeValue,
 } from 'native-base';
 import React from 'react';
+import { formatOrdinals } from '../../utils/utils';
 import { LeaderboardEntry } from '../../xplat/queries';
 import UserTag from '../profile/UserTag';
-
-const pr = new Intl.PluralRules('en-US', { type: 'ordinal' });
-
-const suffixes = new Map([
-  ['one', 'st'],
-  ['two', 'nd'],
-  ['few', 'rd'],
-  ['other', 'th'],
-]);
-const formatOrdinals = (n: number) => {
-  const rule = pr.select(n);
-  const suffix = suffixes.get(rule);
-  return `${n}${suffix}`;
-};
 
 type Props = {
   ranking: number;
