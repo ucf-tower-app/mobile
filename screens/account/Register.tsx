@@ -50,7 +50,7 @@ const checkEmail = (email: string, errorData: RegisterErrorData) => {
 
 const checkUsername = (username: string, errorData: RegisterErrorData) => {
   if (!validUsername(username))
-    errorData.username = 'Must be 5-15 lowercase characters';
+    errorData.username = 'Must be 3-15 lowercase characters';
 };
 
 const checkDisplayName = (
