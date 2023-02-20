@@ -168,45 +168,49 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             <Box p={5} pt={2}>
               <ProfileBanner fetchedUser={profileUserQuery.data} />
             </Box>
+            <Center>
+              <HStack space="md">
+                {permissionLevelCanWrite(userPermissionLevel) &&
+                !profileIsMine ? (
+                  <Button
+                    variant="subtle"
+                    size="md"
+                    bg={secondaryBgColor}
+                    rounded="2xl"
+                    _text={{ color: 'black' }}
+                    isLoading={isServerProcessing}
+                    onPress={followOrUnfollow}
+                  >
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                ) : null}
+                <Center>
+                  <Pressable
+                    onPress={async () => {
+                      navigation.push('Follows', {
+                        userDocRefId: userDocRefId!,
+                      });
+                    }}
+                  >
+                    {({ isHovered, isPressed }) => {
+                      return (
+                        <Box>
+                          <Tintable tinted={isHovered || isPressed} rounded />
+                          <Icon
+                            as={<Ionicons name="md-people" />}
+                            size="lg"
+                            color="black"
+                          />
+                        </Box>
+                      );
+                    }}
+                  </Pressable>
+                </Center>
+              </HStack>
+            </Center>
           </Box>
           <Center w="full" pb={4}>
             <HStack space="md">
-              {permissionLevelCanWrite(userPermissionLevel) &&
-              !profileIsMine ? (
-                <Button
-                  variant="subtle"
-                  size="md"
-                  bg={secondaryBgColor}
-                  rounded="2xl"
-                  _text={{ color: 'black' }}
-                  isLoading={isServerProcessing}
-                  onPress={followOrUnfollow}
-                >
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </Button>
-              ) : null}
-              <Center>
-                <Pressable
-                  onPress={async () => {
-                    navigation.push('Follows', {
-                      userDocRefId: userDocRefId!,
-                    });
-                  }}
-                >
-                  {({ isHovered, isPressed }) => {
-                    return (
-                      <Box>
-                        <Tintable tinted={isHovered || isPressed} rounded />
-                        <Icon
-                          as={<Ionicons name="md-people" />}
-                          size="lg"
-                          color="black"
-                        />
-                      </Box>
-                    );
-                  }}
-                </Pressable>
-              </Center>
               <StatBox
                 stat="Boulder"
                 value={
