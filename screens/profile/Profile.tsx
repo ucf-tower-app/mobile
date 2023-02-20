@@ -1,4 +1,4 @@
-import { Ionicons, AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Box,
   Button,
@@ -9,7 +9,6 @@ import {
   Pressable,
   VStack,
   useColorModeValue,
-  Select,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -69,15 +68,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (
-      signedInUser !== undefined &&
-      signedInUser?.getId() !== data?.userObject.getId()
-    )
+    if (signedInUser !== undefined && !profileIsMine)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
+    else {
+      _contextOptions.Post = () => {
+        navigation.navigate('CreatePost', {});
+      };
+      _contextOptions.Edit = () => {
+        setShowModal(true);
+      };
+    }
+
     setContextOptions(_contextOptions);
-  }, [signedInUser, data, setContextOptions]);
+  }, [setContextOptions, navigation, signedInUser, profileIsMine]);
 
   const signedInUserIQResult = useQuery(
     [signedInUser?.getId()],
@@ -104,14 +109,6 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   }
 
   if (userDocRefId === undefined) return null;
-
-  const handleButtonPress = async (value: string) => {
-    if (value === 'edit') {
-      setShowModal(true);
-    } else if (value === 'post') {
-      navigation.push('CreatePost', {});
-    }
-  };
 
   const followOrUnfollow = async () => {
     if (isFollowing && signedInUser !== undefined) {
@@ -167,36 +164,19 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           </Box>
           <Center>
             <HStack space="md">
-              {permissionLevelCanWrite(userPermissionLevel) ? (
-                profileIsMine ? (
-                  <Select
-                    variant="unstyled"
-                    p="0"
-                    dropdownIcon={
-                      <Icon
-                        as={<AntDesign name="pluscircle" />}
-                        size="2xl"
-                        color={secondaryBgColor}
-                      />
-                    }
-                    onValueChange={handleButtonPress}
-                  >
-                    <Select.Item label="Edit Profile" value={'edit'} />
-                    <Select.Item label="Post" value={'post'} />
-                  </Select>
-                ) : (
-                  <Button
-                    variant="subtle"
-                    size="md"
-                    bg={secondaryBgColor}
-                    rounded="2xl"
-                    _text={{ color: 'black' }}
-                    isLoading={isServerProcessing}
-                    onPress={followOrUnfollow}
-                  >
-                    {isFollowing ? 'Unfollow' : 'Follow'}
-                  </Button>
-                )
+              {permissionLevelCanWrite(userPermissionLevel) &&
+              !profileIsMine ? (
+                <Button
+                  variant="subtle"
+                  size="md"
+                  bg={secondaryBgColor}
+                  rounded="2xl"
+                  _text={{ color: 'black' }}
+                  isLoading={isServerProcessing}
+                  onPress={followOrUnfollow}
+                >
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </Button>
               ) : null}
               <Center>
                 <Pressable
