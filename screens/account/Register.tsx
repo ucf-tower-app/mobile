@@ -9,13 +9,15 @@ import {
   VStack,
 } from 'native-base';
 import { useState } from 'react';
-import { Platform } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 import {
   createUser,
+  isKnightsEmail,
   signIn,
   validDisplayname,
   validUsername,
 } from '../../xplat/api';
+import ConfirmEmailModal from './ConfirmEmailModal';
 
 type RegisterFormData = {
   email: string;
@@ -67,10 +69,34 @@ const Register = ({ setIsRegistering }: Props) => {
   const toast = useToast();
 
   const [formData, setData] = useState<RegisterFormData>(emptyFormData);
+  const [confirmingEmail, setConfirmingEmail] = useState(false);
   const [errorData, setErrorData] = useState<RegisterErrorData>({});
   const [isServerProcessing, setIsServerProcessing] = useState<boolean>(false);
 
+  const register = async () => {
+    setConfirmingEmail(false);
+    // If there are no errors, then we would like to create a user and sign them in
+    setIsServerProcessing(true);
+    try {
+      await createUser(
+        formData.email,
+        formData.password,
+        formData.username,
+        formData.displayName
+      );
+      await signIn(formData.email, formData.password);
+    } catch {
+      toast.show({
+        description: 'Oops, this email already exists. Please try again.',
+        placement: 'top',
+      });
+    } finally {
+      setIsServerProcessing(false);
+    }
+  };
+
   const onSubmit = async () => {
+    Keyboard.dismiss();
     const newErrorData: RegisterErrorData = {};
     checkEmail(formData.email, newErrorData);
     checkUsername(formData.username, newErrorData);
@@ -79,26 +105,9 @@ const Register = ({ setIsRegistering }: Props) => {
 
     setErrorData(newErrorData);
 
-    // If there are no errors, then we would like to create a user and sign them in
     if (Object.values(newErrorData).every((value) => !value)) {
-      setIsServerProcessing(true);
-
-      try {
-        await createUser(
-          formData.email,
-          formData.password,
-          formData.username,
-          formData.displayName
-        );
-        await signIn(formData.email, formData.password);
-      } catch {
-        toast.show({
-          description: 'Oops, this email already exists. Please try again.',
-          placement: 'top',
-        });
-      } finally {
-        setIsServerProcessing(false);
-      }
+      if (isKnightsEmail(formData.email)) register();
+      else setConfirmingEmail(true);
     }
   };
 
@@ -106,6 +115,11 @@ const Register = ({ setIsRegistering }: Props) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <ConfirmEmailModal
+        isConfirming={confirmingEmail}
+        onClose={() => setConfirmingEmail(false)}
+        onConfirm={register}
+      />
       <Center>
         <VStack w="90%" h="full" mx="3" maxW="300px" justifyContent="center">
           <Heading size="xl">Register</Heading>
