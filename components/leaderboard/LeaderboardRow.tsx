@@ -46,7 +46,7 @@ const LeaderboardRow = ({ ranking, data }: Props) => {
           <Text fontSize="lg">{formatOrdinals(ranking)}</Text>
         </Box>
         <Box width="64%">
-          <UserTag user={data.user} />
+          <UserTag userDocRefId={data.user.getId()} />
         </Box>
         <Box width="13%">
           <Icon as={<Ionicons name="trending-up" />} size="2xl" />

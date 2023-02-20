@@ -154,7 +154,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
-                <UserTag user={data.setter} size="sm" />
+                <UserTag userDocRefId={data.setter.getId()} size="sm" />
               </VStack>
             ) : null}
           </HStack>

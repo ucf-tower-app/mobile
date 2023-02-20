@@ -13,8 +13,9 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
 import { navigateToUserProfile } from '../../utils/nav';
+import { useUserCacheMap } from '../../utils/queries';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import { User } from '../../xplat/types/user';
+import { getAvatarUrl } from '../../xplat/api';
 import Timestamp from '../media/Timestamp';
 import Tintable from '../util/Tintable';
 
@@ -67,47 +68,52 @@ export const UserTagSkeleton = ({ size = 'md' }: SkeletonProps) => {
 };
 
 type Props = {
-  user: User;
+  userDocRefId: string;
   size?: Size;
   mini?: boolean;
   timestamp?: Date;
   isNavigationDisabled?: boolean;
 };
 const UserTag = ({
-  user,
+  userDocRefId,
   size = 'md',
   mini = false,
   timestamp,
   isNavigationDisabled = false,
 }: Props) => {
+  const userCacheResult = useUserCacheMap();
   const navigation = useNavigation<TabGlobalNavigationProp>();
-
   const signedInUser = useRecoilValue(userAtom);
-
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-
-  const { isLoading, isError, data, error } = useQuery(
-    user.getId(),
-    user.buildFetcher()
+  const avatarUrlResult = useQuery(['avatar', userDocRefId], () =>
+    getAvatarUrl(userDocRefId)
   );
 
-  if (isLoading) {
+  if (userCacheResult.isLoading || userCacheResult.data === undefined) {
     return <UserTagSkeleton size={size} />;
   }
 
-  if (isError || data === undefined) {
-    console.error(error);
+  if (userCacheResult.isError) {
+    console.error(userCacheResult.error);
     return null;
   }
 
-  const tryNavigate = () => {
-    const signedInUserId = signedInUser?.docRef!.id;
-    if (signedInUserId === undefined) return;
+  const userEntry = userCacheResult.data.get(userDocRefId);
+  if (userEntry === undefined) {
+    console.error(
+      'Failed to find user in cache',
+      userDocRefId,
+      userCacheResult.data.keys
+    );
+    return null;
+  }
+  const displayName = userEntry.displayName;
+  const username = userEntry.username;
 
-    const targetProfileUserId = data.userObject.docRef!.id;
-    if (targetProfileUserId !== undefined) {
-      navigateToUserProfile(signedInUserId, targetProfileUserId, navigation);
-    }
+  const tryNavigate = () => {
+    const signedInUserId = signedInUser?.getId();
+    if (signedInUserId === undefined) return;
+    navigateToUserProfile(signedInUserId, userDocRefId, navigation);
   };
 
   if (mini) {
@@ -117,9 +123,9 @@ const UserTag = ({
           <HStack alignItems="center">
             <Tintable tinted={isHovered || isPressed} rounded />
             <Text fontSize={sizedStyles.sm.displayNameSize} fontWeight="bold">
-              {data.displayName.length <= 18
-                ? data.displayName
-                : data.displayName.slice(0, 15) + '...'}
+              {displayName.length <= 18
+                ? displayName
+                : displayName.slice(0, 15) + '...'}
             </Text>
             {timestamp !== undefined ? (
               <Box ml={2}>
@@ -141,18 +147,22 @@ const UserTag = ({
             <Avatar
               w={sizedStyles[size].avatarSize}
               h={sizedStyles[size].avatarSize}
-              source={{ uri: data.avatarUrl }}
+              source={
+                avatarUrlResult.data !== undefined
+                  ? { uri: avatarUrlResult.data }
+                  : require('../../assets/default_avatar.png')
+              }
             />
             <VStack pl={2}>
               <Text
                 fontSize={sizedStyles[size].displayNameSize}
                 fontWeight="bold"
               >
-                {data.displayName}
+                {displayName}
               </Text>
               <HStack alignItems="center">
                 <Text fontSize={sizedStyles[size].usernameSize} color="grey">
-                  @{data.username}
+                  @{username}
                 </Text>
                 {timestamp !== undefined ? (
                   <Box ml={2}>

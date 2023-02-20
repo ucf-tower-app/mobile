@@ -28,10 +28,10 @@ import RouteLink from '../route/RouteLink';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import Reportable from './actions/Reportable';
 import Timestamp from './Timestamp';
-import Deletable from './actions/Deletable';
 import ActionedMedia from './actions/ActionedMedia';
+import Deletable from './actions/Deletable';
+import Reportable from './actions/Reportable';
 
 export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -190,7 +190,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
       <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
         <Box pl={1.5} pr={1}>
           <UserTag
-            user={postData.author}
+            userDocRefId={postData.author.getId()}
             mini
             isNavigationDisabled={isPreview}
           />
@@ -237,7 +237,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           mb={showRouteLink ? 0 : 2}
         >
           <UserTag
-            user={postData.author}
+            userDocRefId={postData.author.getId()}
             timestamp={postData.timestamp}
             isNavigationDisabled={isPreview}
           />
