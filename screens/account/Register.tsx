@@ -59,7 +59,7 @@ const checkDisplayName = (
 ) => {
   if (!validDisplayname(displayName))
     errorData.displayName =
-      'Must be 5-30 letters or spaces and have no spaces in front or back';
+      'Must be 5-20 letters or spaces and have no spaces in front or back';
 };
 
 const checkPassword = (password: string, errorData: RegisterErrorData) => {
