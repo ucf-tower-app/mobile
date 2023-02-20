@@ -1,10 +1,10 @@
 import {
-  VStack,
-  HStack,
   Box,
-  Text,
-  useColorModeValue,
+  HStack,
   Skeleton,
+  Text,
+  VStack,
+  useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -15,9 +15,9 @@ import { Comment as CommentObj, UserStatus } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import ContextMenu, { ContextOptions } from './ContextMenu';
-import Reportable from './actions/Reportable';
-import Deletable from './actions/Deletable';
 import ActionedMedia from './actions/ActionedMedia';
+import Deletable from './actions/Deletable';
+import Reportable from './actions/Reportable';
 
 const CommentSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -104,7 +104,11 @@ const Comment = ({ comment }: Props) => {
       />
       <VStack w="full" p={2} alignItems="flex-start">
         <HStack w="full" justifyContent="space-between">
-          <UserTag user={data.author} size="sm" timestamp={data.timestamp} />
+          <UserTag
+            userDocRefId={data.author.getId()}
+            size="sm"
+            timestamp={data.timestamp}
+          />
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         <HStack w="full" justifyContent="space-between">
