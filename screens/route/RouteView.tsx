@@ -12,6 +12,7 @@ import {
   Spinner,
   Text,
   VStack,
+  useToast,
   useToken,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -26,12 +27,13 @@ import UserTag from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import SendShareModal from '../../components/route/SendShareModal';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useGenericErrorToast } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { createPost, getForumById } from '../../xplat/api';
+import { CreatePostError, createPost, getForumById } from '../../xplat/api';
 import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
@@ -41,6 +43,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
+  const toast = useToast();
+  const genericToast = useGenericErrorToast();
   const user = useRecoilValue(userAtom);
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
 
@@ -101,23 +105,36 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     }
   };
 
-  const shareSend = () => {
+  const shareSend = async () => {
     if (data !== undefined && user !== undefined) {
       setIsSharing(false);
-      createPost({
-        author: user,
-        forum: getForumById(data.forumDocRefID),
-        textContent: '',
-        routeInfo: {
-          name: data.name,
-          grade: data.gradeDisplayString,
-        },
-        isSend: true,
-      }).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: ['posts', data.forumDocRefID],
+      try {
+        await createPost({
+          author: user,
+          forum: getForumById(data.forumDocRefID),
+          textContent: '',
+          routeInfo: {
+            name: data.name,
+            grade: data.gradeDisplayString,
+          },
+          isSend: true,
+        }).then(() => {
+          queryClient.invalidateQueries({
+            queryKey: ['posts', data.forumDocRefID],
+          });
         });
-      });
+      } catch (e: any) {
+        var msg: string | undefined;
+        if (e === CreatePostError.TooLarge) msg = e;
+        else console.error(e);
+
+        if (msg !== undefined)
+          toast.show({
+            description: msg,
+            placement: 'top',
+          });
+        else genericToast();
+      }
     }
   };
 
@@ -154,7 +171,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                 <Text fontSize="lg" color="grey" fontWeight="bold" mb={2}>
                   Setter
                 </Text>
-                <UserTag user={data.setter} size="sm" />
+                <UserTag userDocRefId={data.setter.getId()} size="sm" />
               </VStack>
             ) : null}
           </HStack>

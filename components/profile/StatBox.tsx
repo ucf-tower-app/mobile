@@ -13,10 +13,12 @@ const StatBox = ({ stat, value, onPress }: Props) => {
   );
 
   return (
-    <Pressable p={2} bg={baseBgColor} onPress={onPress}>
+    <Pressable bg={baseBgColor} onPress={onPress}>
       {({ isHovered, isPressed }) => {
         return (
           <VStack
+            px={2}
+            rounded={6}
             bg={isPressed || isHovered ? primaryBgColor : baseBgColor}
             justifyContent="center"
             alignItems="center"

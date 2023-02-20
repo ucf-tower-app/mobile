@@ -10,8 +10,12 @@ import {
 } from 'native-base';
 import { useState } from 'react';
 import { Keyboard, Platform } from 'react-native';
+import { queryClient } from '../../App';
+import { useGenericErrorToast } from '../../utils/hooks';
+import { USER_CACHE_KEY } from '../../utils/queries';
 import {
   createUser,
+  CreateUserError,
   isKnightsEmail,
   signIn,
   validDisplayname,
@@ -67,6 +71,7 @@ type Props = {
 };
 const Register = ({ setIsRegistering }: Props) => {
   const toast = useToast();
+  const genericToast = useGenericErrorToast();
 
   const [formData, setData] = useState<RegisterFormData>(emptyFormData);
   const [confirmingEmail, setConfirmingEmail] = useState(false);
@@ -84,12 +89,27 @@ const Register = ({ setIsRegistering }: Props) => {
         formData.username,
         formData.displayName
       );
+      queryClient.invalidateQueries({ queryKey: [USER_CACHE_KEY] });
       await signIn(formData.email, formData.password);
-    } catch {
-      toast.show({
-        description: 'Oops, this email already exists. Please try again.',
-        placement: 'top',
-      });
+    } catch (error: any) {
+      var msg: string | undefined;
+      if (error === CreateUserError.UsernameTaken) msg = error;
+      else if (error === CreateUserError.InvalidDisplayName) msg = error;
+      else if (error === CreateUserError.InvalidUsername) msg = error;
+      else if (error.code !== undefined) {
+        if (error.code === 'auth/email-already-in-use')
+          msg = 'This email is already in use! Please try logging in instead.';
+        else console.error(error.code);
+      } else {
+        console.error(error);
+      }
+
+      if (msg !== undefined)
+        toast.show({
+          description: msg,
+          placement: 'top',
+        });
+      else genericToast();
     } finally {
       setIsServerProcessing(false);
     }

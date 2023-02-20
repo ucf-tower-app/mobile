@@ -1,5 +1,5 @@
 // Route metadata for tabs
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon } from 'native-base';
 import HeaderMenu from '../../../components/header/HeaderMenu';

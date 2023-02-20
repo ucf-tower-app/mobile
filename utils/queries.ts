@@ -20,6 +20,7 @@ export type FetchedActiveRoutes = {
   activeRoutes: FetchedRoute[];
 };
 export const ACTIVE_ROUTES_CACHE_KEY = 'active-routes';
+export const USER_CACHE_KEY = 'user-cache';
 const TWO_HOURS = 1000 * 60 * 60 * 2; // ms * s * m * h
 export const ACTIVE_ROUTES_CACHE_OPTIONS = {
   cacheTime: TWO_HOURS,
@@ -46,7 +47,7 @@ export const useActiveRoutes = () => {
 };
 
 export const useUserCacheMap = () => {
-  return useQuery('user-cache', getUserCache, {
+  return useQuery(USER_CACHE_KEY, getUserCache, {
     select: buildUserCacheMap,
     staleTime: TWO_HOURS,
     cacheTime: TWO_HOURS,
@@ -54,7 +55,7 @@ export const useUserCacheMap = () => {
 };
 
 export const useUserSubstringMatcher = () => {
-  return useQuery('user-cache', getUserCache, {
+  return useQuery(USER_CACHE_KEY, getUserCache, {
     select: buildUserSubstringMatcher,
     staleTime: TWO_HOURS,
     cacheTime: TWO_HOURS,

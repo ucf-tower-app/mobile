@@ -40,7 +40,7 @@ const UserRow = ({ user, endComponent }: Props) => {
           <Box bg={baseBgColor}>
             <Tintable tinted={isHovered || isPressed} />
             <HStack alignItems="center" justifyContent="space-between">
-              <UserTag user={user} size="lg" />
+              <UserTag userDocRefId={user.getId()} size="lg" />
               {endComponent}
             </HStack>
           </Box>
