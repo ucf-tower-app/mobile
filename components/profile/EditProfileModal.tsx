@@ -167,7 +167,7 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
                       }
                     />
                     <FormControl.ErrorMessage>
-                      Display Name must be 5-30 Upper/Lowercase letters, spaces,
+                      Display Name must be 5-20 Upper/Lowercase letters, spaces,
                       and hyphens
                     </FormControl.ErrorMessage>
                   </FormControl>
