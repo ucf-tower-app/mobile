@@ -1,6 +1,8 @@
 # mobile
-Mobile application for the UCF Climbing Tower. Powered by Expo
+Mobile application for Tower.
 
 ## Usage
 ```expo start --tunnel```
 Runs the application on Metro, and tunnels the bundler through a public URL.
+
+**Powered by Expo**
