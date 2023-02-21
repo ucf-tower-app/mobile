@@ -36,6 +36,7 @@ const HomeFeed = () => {
     if (enabled && signedInUser !== undefined && userQuery.data !== undefined) {
       const newCursor = getQueryCursor(userQuery.data.followingList);
       setCursor(newCursor);
+      setPosts([]);
       setExhausted(false);
     }
   }, [enabled, signedInUser, userQuery.data]);
