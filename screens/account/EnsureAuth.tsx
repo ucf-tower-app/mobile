@@ -43,6 +43,8 @@ const EnsureAuth = () => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const isInitializing = useRecoilValue(isInitializingAtom);
 
+  const hideProfileTab = userPermissionLevel === UserStatus.Verified;
+
   if (isInitializing || (isSignedIn && userPermissionLevel === undefined)) {
     return <Loading />;
   }
@@ -66,18 +68,20 @@ const EnsureAuth = () => {
         headerShown: false,
       }}
     >
-      {tabRoutes.map((route) => (
-        <Tabs.Screen
-          name={route.name}
-          component={route.stack}
-          options={{
-            tabBarIcon: ({ focused }) =>
-              focused ? route.focusedIcon : route.unfocusedIcon,
-            tabBarShowLabel: false,
-          }}
-          key={route.name}
-        />
-      ))}
+      {tabRoutes.map((route) =>
+        hideProfileTab && route.name === 'ProfileTab' ? null : (
+          <Tabs.Screen
+            name={route.name}
+            component={route.stack}
+            options={{
+              tabBarIcon: ({ focused }) =>
+                focused ? route.focusedIcon : route.unfocusedIcon,
+              tabBarShowLabel: false,
+            }}
+            key={route.name}
+          />
+        )
+      )}
     </Tabs.Navigator>
   );
 };
