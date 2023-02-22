@@ -40,18 +40,17 @@ const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const renderDivider = () => <Divider mt={2} mb={2} />;
-  const maybeRenderFooter = () =>
-    users.length === 0 ? <Text>There's nothing here!</Text> : null;
+  const renderEmptyComponent = () => <Text>There's nothing here!</Text>;
 
   return (
     <FlatList
       bg={baseBgColor}
       data={users}
       ListHeaderComponent={getTopComponent}
-      ListFooterComponent={maybeRenderFooter}
       ItemSeparatorComponent={renderDivider}
       renderItem={({ item }) => <UserTag userDocRefId={item.getId()} />}
       keyExtractor={(item) => item.getId()}
+      ListEmptyComponent={renderEmptyComponent}
     />
   );
 };
