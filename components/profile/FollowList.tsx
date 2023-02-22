@@ -1,4 +1,4 @@
-import { Divider, FlatList, useColorModeValue } from 'native-base';
+import { Divider, FlatList, Text, useColorModeValue } from 'native-base';
 import { useEffect, useState } from 'react';
 import { NativeScrollEvent } from 'react-native';
 import { FetchedUser, User } from '../../xplat/types';
@@ -40,12 +40,15 @@ const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const renderDivider = () => <Divider mt={2} mb={2} />;
+  const maybeRenderFooter = () =>
+    users.length === 0 ? <Text>There's nothing here!</Text> : null;
 
   return (
     <FlatList
       bg={baseBgColor}
       data={users}
       ListHeaderComponent={getTopComponent}
+      ListFooterComponent={maybeRenderFooter}
       ItemSeparatorComponent={renderDivider}
       renderItem={({ item }) => <UserTag userDocRefId={item.getId()} />}
       keyExtractor={(item) => item.getId()}
