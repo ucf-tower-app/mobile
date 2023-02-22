@@ -11,8 +11,8 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { FetchedSend, Send as SendObj } from '../../xplat/types';
-import Timestamp from './Timestamp';
 import RouteLink from '../route/RouteLink';
+import Timestamp from './Timestamp';
 
 export const SendSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -73,7 +73,7 @@ const Send = ({ send }: Props) => {
       </Center>
       <VStack>
         <HStack>
-          <RouteLink route={sendData.route} noPadding />
+          <RouteLink routeName={sendData.routeName} noPadding />
           <Text bold> {sendData.classifier.displayString}</Text>
         </HStack>
         <Timestamp relative date={sendData.timestamp} />

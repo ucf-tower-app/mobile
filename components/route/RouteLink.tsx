@@ -1,43 +1,36 @@
 import { useNavigation } from '@react-navigation/native';
 import { Button } from 'native-base';
-import { useQuery } from 'react-query';
-import { Route, RouteStatus } from '../../xplat/types';
+import { useArchivedSet } from '../../utils/queries';
+import { getRouteByName } from '../../xplat/api';
 
 type Props = {
-  route: Route;
+  routeName: string;
   noPadding?: boolean;
 };
-const RouteLink = ({ route, noPadding = false }: Props) => {
+const RouteLink = ({ routeName, noPadding = false }: Props) => {
   const navigation = useNavigation();
 
-  const { isLoading, isError, data, error } = useQuery(
-    route.getId(),
-    route.buildFetcher()
-  );
+  const archivedRoutes = useArchivedSet();
 
   const navigateToRoute = () => {
-    if (data === undefined) return;
+    if (archivedRoutes.data === undefined) return;
 
-    const screen =
-      data.status === RouteStatus.Archived ? 'SearchTab' : 'ActiveRoutesTab';
+    const screen = archivedRoutes.data.has(routeName)
+      ? 'SearchTab'
+      : 'ActiveRoutesTab';
 
-    navigation.navigate('Tabs', {
-      screen,
-      params: {
-        screen: 'RouteView',
+    getRouteByName(routeName).then((route) =>
+      navigation.navigate('Tabs', {
+        screen,
         params: {
-          routeDocRefId: data.routeObject.getId(),
+          screen: 'RouteView',
+          params: {
+            routeDocRefId: route.getId(),
+          },
         },
-      },
-    });
+      })
+    );
   };
-
-  if (isLoading) return null;
-
-  if (isError || data === undefined) {
-    console.error(error);
-    return null;
-  }
 
   return (
     <Button
@@ -46,7 +39,7 @@ const RouteLink = ({ route, noPadding = false }: Props) => {
       _text={{ fontSize: 'xs' }}
       p={noPadding ? '0' : '2'}
     >
-      {data.name}
+      {routeName}
     </Button>
   );
 };
