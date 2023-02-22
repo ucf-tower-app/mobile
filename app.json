@@ -22,7 +22,8 @@
     },
     "android": {
       "permissions": ["android.permission.RECORD_AUDIO"],
-      "package": "com.tyler.hm.tower"
+      "package": "com.tyler.hm.tower",
+      "versionCode": "2"
     },
     "web": {
       "favicon": "./assets/favicon.png"
