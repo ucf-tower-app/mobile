@@ -197,7 +197,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
               <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
             ) : null}
           </HStack>
-          {permissionLevelCanWrite(userPermissionLevel) ? (
+          {permissionLevelCanWrite(userPermissionLevel) &&
+          data.status === RouteStatus.Active ? (
             <VStack>
               <Button
                 mx={4}
