@@ -2,16 +2,16 @@
 // https://www.npmjs.com/package/react-timestamp/v/5.0.0?activeTab=readme
 // all credit goes to its author.
 
-import { useState, useEffect } from 'react';
+import { Text } from 'native-base';
+import { useEffect, useState } from 'react';
 import {
-  toDate,
-  secondsBetweenDates,
-  YEAR,
   distanceOfTimeInWords,
   formatDate,
   FormatOptions,
+  secondsBetweenDates,
+  toDate,
+  YEAR,
 } from '../../utils/react-timestamp-utils';
-import { Text } from 'native-base';
 
 type Props = {
   date: Date | number | string;
@@ -21,6 +21,7 @@ type Props = {
   autoUpdate?: boolean;
   fontSize?: string;
   color?: string;
+  mini?: boolean;
 };
 
 export default function Timestamp({
@@ -29,6 +30,7 @@ export default function Timestamp({
   relativeTo,
   options,
   autoUpdate,
+  mini = false,
   fontSize = 'xs',
   color = 'grey',
 }: Props) {
@@ -46,12 +48,18 @@ export default function Timestamp({
   const relativeToDate: Date = toDate(relativeTo) || new Date();
   const seconds = secondsBetweenDates(possibleDate, relativeToDate);
   const isRelative = (relative && Math.abs(seconds) < YEAR) || relativeTo;
-  const text: string = isRelative
+  const formatText: string = isRelative
     ? distanceOfTimeInWords(seconds, !relativeTo, options?.translate)
     : formatDate(possibleDate, options);
 
+  const text = mini
+    ? formatText.split(' ')[0] === 'Just'
+      ? 'Now'
+      : formatText.split(' ')[0] + formatText.split(' ')[1].charAt(0)
+    : formatText;
+
   return (
-    <Text fontSize={fontSize} color={color}>
+    <Text numberOfLines={1} fontSize={fontSize} color={color}>
       {text}
     </Text>
   );
