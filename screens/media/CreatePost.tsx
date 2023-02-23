@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { manipulateAsync } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import {
@@ -6,16 +7,15 @@ import {
   Button,
   Divider,
   FormControl,
-  HStack,
   Heading,
+  HStack,
   Input,
   ScrollView,
-  VStack,
   useColorModeValue,
   useToast,
+  VStack,
 } from 'native-base';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
 import Post from '../../components/media/Post';
@@ -28,7 +28,7 @@ import {
 } from '../../utils/hooks';
 import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession, wordFilter } from '../../utils/utils';
-import { CreatePostError, createPost, getForumById } from '../../xplat/api';
+import { createPost, CreatePostError, getForumById } from '../../xplat/api';
 import {
   FetchedRoute,
   LazyStaticImage,
@@ -134,9 +134,19 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
 
       if (result.canceled) return;
 
+      const imageURIs = await Promise.all(
+        result.assets.map((asset) => {
+          if (asset.width > 500) {
+            return manipulateAsync(asset.uri, [{ resize: { width: 500 } }])
+              .then((imageRes) => imageRes.uri)
+              .catch(() => asset.uri);
+          } else return asset.uri;
+        })
+      );
+
       setImageContent(
-        result.assets?.map(
-          (info) => new LazyStaticImage('mock/path', info.uri)
+        imageURIs.map(
+          (imageURI) => new LazyStaticImage('mock/path', imageURI)
         ) ?? []
       );
     } finally {
