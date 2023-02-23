@@ -3,8 +3,8 @@ import {
   Center,
   HStack,
   Text,
-  VStack,
   useColorModeValue,
+  VStack,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Dimensions, Image as ImageRN } from 'react-native';
