@@ -7,8 +7,8 @@ import {
   Icon,
   Skeleton,
   Text,
-  VStack,
   useColorModeValue,
+  VStack,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -25,13 +25,13 @@ import {
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
+import ActionedMedia from './actions/ActionedMedia';
+import Deletable from './actions/Deletable';
+import Reportable from './actions/Reportable';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import Timestamp from './Timestamp';
-import ActionedMedia from './actions/ActionedMedia';
-import Deletable from './actions/Deletable';
-import Reportable from './actions/Reportable';
 
 export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -177,20 +177,27 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
-        <Box pl={1.5} pr={1}>
+      <HStack w="full" justifyItems="center" bg={baseBgColor} px={1.5}>
+        <Box pl={1.5} width="35%">
           <UserTag
             userDocRefId={postData.author.getId()}
             mini
             isNavigationDisabled={isPreview}
           />
         </Box>
-        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+        <Icon
+          width="10%"
+          as={<Ionicons name="trending-up" />}
+          color="black"
+          size="lg"
+        />
         {postData.routeInfo !== undefined && (
-          <Text pl={1}>{postData.routeInfo.name}</Text> // TODO: Make this a link
+          <Text numberOfLines={1} width="40%" pl={1}>
+            {postData.routeInfo.name}
+          </Text> // TODO: Make this a link
         )}
-        <Box pl={2}>
-          <Timestamp relative date={postData.timestamp} />
+        <Box width="10%">
+          <Timestamp mini relative date={postData.timestamp} />
         </Box>
 
         {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
