@@ -7,18 +7,19 @@ import {
   HStack,
   Icon,
   Pressable,
-  VStack,
   useColorModeValue,
+  VStack,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
+import Reportable from '../../components/media/actions/Reportable';
 import ContextMenu, {
   ContextOptions,
 } from '../../components/media/ContextMenu';
 import Feed from '../../components/media/Feed';
-import Reportable from '../../components/media/actions/Reportable';
+import BestSend from '../../components/profile/BestSend';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
@@ -28,7 +29,12 @@ import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { useEarlyLoad, useSignedInUserQuery } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalScreenProps } from '../../utils/types';
-import { User, containsRef, invalidateDocRefId } from '../../xplat/types';
+import {
+  containsRef,
+  invalidateDocRefId,
+  RouteType,
+  User,
+} from '../../xplat/types';
 
 /**
  * The profile component displays the profile banner, a statbox,
@@ -211,27 +217,13 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           </Box>
           <Center w="full" pb={4}>
             <HStack space="md">
-              <StatBox
-                stat="Boulder"
-                value={
-                  profileUserQuery.data.bestBoulder
-                    ? profileUserQuery.data.bestBoulder?.displayString
-                    : 'None'
-                }
-                onPress={() => {
-                  return;
-                }}
+              <BestSend
+                type={RouteType.Boulder}
+                fetchedUser={profileUserQuery.data}
               />
-              <StatBox
-                stat="Top-Rope"
-                value={
-                  profileUserQuery.data.bestToprope
-                    ? profileUserQuery.data.bestToprope?.displayString
-                    : 'None'
-                }
-                onPress={() => {
-                  return;
-                }}
+              <BestSend
+                type={RouteType.Toprope}
+                fetchedUser={profileUserQuery.data}
               />
               <StatBox
                 stat="Sends"
