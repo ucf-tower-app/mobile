@@ -120,16 +120,14 @@ const UserTag = ({
     return (
       <Pressable onPress={tryNavigate} disabled={isNavigationDisabled}>
         {({ isHovered, isPressed }) => (
-          <HStack alignItems="center">
+          <HStack alignItems="center" justifyContent={'center'}>
             <Tintable tinted={isHovered || isPressed} rounded />
             <Text
               numberOfLines={1}
               fontSize={sizedStyles.sm.displayNameSize}
               fontWeight="bold"
             >
-              {displayName.length <= 18
-                ? displayName
-                : displayName.slice(0, 15) + '...'}
+              {displayName}
             </Text>
             {timestamp !== undefined ? (
               <Box ml={2}>
