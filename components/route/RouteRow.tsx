@@ -94,19 +94,19 @@ const RouteRow = ({ route }: Props) => {
       }
     >
       <HStack
-        p={2}
         backgroundColor={baseBgColor}
         justifyContent="flex-start"
         alignItems="center"
       >
         <Box
-          height={'17px'}
+          ml={3}
+          height={'20px'}
           style={{ aspectRatio: 1 }}
           bgColor={tapeTint}
           borderRadius={'50%'}
           shadow={4}
         />
-        <VStack pl={2} pt={2} width="85%">
+        <VStack ml={0.5} mt={1.5} mb={1.5} width="85%">
           <Text
             ml={2}
             numberOfLines={1}
