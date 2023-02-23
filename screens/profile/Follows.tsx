@@ -43,7 +43,7 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
     return null;
   }
 
-  const followsComponent = (
+  const getFollowsComponent = () => (
     <Center w="full" bgColor={baseBgColor} p="2">
       <VStack w="full">
         <HStack space="1" p={1} mt={1}>
@@ -70,7 +70,7 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
     <FollowList
       userTab={tabViewed}
       fetchedUser={data}
-      topComponent={followsComponent}
+      getTopComponent={getFollowsComponent}
     />
   );
 };
