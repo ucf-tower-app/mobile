@@ -74,9 +74,15 @@ const HomeFeed = () => {
     if (!exhausted)
       return (
         <VStack>
-          <PostSkeleton />
-          <PostSkeleton />
-          <PostSkeleton />
+          <Box my={2}>
+            <PostSkeleton />
+          </Box>
+          <Box my={2}>
+            <PostSkeleton />
+          </Box>
+          <Box my={2}>
+            <PostSkeleton />
+          </Box>
         </VStack>
       );
     else return null;

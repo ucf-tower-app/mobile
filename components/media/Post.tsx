@@ -36,7 +36,7 @@ export const PostSkeleton = () => {
       <Box pl={2}>
         <UserTagSkeleton />
       </Box>
-      <Skeleton.Text p={2} lines={2} />
+      <Skeleton.Text p={2} w="95%" lines={2} />
       <Skeleton w="full" pt={2} h={40} />
     </VStack>
   );
