@@ -76,49 +76,6 @@ const HomeFeed = () => {
     } else if (feed === 'following') {
       if (followingPostsIQ.hasNextPage) followingPostsIQ.fetchNextPage();
     }
-<<<<<<< HEAD
-=======
-    if (exhausted) return;
-
-    const newPosts = [];
-    const stride = posts.length === 0 ? INITIAL_STRIDE : STRIDE;
-    while (newPosts.length < stride && (await cursor.hasNext())) {
-      newPosts.push(await cursor.pollNext());
-    }
-    const hasNext = await cursor.hasNext();
-    setExhausted(!hasNext);
-    setPosts([...posts, ...newPosts]);
-  }, [cursor, exhausted, posts]);
-
-  useEffect(() => {
-    if (cursor) getNextPosts();
-  }, [cursor, getNextPosts]);
-
-  const header = () => (
-    <Box>
-      {enabled ? null : (
-        <Button onPress={() => setEnabled(true)}>Enable</Button>
-      )}
-    </Box>
-  );
-
-  const renderSpinner = () => {
-    if (!exhausted)
-      return (
-        <VStack>
-          <Box my={2}>
-            <PostSkeleton />
-          </Box>
-          <Box my={2}>
-            <PostSkeleton />
-          </Box>
-          <Box my={2}>
-            <PostSkeleton />
-          </Box>
-        </VStack>
-      );
-    else return null;
->>>>>>> main
   };
 
   const header = () => {
