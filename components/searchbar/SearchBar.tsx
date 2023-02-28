@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { Icon, Input, Pressable } from 'native-base';
 import { useState } from 'react';
+import { Keyboard } from 'react-native';
 import { DebounceSession } from '../../utils/utils';
 
 type QueryHandler = {
@@ -35,7 +36,12 @@ const SearchBar = ({ queryHandler }: Props) => {
       onChangeText={handleInput}
       value={inputText}
       InputRightElement={
-        <Pressable onPress={() => handleInput('')}>
+        <Pressable
+          onPress={() => {
+            Keyboard.dismiss();
+            handleInput('');
+          }}
+        >
           <Icon as={<Feather name="x" />} size="md" color="black" mr="4" />
         </Pressable>
       }
