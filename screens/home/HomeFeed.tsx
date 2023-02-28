@@ -4,6 +4,8 @@ import {
   Divider,
   FlatList,
   HStack,
+  VStack,
+  View,
   useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -47,33 +49,28 @@ const HomeFeed = () => {
     },
     enabled: feed === 'following',
   });
-  const [posts, setPosts] = useState<PostObj[]>([]);
+  const [allPosts, setAllPosts] = useState<PostObj[]>([]);
+  const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
 
   useEffect(() => {
     if (feed === 'all') {
       if (allPostsIQ.data !== undefined) {
-        setPosts(
+        setAllPosts(
           allPostsIQ.data.pages.flatMap((page) =>
             constructPageData(PostObj, page)
           )
         );
-      } else setPosts([]);
+      } else setAllPosts([]);
     } else if (feed === 'following') {
       if (followingPostsIQ.data !== undefined) {
-        setPosts(followingPostsIQ.data.pages.flatMap((page) => page.result));
-      } else setPosts([]);
+        setFollowingPosts(
+          followingPostsIQ.data.pages.flatMap((page) => page.result)
+        );
+      } else setFollowingPosts([]);
     }
   }, [allPostsIQ.data, feed, followingPostsIQ.data]);
 
-  const hasNextPage =
-    feed === 'none'
-      ? false
-      : feed === 'all'
-      ? allPostsIQ.hasNextPage
-      : followingPostsIQ.hasNextPage;
-
   const getNextPosts = () => {
-    console.log('I need more posts!');
     if (feed === 'all') {
       if (allPostsIQ.hasNextPage) allPostsIQ.fetchNextPage();
     } else if (feed === 'following') {
@@ -90,26 +87,42 @@ const HomeFeed = () => {
       );
     else
       return (
-        <HStack>
-          <Button onPress={() => setFeed('all')}>Anyone</Button>
-          <Button onPress={() => setFeed('following')}>Following</Button>
-        </HStack>
+        <VStack>
+          <View mt={1} />
+          <HStack w="full" alignContent={'center'} justifyContent={'center'}>
+            <Button
+              variant={feed === 'all' ? 'solid' : 'outline'}
+              rounded="full"
+              onPress={() => setFeed('all')}
+            >
+              Anyone
+            </Button>
+            <Button
+              variant={feed === 'following' ? 'solid' : 'outline'}
+              rounded="full"
+              ml={3}
+              onPress={() => setFeed('following')}
+            >
+              Following
+            </Button>
+          </HStack>
+          <Divider mt={1} mb={1} orientation="horizontal" />
+        </VStack>
       );
   };
 
-  const renderSpinner = () => {
-    if (hasNextPage) return <PostSkeleton />;
-    else return null;
-  };
-
-  return (
+  const allPostsFeed = (
     <FlatList
       bgColor={baseBgColor}
       ListHeaderComponent={header}
-      data={posts}
+      data={allPosts}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={renderSpinner}
+      ListFooterComponent={
+        allPostsIQ.hasNextPage || allPosts.length === 0 ? (
+          <PostSkeleton />
+        ) : null
+      }
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
@@ -118,6 +131,33 @@ const HomeFeed = () => {
       keyExtractor={(item) => item.getId()}
     />
   );
+
+  const followingPostsFeed = (
+    <FlatList
+      bgColor={baseBgColor}
+      ListHeaderComponent={header}
+      data={followingPosts}
+      onEndReached={getNextPosts}
+      ItemSeparatorComponent={Divider}
+      ListFooterComponent={
+        followingPostsIQ.hasNextPage || followingPosts.length === 0 ? (
+          <PostSkeleton />
+        ) : null
+      }
+      renderItem={({ item }) => (
+        <Box my={2}>
+          <Post post={item} />
+        </Box>
+      )}
+      keyExtractor={(item) => item.getId()}
+    />
+  );
+
+  return feed === 'none'
+    ? header()
+    : feed === 'all'
+    ? allPostsFeed
+    : followingPostsFeed;
 };
 
 export default HomeFeed;
