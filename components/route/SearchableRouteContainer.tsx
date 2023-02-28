@@ -53,7 +53,6 @@ const RouteSearchHeader = ({
           minWidth={'45%'}
           selectedValue={filter}
           placeholder="Filter"
-          onClose={() => setFilter('')}
           onValueChange={(value) =>
             setFilter(value === 'None' ? '' : (value as Filter))
           }
@@ -70,7 +69,6 @@ const RouteSearchHeader = ({
           minWidth={'45%'}
           selectedValue={ordering}
           placeholder="Order By"
-          onClose={() => setOrdering('')}
           onValueChange={(value) =>
             setOrdering(value === 'None' ? '' : (value as Ordering))
           }
