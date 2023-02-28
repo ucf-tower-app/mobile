@@ -25,7 +25,7 @@ import Feed from '../../components/media/Feed';
 import { PostSkeleton } from '../../components/media/Post';
 import Timestamp from '../../components/media/Timestamp';
 import LikeButton from '../../components/misc/LikeButton';
-import UserTag from '../../components/profile/UserTag';
+import UserTag, { UserTagSkeleton } from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import SendShareModal from '../../components/route/SendShareModal';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
@@ -51,17 +51,14 @@ const LoadingRouteView = () => {
     <Center w="full" h="full" bg={baseBgColor}>
       <VStack w="full" h="full" justifyItems={'center'}>
         <Skeleton h="30%" />
-        <Skeleton.Text pb={2} />
-        <Skeleton.Text pb={2} />
-        <Skeleton.Text pb={2} />
-        <Center h="7%">
+        <Skeleton.Text mt={2} mb={2} />
+        <UserTagSkeleton />
+        <Center h="7%" mt={2} mb={2}>
           <Skeleton w="60%" h="100%" rounded={30} />
         </Center>
-        <Center h="7%">
+        <Center h="7%" mb={2}>
           <Skeleton w="60%" h="100%" rounded={30} />
         </Center>
-        <PostSkeleton />
-        <PostSkeleton />
         <PostSkeleton />
       </VStack>
     </Center>
@@ -69,7 +66,7 @@ const LoadingRouteView = () => {
 };
 
 const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
-  const isEarly = useEarlyLoad(300);
+  const isEarly = useEarlyLoad(20000);
   const routeDocRefId = route.params.routeDocRefId;
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
