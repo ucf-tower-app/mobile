@@ -1,18 +1,57 @@
-import {
-  Button,
-  Center,
-  HStack,
-  Spinner,
-  useColorModeValue,
-  VStack,
-} from 'native-base';
+import { Center, HStack, Select, Spinner, Text, VStack } from 'native-base';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import FollowList from '../../components/profile/FollowList';
+import SearchBar from '../../components/searchbar/SearchBar';
 import { TabGlobalScreenProps } from '../../utils/types';
+import { DebounceSession } from '../../utils/utils';
 import { User } from '../../xplat/types';
 
-type UserTab = 'followers' | 'following';
+type UserTab = 'followers' | 'following' | 'both';
+
+type HeaderProps = {
+  setSearchQuery: (q: string) => void;
+  tabViewed: UserTab;
+  setTabViewed: (tab: UserTab) => void;
+};
+
+const FollowsHeader = ({
+  setSearchQuery,
+  tabViewed,
+  setTabViewed,
+}: HeaderProps) => {
+  return (
+    <Center w="full" p="2">
+      <VStack w="full">
+        <SearchBar
+          queryHandler={{
+            onChangeQuery: (newQuery: string) =>
+              setSearchQuery(newQuery.toLowerCase()),
+            onChangeQueryDebounceSession: new DebounceSession(100),
+          }}
+        />
+        <HStack
+          space="1"
+          p={1}
+          mt={1}
+          justifyContent={'center'}
+          alignItems={'center'}
+        >
+          <Text>Show: </Text>
+          <Select
+            minWidth={'50%'}
+            selectedValue={tabViewed}
+            onValueChange={(value) => setTabViewed(value as UserTab)}
+          >
+            <Select.Item value="followers" label="Followers" />
+            <Select.Item value="following" label="Following" />
+            <Select.Item value="both" label="Followers + Following" />
+          </Select>
+        </HStack>
+      </VStack>
+    </Center>
+  );
+};
 
 /**
  * This screen displays the followers and following lists of
@@ -21,9 +60,8 @@ type UserTab = 'followers' | 'following';
 const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
   const userDocRefId = route.params.userDocRefId;
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [tabViewed, setTabViewed] = useState<UserTab>('followers');
-
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const { isLoading, isError, data, error } = useQuery(
     userDocRefId,
@@ -43,34 +81,18 @@ const Follows = ({ route }: TabGlobalScreenProps<'Follows'>) => {
     return null;
   }
 
-  const getFollowsComponent = () => (
-    <Center w="full" bgColor={baseBgColor} p="2">
-      <VStack w="full">
-        <HStack space="1" p={1} mt={1}>
-          <Button
-            onPress={() => setTabViewed('followers')}
-            variant={tabViewed === 'followers' ? 'solid' : 'outline'}
-            rounded="full"
-          >
-            Followers
-          </Button>
-          <Button
-            onPress={() => setTabViewed('following')}
-            variant={tabViewed === 'following' ? 'solid' : 'outline'}
-            rounded="full"
-          >
-            Following
-          </Button>
-        </HStack>
-      </VStack>
-    </Center>
-  );
-
   return (
     <FollowList
+      searchQuery={searchQuery}
       userTab={tabViewed}
       fetchedUser={data}
-      getTopComponent={getFollowsComponent}
+      header={
+        <FollowsHeader
+          setSearchQuery={setSearchQuery}
+          setTabViewed={setTabViewed}
+          tabViewed={tabViewed}
+        />
+      }
     />
   );
 };
