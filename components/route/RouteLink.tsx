@@ -27,6 +27,7 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
           params: {
             routeDocRefId: route.getId(),
           },
+          initial: false,
         },
       })
     );
