@@ -1,32 +1,7 @@
-import {
-  Center,
-  ScrollView,
-  Spinner,
-  VStack,
-  useColorModeValue,
-} from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
-import { useInfiniteQuery } from 'react-query';
-import {
-  constructPageData,
-  getIQParams_UserFollowers,
-  getIQParams_UserFollowing,
-} from '../../xplat/queries';
+import { Divider, FlatList, Text, useColorModeValue } from 'native-base';
+import { useEffect, useState } from 'react';
 import { FetchedUser, User } from '../../xplat/types';
-import UserRow from './UserRow';
-
-const isCloseToBottom = ({
-  layoutMeasurement,
-  contentOffset,
-  contentSize,
-}: NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
-};
+import UserTag from './UserTag';
 
 /**
  * Similar to a feed of posts. This displays a list of users for a Follow
@@ -36,76 +11,34 @@ const isCloseToBottom = ({
 type Props = {
   userTab: 'followers' | 'following';
   fetchedUser: FetchedUser;
-  topComponent?: JSX.Element;
+  getTopComponent?: () => JSX.Element;
 };
-const FollowList = ({ userTab, fetchedUser, topComponent }: Props) => {
+const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
   const [users, setUsers] = useState<User[]>([]);
-
-  const followersIQ = useInfiniteQuery(
-    getIQParams_UserFollowers(fetchedUser.docRefId)
-  );
-
-  const followingIQ = useInfiniteQuery(
-    getIQParams_UserFollowing(fetchedUser.followingList)
-  );
 
   useEffect(() => {
     if (userTab === 'followers') {
-      if (followersIQ.data)
-        setUsers(
-          followersIQ.data.pages.flatMap((page) =>
-            constructPageData(User, page)
-          )
-        );
+      setUsers(fetchedUser.followersList);
     } else {
-      if (followingIQ.data) setUsers(followingIQ.data.pages.flat());
+      setUsers(fetchedUser.followingList);
     }
-  }, [followersIQ.data, followingIQ.data, userTab]);
+  }, [fetchedUser.followersList, fetchedUser.followingList, userTab]);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  const loadNextUsers = useCallback(async () => {
-    if (userTab === 'followers') {
-      if (followersIQ.hasNextPage && !followersIQ.isFetchingNextPage)
-        await followersIQ.fetchNextPage();
-    } else {
-      if (followingIQ.hasNextPage && !followingIQ.isFetchingNextPage)
-        await followingIQ.fetchNextPage();
-    }
-  }, [followersIQ, followingIQ, userTab]);
-
-  const hasNextPage =
-    userTab === 'followers' ? followersIQ.hasNextPage : followingIQ.hasNextPage;
+  const renderDivider = () => <Divider mt={2} mb={2} />;
+  const renderEmptyComponent = () => <Text>There's nothing here!</Text>;
 
   return (
-    <ScrollView
-      w="full"
+    <FlatList
       bg={baseBgColor}
-      onScroll={({ nativeEvent }) => {
-        if (hasNextPage && isCloseToBottom(nativeEvent)) {
-          loadNextUsers();
-        }
-      }}
-      scrollEventThrottle={1000}
-    >
-      <Center w="full">
-        {topComponent}
-        <VStack w="full">
-          {users.map((user) => {
-            return (
-              <VStack key={user.getId()} py="3">
-                <UserRow user={user} />
-              </VStack>
-            );
-          })}
-          {hasNextPage ? (
-            <Center pt={4}>
-              <Spinner size="lg" />
-            </Center>
-          ) : null}
-        </VStack>
-      </Center>
-    </ScrollView>
+      data={users}
+      ListHeaderComponent={getTopComponent}
+      ItemSeparatorComponent={renderDivider}
+      renderItem={({ item }) => <UserTag userDocRefId={item.getId()} />}
+      keyExtractor={(item) => item.getId()}
+      ListEmptyComponent={renderEmptyComponent}
+    />
   );
 };
 

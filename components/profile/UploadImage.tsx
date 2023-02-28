@@ -38,8 +38,8 @@ const UploadImage = ({ editAvatar, setEditAvatar }: Props) => {
         aspect: [1, 1],
         quality: 0,
       });
-      if (!_image.cancelled) {
-        setEditAvatar(_image.uri);
+      if (!_image.canceled) {
+        setEditAvatar(_image.assets[0].uri);
       }
     }
   };

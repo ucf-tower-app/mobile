@@ -7,13 +7,13 @@ import {
   Center,
   Divider,
   Flex,
-  HStack,
   Heading,
+  HStack,
   Spinner,
   Text,
-  VStack,
   useToast,
   useToken,
+  VStack,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet } from 'react-native';
@@ -33,7 +33,11 @@ import {
   TabGlobalNavigationProp,
   TabGlobalScreenProps,
 } from '../../utils/types';
-import { CreatePostError, createPost, getForumById } from '../../xplat/api';
+import { createPost, CreatePostError, getForumById } from '../../xplat/api';
+import {
+  getRQKey_MonthlyLeaderboard,
+  getRQKey_SemesterLeaderboard,
+} from '../../xplat/queries';
 import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
@@ -101,6 +105,13 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
         setIsSending(false);
         setIsSharing(true);
         send.fetch().then(setFetchedSend);
+        queryClient.invalidateQueries({
+          queryKey: getRQKey_MonthlyLeaderboard(new Date()),
+        });
+        queryClient.invalidateQueries({
+          queryKey: getRQKey_SemesterLeaderboard(new Date()),
+        });
+        queryClient.invalidateQueries({ queryKey: user.getId() });
       });
     }
   };
@@ -197,7 +208,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
               <LikeButton likes={data.likes} onSetIsLiked={onSetIsLiked} />
             ) : null}
           </HStack>
-          {permissionLevelCanWrite(userPermissionLevel) ? (
+          {permissionLevelCanWrite(userPermissionLevel) &&
+          data.status === RouteStatus.Active ? (
             <VStack>
               <Button
                 mx={4}

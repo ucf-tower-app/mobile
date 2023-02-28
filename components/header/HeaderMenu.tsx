@@ -31,11 +31,6 @@ const HeaderMenu = ({ navigate }: Props) => {
             return PressableDots(triggerProps);
           }}
         >
-          <Menu.Item onPress={() => navigate('Settings')}>Settings</Menu.Item>
-          <Menu.Item onPress={() => navigate('Tutorial')}>Tutorial</Menu.Item>
-          <Menu.Item onPress={() => navigate('LostAndFound')}>
-            Lost and Found
-          </Menu.Item>
           {userPermissionLevel === UserStatus.Verified ? (
             <Menu.Item onPress={() => setChangeEmail(true)}>
               Verify Knights Email

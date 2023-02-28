@@ -7,8 +7,8 @@ import {
   Icon,
   Skeleton,
   Text,
-  VStack,
   useColorModeValue,
+  VStack,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -16,22 +16,17 @@ import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
-import {
-  FetchedPost,
-  Post as PostObj,
-  Route,
-  UserStatus,
-} from '../../xplat/types';
+import { FetchedPost, Post as PostObj, UserStatus } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
+import ActionedMedia from './actions/ActionedMedia';
+import Deletable from './actions/Deletable';
+import Reportable from './actions/Reportable';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
 import Timestamp from './Timestamp';
-import ActionedMedia from './actions/ActionedMedia';
-import Deletable from './actions/Deletable';
-import Reportable from './actions/Reportable';
 
 export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -41,7 +36,7 @@ export const PostSkeleton = () => {
       <Box pl={2}>
         <UserTagSkeleton />
       </Box>
-      <Skeleton.Text p={2} lines={2} />
+      <Skeleton.Text p={2} w="95%" lines={2} />
       <Skeleton w="full" pt={2} h={40} />
     </VStack>
   );
@@ -79,7 +74,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
-  const [route, setRoute] = useState<Route>();
+  const [routeName, setRouteName] = useState<string>();
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
@@ -124,15 +119,9 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   useEffect(() => {
     if (realQR.data !== undefined) {
       setPostData(realQR.data);
-
-      const updateRoute = async () => {
-        const _route = await (
-          await realQR.data.postObject.getForum()
-        )?.getRoute();
-        setRoute(_route);
-      };
-
-      updateRoute();
+      if (realQR.data.routeInfo !== undefined) {
+        setRouteName(realQR.data.routeInfo.name);
+      }
     }
   }, [realQR.data]);
 
@@ -177,20 +166,27 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" justifyItems="center" bg={baseBgColor} px={2}>
-        <Box pl={1.5} pr={1}>
+      <HStack w="full" justifyItems="center" bg={baseBgColor} px={1.5}>
+        <Box pl={1.5} width="35%">
           <UserTag
             userDocRefId={postData.author.getId()}
             mini
             isNavigationDisabled={isPreview}
           />
         </Box>
-        <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+        <Icon
+          width="10%"
+          as={<Ionicons name="trending-up" />}
+          color="black"
+          size="lg"
+        />
         {postData.routeInfo !== undefined && (
-          <Text pl={1}>{postData.routeInfo.name}</Text> // TODO: Make this a link
+          <Text numberOfLines={1} width="40%" pl={1}>
+            {postData.routeInfo.name}
+          </Text> // TODO: Make this a link
         )}
-        <Box pl={2}>
-          <Timestamp relative date={postData.timestamp} />
+        <Box width="10%">
+          <Timestamp mini relative date={postData.timestamp} />
         </Box>
 
         {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
@@ -202,7 +198,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     );
   }
 
-  const showRouteLink = !isInRouteView && route !== undefined;
+  const showRouteLink = !isInRouteView && routeName !== undefined;
   return (
     <>
       <Reportable
@@ -235,7 +231,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
         </HStack>
         {showRouteLink ? (
           <Box mb={2}>
-            <RouteLink route={route!} />
+            <RouteLink routeName={routeName} />
           </Box>
         ) : null}
         <Box p={isPreview ? 1 : 2} pt={0}>
