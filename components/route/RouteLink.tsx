@@ -44,7 +44,7 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
     <Button
       variant="link"
       onPress={navigateToRoute}
-      _text={{ fontSize: 'xs' }}
+      _text={{ fontSize: 'xs', numberOfLines: 1 }}
       p={noPadding ? '0' : '2'}
     >
       {routeName}
