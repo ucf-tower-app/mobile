@@ -4,6 +4,7 @@ import {
   HStack,
   Select,
   Spinner,
+  Text,
   VStack,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
@@ -138,21 +139,6 @@ const SearchableRouteContainer = ({ fetchedRoutes }: Props) => {
     processQuery();
   }, [fetchedRoutes, filter, ordering, query]);
 
-  if (isLoading) {
-    return (
-      <VStack>
-        <RouteSearchHeader
-          ordering={ordering}
-          filter={filter}
-          setOrdering={setOrdering}
-          setFilter={setFilter}
-          setQuery={setQuery}
-        />
-        <Spinner mt={8} size="lg" />
-      </VStack>
-    );
-  }
-
   return (
     <FlatList
       h="full"
@@ -168,6 +154,16 @@ const SearchableRouteContainer = ({ fetchedRoutes }: Props) => {
       data={displayedRoutes}
       ItemSeparatorComponent={Divider}
       renderItem={({ item }) => <RouteRow route={item.routeObject} />}
+      ListFooterComponent={
+        isLoading ? (
+          <Spinner mt={8} size="lg" />
+        ) : displayedRoutes.length === 0 ? (
+          <Text m={2} textAlign={'center'}>
+            No routes seem to match your search. Consider removing your filter
+            or changing your search terms?
+          </Text>
+        ) : null
+      }
     />
   );
 };
