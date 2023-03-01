@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
@@ -23,7 +24,8 @@ import { Post as PostObj } from '../../xplat/types';
 type activeFeed = 'none' | 'all' | 'following';
 
 const HomeFeed = () => {
-  // const signedInUser = useRecoilValue(userAtom);
+  const navigation = useNavigation();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
   const [feed, setFeed] = useState<activeFeed>(
@@ -104,6 +106,22 @@ const HomeFeed = () => {
               onPress={() => setFeed('following')}
             >
               Following
+            </Button>
+            <Button
+              variant="outline"
+              rounded="full"
+              ml={3}
+              onPress={() =>
+                navigation.navigate('Tabs', {
+                  screen: 'HomeTab',
+                  params: {
+                    screen: 'CreatePost',
+                    params: {},
+                  },
+                })
+              }
+            >
+              Post
             </Button>
           </HStack>
           <Divider mt={1} mb={1} orientation="horizontal" />
