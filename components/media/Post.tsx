@@ -26,7 +26,6 @@ import Reportable from './actions/Reportable';
 import ContextMenu, { ContextOptions } from './ContextMenu';
 import { MediaType } from './Media';
 import MediaCarousel from './MediaCarousel';
-import Timestamp from './Timestamp';
 
 export const PostSkeleton = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
@@ -166,35 +165,28 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   if (postData.isSend) {
     return (
-      <HStack w="full" justifyItems="center" bg={baseBgColor} px={1.5}>
-        <Box pl={1.5} width="42%" justifyItems={'center'}>
-          <UserTag
-            userDocRefId={postData.author.getId()}
-            mini
-            isNavigationDisabled={isPreview}
-          />
-        </Box>
-        <Icon
-          width="10%"
-          as={<Ionicons name="trending-up" />}
-          color="black"
-          size="lg"
+      <VStack w="full" alignItems="flex-start" bg={baseBgColor} p="2">
+        <UserTag
+          userDocRefId={postData.author.getId()}
+          timestamp={postData.timestamp}
+          isNavigationDisabled={isPreview}
         />
-        {postData.routeInfo !== undefined && (
-          <Box width="33%" pl={1}>
-            <RouteLink noPadding routeName={postData.routeInfo.name} />
-          </Box>
-        )}
-        <Box width="10%">
-          <Timestamp mini relative date={postData.timestamp} />
-        </Box>
-
-        {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
-          <Box ml="auto">
-            <LikeButton likes={postData.likes} onSetIsLiked={onSetIsLiked} />
-          </Box>
-        ) : null}
-      </HStack>
+        <HStack w="full" bg={baseBgColor} pt="2" alignItems="center">
+          <Icon as={<Ionicons name="trending-up" />} color="black" size="lg" />
+          {postData.routeInfo !== undefined && (
+            <HStack>
+              <Text> Sent </Text>
+              <RouteLink noPadding routeName={postData.routeInfo.name} />
+              <Text> </Text>
+            </HStack>
+          )}
+          {!isPreview && permissionLevelCanWrite(userPermissionLevel) ? (
+            <Box ml="auto">
+              <LikeButton likes={postData.likes} onSetIsLiked={onSetIsLiked} />
+            </Box>
+          ) : null}
+        </HStack>
+      </VStack>
     );
   }
 
