@@ -10,6 +10,7 @@ import {
   Center,
   Icon,
   Text,
+  Spinner,
 } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
@@ -116,16 +117,24 @@ const HomeFeed = () => {
   };
 
   const renderEmptyList = () => {
-    return (
-      <Center w="full" mt="1/2">
-        <VStack>
-          <Center>
-            <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
-          </Center>
-          <Text fontSize="lg">No posts.</Text>
-        </VStack>
-      </Center>
-    );
+    if (allPostsIQ.isLoading || followingPostsIQ.isLoading) {
+      return (
+        <Center w="full" mt="1/2">
+          <Spinner size="lg" />
+        </Center>
+      );
+    } else {
+      return (
+        <Center w="full" mt="1/2">
+          <VStack>
+            <Center>
+              <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
+            </Center>
+            <Text fontSize="lg">No posts.</Text>
+          </VStack>
+        </Center>
+      );
+    }
   };
 
   const allPostsFeed = (
@@ -136,11 +145,6 @@ const HomeFeed = () => {
       ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={
-        allPostsIQ.hasNextPage || allPosts.length === 0 ? (
-          <PostSkeleton />
-        ) : null
-      }
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
@@ -158,11 +162,6 @@ const HomeFeed = () => {
       ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={
-        followingPostsIQ.hasNextPage || followingPosts.length === 0 ? (
-          <PostSkeleton />
-        ) : null
-      }
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
