@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
-import Post, { PostSkeleton } from '../../components/media/Post';
+import Post from '../../components/media/Post';
 import { useSignedInUserQuery } from '../../utils/hooks';
 import { constructPageData } from '../../xplat/queries';
 import {
