@@ -7,7 +7,11 @@ import {
   VStack,
   View,
   useColorModeValue,
+  Center,
+  Icon,
+  Text,
 } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import Post, { PostSkeleton } from '../../components/media/Post';
@@ -111,11 +115,25 @@ const HomeFeed = () => {
       );
   };
 
+  const renderEmptyList = () => {
+    return (
+      <Center w="full" mt="1/2">
+        <VStack>
+          <Center>
+            <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
+          </Center>
+          <Text fontSize="lg">No posts.</Text>
+        </VStack>
+      </Center>
+    );
+  };
+
   const allPostsFeed = (
     <FlatList
       bgColor={baseBgColor}
       ListHeaderComponent={header}
       data={allPosts}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
       ListFooterComponent={
@@ -137,6 +155,7 @@ const HomeFeed = () => {
       bgColor={baseBgColor}
       ListHeaderComponent={header}
       data={followingPosts}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
       ListFooterComponent={
