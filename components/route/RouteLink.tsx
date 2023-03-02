@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { Button } from 'native-base';
+import { useEffect, useState } from 'react';
 import { useArchivedSet } from '../../utils/queries';
 import { getRouteByName } from '../../xplat/api';
 
@@ -11,13 +12,20 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
   const navigation = useNavigation();
 
   const archivedRoutes = useArchivedSet();
+  const [targScreen, setTargScreen] = useState<
+    'SearchTab' | 'ActiveRoutesTab'
+  >();
+
+  useEffect(() => {
+    if (archivedRoutes.data !== undefined)
+      setTargScreen(
+        archivedRoutes.data.has(routeName) ? 'SearchTab' : 'ActiveRoutesTab'
+      );
+  }, [archivedRoutes.data, routeName]);
 
   const navigateToRoute = () => {
-    if (archivedRoutes.data === undefined) return;
-
-    const screen = archivedRoutes.data.has(routeName)
-      ? 'SearchTab'
-      : 'ActiveRoutesTab';
+    if (targScreen === undefined) return;
+    const screen = targScreen;
 
     getRouteByName(routeName).then((route) =>
       navigation.navigate('Tabs', {
@@ -27,6 +35,7 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
           params: {
             routeDocRefId: route.getId(),
           },
+          initial: false,
         },
       })
     );
@@ -36,7 +45,7 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
     <Button
       variant="link"
       onPress={navigateToRoute}
-      _text={{ fontSize: 'xs' }}
+      _text={{ fontSize: 'xs', numberOfLines: 1 }}
       p={noPadding ? '0' : '2'}
     >
       {routeName}

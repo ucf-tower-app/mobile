@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
@@ -7,10 +8,15 @@ import {
   VStack,
   View,
   useColorModeValue,
+  Center,
+  Icon,
+  Text,
+  Spinner,
 } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
-import Post, { PostSkeleton } from '../../components/media/Post';
+import Post from '../../components/media/Post';
 import { useSignedInUserQuery } from '../../utils/hooks';
 import { constructPageData } from '../../xplat/queries';
 import {
@@ -23,7 +29,8 @@ import { Post as PostObj } from '../../xplat/types';
 type activeFeed = 'none' | 'all' | 'following';
 
 const HomeFeed = () => {
-  // const signedInUser = useRecoilValue(userAtom);
+  const navigation = useNavigation();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
   const [feed, setFeed] = useState<activeFeed>(
@@ -105,10 +112,47 @@ const HomeFeed = () => {
             >
               Following
             </Button>
+            <Button
+              variant="outline"
+              rounded="full"
+              ml={3}
+              onPress={() =>
+                navigation.navigate('Tabs', {
+                  screen: 'HomeTab',
+                  params: {
+                    screen: 'CreatePost',
+                    params: {},
+                  },
+                })
+              }
+            >
+              Post
+            </Button>
           </HStack>
           <Divider mt={1} mb={1} orientation="horizontal" />
         </VStack>
       );
+  };
+
+  const renderEmptyList = () => {
+    if (allPostsIQ.isLoading || followingPostsIQ.isLoading) {
+      return (
+        <Center w="full" mt="1/2">
+          <Spinner size="lg" />
+        </Center>
+      );
+    } else {
+      return (
+        <Center w="full" mt="1/2">
+          <VStack>
+            <Center>
+              <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
+            </Center>
+            <Text fontSize="lg">No posts.</Text>
+          </VStack>
+        </Center>
+      );
+    }
   };
 
   const allPostsFeed = (
@@ -116,13 +160,9 @@ const HomeFeed = () => {
       bgColor={baseBgColor}
       ListHeaderComponent={header}
       data={allPosts}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={
-        allPostsIQ.hasNextPage || allPosts.length === 0 ? (
-          <PostSkeleton />
-        ) : null
-      }
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
@@ -137,13 +177,9 @@ const HomeFeed = () => {
       bgColor={baseBgColor}
       ListHeaderComponent={header}
       data={followingPosts}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={
-        followingPostsIQ.hasNextPage || followingPosts.length === 0 ? (
-          <PostSkeleton />
-        ) : null
-      }
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
