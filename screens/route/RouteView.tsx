@@ -51,14 +51,17 @@ const LoadingRouteView = () => {
     <Center w="full" h="full" bg={baseBgColor}>
       <VStack w="full" h="full" justifyItems={'center'}>
         <Skeleton h="30%" />
-        <Skeleton.Text mt={2} mb={2} />
-        <UserTagSkeleton />
+        <Skeleton.Text p={4} />
+        <HStack p={2}>
+          <UserTagSkeleton />
+        </HStack>
         <Center h="7%" mt={2} mb={2}>
-          <Skeleton w="60%" h="100%" rounded={30} />
+          <Skeleton w="90%" h="100%" rounded={30} />
         </Center>
         <Center h="7%" mb={2}>
-          <Skeleton w="60%" h="100%" rounded={30} />
+          <Skeleton w="90%" h="100%" rounded={30} />
         </Center>
+        <Skeleton.Text h={'2%'} pr={'30%'} pl={'30%'} />
         <PostSkeleton />
       </VStack>
     </Center>
@@ -66,7 +69,7 @@ const LoadingRouteView = () => {
 };
 
 const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
-  const isEarly = useEarlyLoad(20000);
+  const isEarly = useEarlyLoad(100);
   const routeDocRefId = route.params.routeDocRefId;
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
