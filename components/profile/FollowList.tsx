@@ -1,28 +1,48 @@
 import { Divider, FlatList, Text, useColorModeValue } from 'native-base';
 import { useEffect, useState } from 'react';
+import { useUserCacheMap } from '../../utils/queries';
 import { FetchedUser, User } from '../../xplat/types';
-import UserTag from './UserTag';
+import UserRow from './UserRow';
 
-/**
- * Similar to a feed of posts. This displays a list of users for a Follow
- * list and is loaded with a stride of 5. Clicking a user will navigate
- * to the user's profile.
- */
 type Props = {
-  userTab: 'followers' | 'following';
+  searchQuery: string;
+  userTab: 'followers' | 'following' | 'both';
   fetchedUser: FetchedUser;
-  getTopComponent?: () => JSX.Element;
+  header?: JSX.Element;
 };
-const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
+const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
   const [users, setUsers] = useState<User[]>([]);
+  const userCache = useUserCacheMap();
 
   useEffect(() => {
+    let newUsers: User[] = [];
     if (userTab === 'followers') {
-      setUsers(fetchedUser.followersList);
+      newUsers = [...fetchedUser.followersList];
+    } else if (userTab === 'following') {
+      newUsers = [...fetchedUser.followingList];
     } else {
-      setUsers(fetchedUser.followingList);
+      newUsers = [...fetchedUser.followersList];
+      const ids = new Set<string>(newUsers.map((user) => user.getId()));
+      fetchedUser.followingList.forEach((user) => {
+        if (!ids.has(user.getId())) newUsers.push(user);
+      });
     }
-  }, [fetchedUser.followersList, fetchedUser.followingList, userTab]);
+    if (searchQuery === '' || userCache.data === undefined) setUsers(newUsers);
+    else
+      setUsers(
+        newUsers.filter((user) => {
+          const entry = userCache.data.get(user.getId());
+          if (entry === undefined) return false;
+          return entry.username.includes(searchQuery);
+        })
+      );
+  }, [
+    fetchedUser.followersList,
+    fetchedUser.followingList,
+    searchQuery,
+    userCache.data,
+    userTab,
+  ]);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -33,9 +53,9 @@ const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
     <FlatList
       bg={baseBgColor}
       data={users}
-      ListHeaderComponent={getTopComponent}
+      ListHeaderComponent={header}
       ItemSeparatorComponent={renderDivider}
-      renderItem={({ item }) => <UserTag userDocRefId={item.getId()} />}
+      renderItem={({ item }) => <UserRow userDocRefId={item.getId()} />}
       keyExtractor={(item) => item.getId()}
       ListEmptyComponent={renderEmptyComponent}
     />

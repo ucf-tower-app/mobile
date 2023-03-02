@@ -1,52 +1,45 @@
-import { useNavigation } from '@react-navigation/native';
-import { Box, HStack, Pressable, useColorModeValue } from 'native-base';
-import { useRecoilValue } from 'recoil';
-import { userAtom } from '../../utils/atoms';
-import { navigateToUserProfile } from '../../utils/nav';
-import { TabGlobalNavigationProp } from '../../utils/types';
-import { User } from '../../xplat/types/user';
-import Tintable from '../util/Tintable';
+import { Box, HStack, Text, VStack, useColorModeValue } from 'native-base';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import UserTag from './UserTag';
 
 type Props = {
-  user: User | undefined;
-  endComponent?: JSX.Element;
+  userDocRefId: string;
 };
-const UserRow = ({ user, endComponent }: Props) => {
-  const navigation = useNavigation<TabGlobalNavigationProp>();
-
-  const signedInUser = useRecoilValue(userAtom);
-
-  const tryNavigate = () => {
-    const [signedInUserId, targetProfileUserId] = [
-      signedInUser?.docRef!.id,
-      user?.docRef!.id,
-    ];
-
-    if (targetProfileUserId === undefined || signedInUserId === undefined)
-      return;
-
-    navigateToUserProfile(signedInUserId, targetProfileUserId, navigation);
-  };
+const UserRow = ({ userDocRefId }: Props) => {
+  const userQuery = useSignedInUserQuery();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
-  if (user === undefined) return null;
-
   return (
-    <Pressable onPress={tryNavigate}>
-      {({ isHovered, isPressed }) => {
-        return (
-          <Box bg={baseBgColor}>
-            <Tintable tinted={isHovered || isPressed} />
-            <HStack alignItems="center" justifyContent="space-between">
-              <UserTag userDocRefId={user.getId()} size="lg" />
-              {endComponent}
-            </HStack>
-          </Box>
-        );
-      }}
-    </Pressable>
+    <HStack
+      alignItems="center"
+      justifyContent={'space-between'}
+      bg={baseBgColor}
+    >
+      <Box ml={2} minWidth={'60%'}>
+        <UserTag userDocRefId={userDocRefId} size="lg" />
+      </Box>
+      {userQuery.data !== undefined && (
+        <VStack justifyItems={'center'}>
+          <Text>
+            {userQuery.data.followersList.some(
+              (user) => user.getId() === userDocRefId
+            )
+              ? 'Follows You'
+              : ' '}
+          </Text>
+          <Text>
+            {userQuery.data.followingList.some(
+              (user) => user.getId() === userDocRefId
+            )
+              ? 'Following'
+              : ' '}
+          </Text>
+        </VStack>
+      )}
+
+      <VStack />
+    </HStack>
   );
 };
 

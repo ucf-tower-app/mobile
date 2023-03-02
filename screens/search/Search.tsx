@@ -6,9 +6,9 @@ import {
   HStack,
   ScrollView,
   Spinner,
-  useColorModeValue,
-  VStack,
   Text,
+  VStack,
+  useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import UserRow from '../../components/profile/UserRow';
@@ -106,7 +106,7 @@ const Search = () => {
       ? userSearchResults.map((userSearchResult) => {
           return (
             <Box key={userSearchResult.user.getId()}>
-              <UserRow user={userSearchResult.user} />
+              <UserRow userDocRefId={userSearchResult.user.getId()} />
               <Divider my="3" />
             </Box>
           );
