@@ -9,8 +9,9 @@ import {
   Flex,
   Heading,
   HStack,
-  Spinner,
+  Skeleton,
   Text,
+  useColorModeValue,
   useToast,
   useToken,
   VStack,
@@ -21,13 +22,14 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
 import Feed from '../../components/media/Feed';
+import { PostSkeleton } from '../../components/media/Post';
 import Timestamp from '../../components/media/Timestamp';
 import LikeButton from '../../components/misc/LikeButton';
-import UserTag from '../../components/profile/UserTag';
+import UserTag, { UserTagSkeleton } from '../../components/profile/UserTag';
 import RatingModal from '../../components/route/RatingModal';
 import SendShareModal from '../../components/route/SendShareModal';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
-import { useGenericErrorToast } from '../../utils/hooks';
+import { useEarlyLoad, useGenericErrorToast } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import {
   TabGlobalNavigationProp,
@@ -42,7 +44,32 @@ import { FetchedSend, Route, RouteStatus } from '../../xplat/types';
 
 const FORCED_THUMBNAIL_HEIGHT = 200;
 
+const LoadingRouteView = () => {
+  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+
+  return (
+    <Center w="full" h="full" bg={baseBgColor}>
+      <VStack w="full" h="full" justifyItems={'center'}>
+        <Skeleton h="30%" />
+        <Skeleton.Text p={4} />
+        <HStack p={2}>
+          <UserTagSkeleton />
+        </HStack>
+        <Center h="7%" mt={2} mb={2}>
+          <Skeleton w="90%" h="100%" rounded={30} />
+        </Center>
+        <Center h="7%" mb={2}>
+          <Skeleton w="90%" h="100%" rounded={30} />
+        </Center>
+        <Skeleton.Text h={'2%'} pr={'30%'} pl={'30%'} />
+        <PostSkeleton />
+      </VStack>
+    </Center>
+  );
+};
+
 const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
+  const isEarly = useEarlyLoad(100);
   const routeDocRefId = route.params.routeDocRefId;
 
   const navigation = useNavigation<TabGlobalNavigationProp>();
@@ -78,12 +105,8 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     });
   }, [data, user]);
 
-  if (isLoading) {
-    return (
-      <Center>
-        <Spinner size="lg" />
-      </Center>
-    );
+  if (isLoading || isEarly) {
+    return <LoadingRouteView />;
   }
 
   if (isError || data === undefined) {
