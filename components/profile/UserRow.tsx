@@ -21,12 +21,20 @@ const UserRow = ({ userDocRefId }: Props) => {
       </Box>
       {userQuery.data !== undefined && (
         <VStack justifyItems={'center'}>
-          {userQuery.data.followersList.some(
-            (user) => user.getId() === userDocRefId
-          ) && <Text>Follows You</Text>}
-          {userQuery.data.followingList.some(
-            (user) => user.getId() === userDocRefId
-          ) && <Text>Following</Text>}
+          <Text>
+            {userQuery.data.followersList.some(
+              (user) => user.getId() === userDocRefId
+            )
+              ? 'Follows You'
+              : ' '}
+          </Text>
+          <Text>
+            {userQuery.data.followingList.some(
+              (user) => user.getId() === userDocRefId
+            )
+              ? 'Following'
+              : ' '}
+          </Text>
         </VStack>
       )}
 
