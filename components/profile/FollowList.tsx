@@ -1,20 +1,7 @@
 import { Divider, FlatList, Text, useColorModeValue } from 'native-base';
 import { useEffect, useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
 import { FetchedUser, User } from '../../xplat/types';
 import UserTag from './UserTag';
-
-const isCloseToBottom = ({
-  layoutMeasurement,
-  contentOffset,
-  contentSize,
-}: NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
-};
 
 /**
  * Similar to a feed of posts. This displays a list of users for a Follow
@@ -35,7 +22,7 @@ const FollowList = ({ userTab, fetchedUser, getTopComponent }: Props) => {
     } else {
       setUsers(fetchedUser.followingList);
     }
-  }, [userTab]);
+  }, [fetchedUser.followersList, fetchedUser.followingList, userTab]);
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 

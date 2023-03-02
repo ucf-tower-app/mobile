@@ -1,96 +1,168 @@
+import { useNavigation } from '@react-navigation/native';
 import {
-  Button,
   Box,
+  Button,
   Divider,
   FlatList,
+  HStack,
   VStack,
+  View,
   useColorModeValue,
+  Center,
+  Icon,
+  Text,
+  Spinner,
 } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useRecoilValue } from 'recoil';
-import Post, { PostSkeleton } from '../../components/media/Post';
-import { userAtom } from '../../utils/atoms';
-import { getQueryCursor } from '../../xplat/queries/feed';
-import { PostCursorMerger, Post as PostObj } from '../../xplat/types';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { useInfiniteQuery } from 'react-query';
+import Post from '../../components/media/Post';
+import { useSignedInUserQuery } from '../../utils/hooks';
+import { constructPageData } from '../../xplat/queries';
+import {
+  extractNext,
+  getIQParams_AllPosts,
+  getInitialPageParam,
+} from '../../xplat/queries/feed';
+import { Post as PostObj } from '../../xplat/types';
 
-const STRIDE = 2;
-const INITIAL_STRIDE = 5;
+type activeFeed = 'none' | 'all' | 'following';
 
 const HomeFeed = () => {
-  const signedInUser = useRecoilValue(userAtom);
+  const navigation = useNavigation();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-  const userQuery = useQuery(
-    signedInUser !== undefined ? signedInUser.getId() : 'nullQuery',
-    signedInUser === undefined ? () => undefined : signedInUser.buildFetcher(),
-    { enabled: signedInUser !== undefined }
+  const userQuery = useSignedInUserQuery();
+  const [feed, setFeed] = useState<activeFeed>(
+    process.env.NODE_ENV === 'development' ? 'none' : 'all'
   );
-  const [enabled, setEnabled] = useState<boolean>(
-    process.env.NODE_ENV !== 'development'
-  );
-  const [cursor, setCursor] = useState<PostCursorMerger>();
-  const [exhausted, setExhausted] = useState<boolean>(false);
-  const [posts, setPosts] = useState<PostObj[]>([]);
+  const allPostsIQ = useInfiniteQuery({
+    ...getIQParams_AllPosts(),
+    enabled: feed === 'all',
+  });
+  const followingPostsIQ = useInfiniteQuery({
+    queryKey:
+      userQuery.data !== undefined
+        ? ['follow-posts', userQuery.data.docRefId]
+        : ['nullQuery'],
+    queryFn: async ({ pageParam }) => {
+      if (pageParam === undefined)
+        pageParam = await getInitialPageParam(userQuery.data);
+      return extractNext(pageParam);
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.hasMoreData) return lastPage.param;
+      else return undefined;
+    },
+    enabled: feed === 'following',
+  });
+  const [allPosts, setAllPosts] = useState<PostObj[]>([]);
+  const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
 
   useEffect(() => {
-    if (enabled && signedInUser !== undefined && userQuery.data !== undefined) {
-      const newCursor = getQueryCursor(userQuery.data.followingList);
-      setCursor(newCursor);
-      setPosts([]);
-      setExhausted(false);
+    if (feed === 'all') {
+      if (allPostsIQ.data !== undefined) {
+        setAllPosts(
+          allPostsIQ.data.pages.flatMap((page) =>
+            constructPageData(PostObj, page)
+          )
+        );
+      } else setAllPosts([]);
+    } else if (feed === 'following') {
+      if (followingPostsIQ.data !== undefined) {
+        setFollowingPosts(
+          followingPostsIQ.data.pages.flatMap((page) => page.result)
+        );
+      } else setFollowingPosts([]);
     }
-  }, [enabled, signedInUser, userQuery.data]);
+  }, [allPostsIQ.data, feed, followingPostsIQ.data]);
 
-  const getNextPosts = useCallback(async () => {
-    if (cursor === undefined) {
-      setExhausted(true);
-      return;
+  const getNextPosts = () => {
+    if (feed === 'all') {
+      if (allPostsIQ.hasNextPage) allPostsIQ.fetchNextPage();
+    } else if (feed === 'following') {
+      if (followingPostsIQ.hasNextPage) followingPostsIQ.fetchNextPage();
     }
-    if (exhausted) return;
-
-    const newPosts = [];
-    const stride = posts.length === 0 ? INITIAL_STRIDE : STRIDE;
-    while (newPosts.length < stride && (await cursor.hasNext())) {
-      newPosts.push(await cursor.pollNext());
-    }
-    const hasNext = await cursor.hasNext();
-    setExhausted(!hasNext);
-    setPosts([...posts, ...newPosts]);
-  }, [cursor, exhausted, posts]);
-
-  useEffect(() => {
-    if (cursor) getNextPosts();
-  }, [cursor, getNextPosts]);
-
-  const header = () => (
-    <Box>
-      {enabled ? null : (
-        <Button onPress={() => setEnabled(true)}>Enable</Button>
-      )}
-    </Box>
-  );
-
-  const renderSpinner = () => {
-    if (!exhausted)
-      return (
-        <VStack>
-          <PostSkeleton />
-          <PostSkeleton />
-          <PostSkeleton />
-        </VStack>
-      );
-    else return null;
   };
 
-  return (
+  const header = () => {
+    if (feed === 'none')
+      return (
+        <Box>
+          <Button onPress={() => setFeed('following')}>Enable</Button>
+        </Box>
+      );
+    else
+      return (
+        <VStack>
+          <View mt={1} />
+          <HStack w="full" alignContent={'center'} justifyContent={'center'}>
+            <Button
+              variant={feed === 'all' ? 'solid' : 'outline'}
+              rounded="full"
+              onPress={() => setFeed('all')}
+            >
+              Anyone
+            </Button>
+            <Button
+              variant={feed === 'following' ? 'solid' : 'outline'}
+              rounded="full"
+              ml={3}
+              onPress={() => setFeed('following')}
+            >
+              Following
+            </Button>
+            <Button
+              variant="outline"
+              rounded="full"
+              ml={3}
+              onPress={() =>
+                navigation.navigate('Tabs', {
+                  screen: 'HomeTab',
+                  params: {
+                    screen: 'CreatePost',
+                    params: {},
+                  },
+                })
+              }
+            >
+              Post
+            </Button>
+          </HStack>
+          <Divider mt={1} mb={1} orientation="horizontal" />
+        </VStack>
+      );
+  };
+
+  const renderEmptyList = () => {
+    if (allPostsIQ.isLoading || followingPostsIQ.isLoading) {
+      return (
+        <Center w="full" mt="1/2">
+          <Spinner size="lg" />
+        </Center>
+      );
+    } else {
+      return (
+        <Center w="full" mt="1/2">
+          <VStack>
+            <Center>
+              <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
+            </Center>
+            <Text fontSize="lg">No posts.</Text>
+          </VStack>
+        </Center>
+      );
+    }
+  };
+
+  const allPostsFeed = (
     <FlatList
       bgColor={baseBgColor}
       ListHeaderComponent={header}
-      data={posts}
-      extraData={cursor}
+      data={allPosts}
+      ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      ListFooterComponent={renderSpinner}
       renderItem={({ item }) => (
         <Box my={2}>
           <Post post={item} />
@@ -99,6 +171,29 @@ const HomeFeed = () => {
       keyExtractor={(item) => item.getId()}
     />
   );
+
+  const followingPostsFeed = (
+    <FlatList
+      bgColor={baseBgColor}
+      ListHeaderComponent={header}
+      data={followingPosts}
+      ListEmptyComponent={renderEmptyList}
+      onEndReached={getNextPosts}
+      ItemSeparatorComponent={Divider}
+      renderItem={({ item }) => (
+        <Box my={2}>
+          <Post post={item} />
+        </Box>
+      )}
+      keyExtractor={(item) => item.getId()}
+    />
+  );
+
+  return feed === 'none'
+    ? header()
+    : feed === 'all'
+    ? allPostsFeed
+    : followingPostsFeed;
 };
 
 export default HomeFeed;

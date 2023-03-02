@@ -36,7 +36,7 @@ export const PostSkeleton = () => {
       <Box pl={2}>
         <UserTagSkeleton />
       </Box>
-      <Skeleton.Text p={2} lines={2} />
+      <Skeleton.Text p={2} w="95%" lines={2} />
       <Skeleton w="full" pt={2} h={40} />
     </VStack>
   );
@@ -167,7 +167,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   if (postData.isSend) {
     return (
       <HStack w="full" justifyItems="center" bg={baseBgColor} px={1.5}>
-        <Box pl={1.5} width="35%">
+        <Box pl={1.5} width="42%" justifyItems={'center'}>
           <UserTag
             userDocRefId={postData.author.getId()}
             mini
@@ -181,9 +181,9 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           size="lg"
         />
         {postData.routeInfo !== undefined && (
-          <Text numberOfLines={1} width="40%" pl={1}>
-            {postData.routeInfo.name}
-          </Text> // TODO: Make this a link
+          <Box width="33%" pl={1}>
+            <RouteLink noPadding routeName={postData.routeInfo.name} />
+          </Box>
         )}
         <Box width="10%">
           <Timestamp mini relative date={postData.timestamp} />
