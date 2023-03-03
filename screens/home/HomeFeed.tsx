@@ -117,22 +117,22 @@ const HomeFeed = () => {
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
 
   useEffect(() => {
-    if (activeFeed === 'all') {
-      if (allPostsIQ.data !== undefined) {
-        setAllPosts(
-          allPostsIQ.data.pages.flatMap((page) =>
-            constructPageData(PostObj, page)
-          )
-        );
-      } else setAllPosts([]);
-    } else if (activeFeed === 'following') {
-      if (followingPostsIQ.data !== undefined) {
-        setFollowingPosts(
-          followingPostsIQ.data.pages.flatMap((page) => page.result)
-        );
-      } else setFollowingPosts([]);
-    }
-  }, [allPostsIQ.data, activeFeed, followingPostsIQ.data]);
+    if (allPostsIQ.data !== undefined)
+      setAllPosts(
+        allPostsIQ.data.pages.flatMap((page) =>
+          constructPageData(PostObj, page)
+        )
+      );
+    else setAllPosts([]);
+  }, [allPostsIQ.data]);
+
+  useEffect(() => {
+    if (followingPostsIQ.data !== undefined)
+      setFollowingPosts(
+        followingPostsIQ.data.pages.flatMap((page) => page.result)
+      );
+    else setFollowingPosts([]);
+  }, [followingPostsIQ.data]);
 
   const getNextPosts = () => {
     if (activeFeed === 'all') {
@@ -176,6 +176,7 @@ const HomeFeed = () => {
       ListHeaderComponent={
         <Header activeFeed={activeFeed} setActiveFeed={setActiveFeed} />
       }
+      initialNumToRender={1}
       data={activeFeed === 'all' ? allPosts : followingPosts}
       ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
