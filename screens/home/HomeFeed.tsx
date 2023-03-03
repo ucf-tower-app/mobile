@@ -83,6 +83,30 @@ const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
   );
 };
 
+type EmptyListProps = {
+  isLoading: boolean;
+};
+const EmptyList = ({ isLoading }: EmptyListProps) => {
+  if (isLoading) {
+    return (
+      <Center w="full" mt="1/2">
+        <Spinner size="lg" />
+      </Center>
+    );
+  } else {
+    return (
+      <Center w="full" mt="1/2">
+        <VStack>
+          <Center>
+            <Icon as={Ionicons} name="home-sharp" size="6xl" />
+          </Center>
+          <Text fontSize="lg">No posts.</Text>
+        </VStack>
+      </Center>
+    );
+  }
+};
+
 const HomeFeed = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
@@ -142,27 +166,6 @@ const HomeFeed = () => {
     }
   };
 
-  const renderEmptyList = () => {
-    if (allPostsIQ.isLoading || followingPostsIQ.isLoading) {
-      return (
-        <Center w="full" mt="1/2">
-          <Spinner size="lg" />
-        </Center>
-      );
-    } else {
-      return (
-        <Center w="full" mt="1/2">
-          <VStack>
-            <Center>
-              <Icon as={<Ionicons name="home-sharp" />} size="6xl" />
-            </Center>
-            <Text fontSize="lg">No posts.</Text>
-          </VStack>
-        </Center>
-      );
-    }
-  };
-
   if (activeFeed === 'none')
     return (
       <Box>
@@ -178,7 +181,15 @@ const HomeFeed = () => {
       }
       initialNumToRender={1}
       data={activeFeed === 'all' ? allPosts : followingPosts}
-      ListEmptyComponent={renderEmptyList}
+      ListEmptyComponent={
+        <EmptyList
+          isLoading={
+            activeFeed === 'all'
+              ? allPostsIQ.isLoading
+              : followingPostsIQ.isLoading
+          }
+        />
+      }
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
       renderItem={({ item }) => (
