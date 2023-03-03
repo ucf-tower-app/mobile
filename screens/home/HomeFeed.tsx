@@ -26,20 +26,76 @@ import {
 } from '../../xplat/queries/feed';
 import { Post as PostObj } from '../../xplat/types';
 
-type activeFeed = 'none' | 'all' | 'following';
+type ActiveFeed = 'none' | 'all' | 'following';
 
-const HomeFeed = () => {
+type HeaderProps = {
+  activeFeed: ActiveFeed;
+  setActiveFeed: (newActiveFeed: ActiveFeed) => void;
+};
+const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
   const navigation = useNavigation();
 
+  if (activeFeed === 'none')
+    return (
+      <Box>
+        <Button onPress={() => setActiveFeed('following')}>Enable</Button>
+      </Box>
+    );
+
+  return (
+    <VStack>
+      <View mt={1} />
+      <HStack w="full" alignContent={'center'} justifyContent={'center'}>
+        <Button
+          variant={activeFeed === 'all' ? 'solid' : 'outline'}
+          rounded="full"
+          onPress={() => setActiveFeed('all')}
+        >
+          Anyone
+        </Button>
+        <Button
+          variant={activeFeed === 'following' ? 'solid' : 'outline'}
+          rounded="full"
+          ml={3}
+          onPress={() => setActiveFeed('following')}
+        >
+          Following
+        </Button>
+        <Button
+          variant="outline"
+          rounded="full"
+          ml={3}
+          onPress={() =>
+            navigation.navigate('Tabs', {
+              screen: 'HomeTab',
+              params: {
+                screen: 'CreatePost',
+                params: {},
+              },
+            })
+          }
+        >
+          Post
+        </Button>
+      </HStack>
+      <Divider mt={1} mb={1} orientation="horizontal" />
+    </VStack>
+  );
+};
+
+const HomeFeed = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
-  const [feed, setFeed] = useState<activeFeed>(
+
+  const [activeFeed, setActiveFeed] = useState<ActiveFeed>(
     process.env.NODE_ENV === 'development' ? 'none' : 'all'
   );
+
   const allPostsIQ = useInfiniteQuery({
     ...getIQParams_AllPosts(),
-    enabled: feed === 'all',
+    enabled: activeFeed === 'all',
   });
+
   const followingPostsIQ = useInfiniteQuery({
     queryKey:
       userQuery.data !== undefined
@@ -54,13 +110,14 @@ const HomeFeed = () => {
       if (lastPage.hasMoreData) return lastPage.param;
       else return undefined;
     },
-    enabled: feed === 'following',
+    enabled: activeFeed === 'following',
   });
+
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
 
   useEffect(() => {
-    if (feed === 'all') {
+    if (activeFeed === 'all') {
       if (allPostsIQ.data !== undefined) {
         setAllPosts(
           allPostsIQ.data.pages.flatMap((page) =>
@@ -68,70 +125,21 @@ const HomeFeed = () => {
           )
         );
       } else setAllPosts([]);
-    } else if (feed === 'following') {
+    } else if (activeFeed === 'following') {
       if (followingPostsIQ.data !== undefined) {
         setFollowingPosts(
           followingPostsIQ.data.pages.flatMap((page) => page.result)
         );
       } else setFollowingPosts([]);
     }
-  }, [allPostsIQ.data, feed, followingPostsIQ.data]);
+  }, [allPostsIQ.data, activeFeed, followingPostsIQ.data]);
 
   const getNextPosts = () => {
-    if (feed === 'all') {
+    if (activeFeed === 'all') {
       if (allPostsIQ.hasNextPage) allPostsIQ.fetchNextPage();
-    } else if (feed === 'following') {
+    } else if (activeFeed === 'following') {
       if (followingPostsIQ.hasNextPage) followingPostsIQ.fetchNextPage();
     }
-  };
-
-  const header = () => {
-    if (feed === 'none')
-      return (
-        <Box>
-          <Button onPress={() => setFeed('following')}>Enable</Button>
-        </Box>
-      );
-    else
-      return (
-        <VStack>
-          <View mt={1} />
-          <HStack w="full" alignContent={'center'} justifyContent={'center'}>
-            <Button
-              variant={feed === 'all' ? 'solid' : 'outline'}
-              rounded="full"
-              onPress={() => setFeed('all')}
-            >
-              Anyone
-            </Button>
-            <Button
-              variant={feed === 'following' ? 'solid' : 'outline'}
-              rounded="full"
-              ml={3}
-              onPress={() => setFeed('following')}
-            >
-              Following
-            </Button>
-            <Button
-              variant="outline"
-              rounded="full"
-              ml={3}
-              onPress={() =>
-                navigation.navigate('Tabs', {
-                  screen: 'HomeTab',
-                  params: {
-                    screen: 'CreatePost',
-                    params: {},
-                  },
-                })
-              }
-            >
-              Post
-            </Button>
-          </HStack>
-          <Divider mt={1} mb={1} orientation="horizontal" />
-        </VStack>
-      );
   };
 
   const renderEmptyList = () => {
@@ -155,11 +163,20 @@ const HomeFeed = () => {
     }
   };
 
-  const allPostsFeed = (
+  if (activeFeed === 'none')
+    return (
+      <Box>
+        <Button onPress={() => setActiveFeed('following')}>Enable</Button>
+      </Box>
+    );
+
+  return (
     <FlatList
       bgColor={baseBgColor}
-      ListHeaderComponent={header}
-      data={allPosts}
+      ListHeaderComponent={
+        <Header activeFeed={activeFeed} setActiveFeed={setActiveFeed} />
+      }
+      data={activeFeed === 'all' ? allPosts : followingPosts}
       ListEmptyComponent={renderEmptyList}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
@@ -171,29 +188,6 @@ const HomeFeed = () => {
       keyExtractor={(item) => item.getId()}
     />
   );
-
-  const followingPostsFeed = (
-    <FlatList
-      bgColor={baseBgColor}
-      ListHeaderComponent={header}
-      data={followingPosts}
-      ListEmptyComponent={renderEmptyList}
-      onEndReached={getNextPosts}
-      ItemSeparatorComponent={Divider}
-      renderItem={({ item }) => (
-        <Box my={2}>
-          <Post post={item} />
-        </Box>
-      )}
-      keyExtractor={(item) => item.getId()}
-    />
-  );
-
-  return feed === 'none'
-    ? header()
-    : feed === 'all'
-    ? allPostsFeed
-    : followingPostsFeed;
 };
 
 export default HomeFeed;
