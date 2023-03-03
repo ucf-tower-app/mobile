@@ -107,6 +107,17 @@ const EmptyList = ({ isLoading }: EmptyListProps) => {
   }
 };
 
+type ItemProps = {
+  item: PostObj;
+};
+const Item = ({ item }: ItemProps) => {
+  return (
+    <Box my={2}>
+      <Post post={item} />
+    </Box>
+  );
+};
+
 const HomeFeed = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
@@ -192,11 +203,7 @@ const HomeFeed = () => {
       }
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
-      renderItem={({ item }) => (
-        <Box my={2}>
-          <Post post={item} />
-        </Box>
-      )}
+      renderItem={Item}
       keyExtractor={(item) => item.getId()}
     />
   );
