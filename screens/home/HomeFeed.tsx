@@ -125,6 +125,8 @@ const HomeFeed = () => {
   const [activeFeed, setActiveFeed] = useState<ActiveFeed>(
     process.env.NODE_ENV === 'development' ? 'none' : 'all'
   );
+  const [justSwitchedActiveFeed, setJustSwitchedActiveFeed] =
+    useState<boolean>(false);
 
   const allPostsIQ = useInfiniteQuery({
     ...getIQParams_AllPosts(),
@@ -169,13 +171,14 @@ const HomeFeed = () => {
     else setFollowingPosts([]);
   }, [followingPostsIQ.data]);
 
-  const getNextPosts = () => {
-    if (activeFeed === 'all') {
-      if (allPostsIQ.hasNextPage) allPostsIQ.fetchNextPage();
-    } else if (activeFeed === 'following') {
-      if (followingPostsIQ.hasNextPage) followingPostsIQ.fetchNextPage();
+  // Keep track of if we've *just* switched the feed, so that we can intercept the render to show
+  // a loading symbol while loading
+  useEffect(() => {
+    if (justSwitchedActiveFeed) {
+      const timeout = setTimeout(() => setJustSwitchedActiveFeed(false), 80);
+      return () => clearTimeout(timeout);
     }
-  };
+  }, [justSwitchedActiveFeed]);
 
   if (activeFeed === 'none')
     return (
@@ -184,11 +187,33 @@ const HomeFeed = () => {
       </Box>
     );
 
+  if (justSwitchedActiveFeed)
+    return (
+      <VStack>
+        <Header activeFeed={activeFeed} setActiveFeed={setActiveFeed} />
+        <EmptyList isLoading={true} />
+      </VStack>
+    );
+
+  const getNextPosts = () => {
+    if (activeFeed === 'all') {
+      if (allPostsIQ.hasNextPage) allPostsIQ.fetchNextPage();
+    } else if (activeFeed === 'following') {
+      if (followingPostsIQ.hasNextPage) followingPostsIQ.fetchNextPage();
+    }
+  };
+
   return (
     <FlatList
       bgColor={baseBgColor}
       ListHeaderComponent={
-        <Header activeFeed={activeFeed} setActiveFeed={setActiveFeed} />
+        <Header
+          activeFeed={activeFeed}
+          setActiveFeed={(_activeFeed: ActiveFeed) => {
+            setActiveFeed(_activeFeed);
+            setJustSwitchedActiveFeed(true);
+          }}
+        />
       }
       initialNumToRender={1}
       data={activeFeed === 'all' ? allPosts : followingPosts}
