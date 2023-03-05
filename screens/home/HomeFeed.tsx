@@ -215,7 +215,6 @@ const HomeFeed = () => {
           }}
         />
       }
-      initialNumToRender={1}
       data={activeFeed === 'all' ? allPosts : followingPosts}
       ListEmptyComponent={
         <EmptyList
