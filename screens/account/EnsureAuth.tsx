@@ -24,7 +24,7 @@ const Loading = () => (
       w="full"
       h="full"
       resizeMode={ResizeMode.CONTAIN}
-      source={require('../../assets/tower_logo.jpeg')}
+      source={require('../../assets/tower_logo.png')}
       alt="Logo"
     />
   </Center>
