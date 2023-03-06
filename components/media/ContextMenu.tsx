@@ -1,4 +1,4 @@
-import { Menu } from 'native-base';
+import { Menu, Box } from 'native-base';
 import { PressableDots } from '../header/HeaderMenu';
 
 export type ContextOptions = {
@@ -9,17 +9,15 @@ type Props = {
 };
 const ContextMenu = ({ contextOptions }: Props) => {
   return Object.keys(contextOptions).length > 0 ? (
-    <Menu
-      trigger={(triggerProps) => {
-        return PressableDots(triggerProps);
-      }}
-    >
-      {Object.keys(contextOptions).map((key) => (
-        <Menu.Item key={key} onPress={contextOptions[key]}>
-          {key}
-        </Menu.Item>
-      ))}
-    </Menu>
+    <Box h={0} minH="100%">
+      <Menu trigger={PressableDots}>
+        {Object.keys(contextOptions).map((key) => (
+          <Menu.Item key={key} onPress={contextOptions[key]}>
+            {key}
+          </Menu.Item>
+        ))}
+      </Menu>
+    </Box>
   ) : null;
 };
 
