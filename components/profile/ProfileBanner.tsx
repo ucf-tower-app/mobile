@@ -14,6 +14,7 @@ const ProfileBanner = ({ fetchedUser }: Props) => {
         bg="gray.300"
         size="2xl"
         mb={3}
+        borderWidth={2}
       />
       <Heading fontSize="3xl" mb={1}>
         {fetchedUser.displayName}
