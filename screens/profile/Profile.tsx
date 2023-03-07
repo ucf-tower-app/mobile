@@ -202,11 +202,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
                       return (
                         <Box>
                           <Tintable tinted={isHovered || isPressed} rounded />
-                          <Icon
-                            as={<Ionicons name="md-people" />}
-                            size="lg"
-                            color="black"
-                          />
+                          <Icon as={<Ionicons name="md-people" />} size="lg" />
                         </Box>
                       );
                     }}

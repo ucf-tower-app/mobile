@@ -89,7 +89,11 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
 
   // Start as true so that the send button is disabled until the route is loaded
 
-  const backgroundHex = useToken('colors', 'lightMode.base');
+  const backgroundColorKey = useColorModeValue(
+    'lightMode.base',
+    'darkMode.base'
+  );
+  const backgroundColorHex = useToken('colors', backgroundColorKey);
 
   const { isLoading, isError, data, error } = useQuery(
     routeDocRefId,
@@ -179,7 +183,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const routeViewComponent = () => (
-    <Box w="full" bg={backgroundHex}>
+    <Box w="full" bg={backgroundColorHex}>
       <ImageBackground
         style={styles.thumbnail}
         resizeMode={ResizeMode.COVER}
@@ -187,9 +191,15 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
       >
         <LinearGradient
           style={styles.gradient}
-          colors={[backgroundHex + '00', backgroundHex]}
+          colors={[backgroundColorHex + '00', backgroundColorHex]}
         />
-        <Flex direction="column" h="full" w="full" bg={backgroundHex} pb="0">
+        <Flex
+          direction="column"
+          h="full"
+          w="full"
+          bg={backgroundColorHex}
+          pb="0"
+        >
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4}>
             <Heading size="2xl">{data.name}</Heading>
             <Heading size="2xl" color="grey">

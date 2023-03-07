@@ -1,6 +1,7 @@
 // Route metadata for the profile tab
 import { View } from 'react-native';
 import EnsureAuth from '../../../screens/account/EnsureAuth';
+import Settings from '../../../screens/settings/Settings';
 import { Name } from './names';
 
 export type Route = {
@@ -15,7 +16,7 @@ export const routes: Route[] = [
   },
   {
     name: 'Settings',
-    component: View,
+    component: Settings,
   },
   {
     name: 'LostAndFound',

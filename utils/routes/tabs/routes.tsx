@@ -18,10 +18,6 @@ export type Route = {
   stack: any;
 };
 
-const headerRightButton = (navigation: any) => {
-  return <HeaderMenu navigate={navigation.navigate} />;
-};
-
 // Builds a navigator stack for a given tab
 const buildStack = (tabName: TabName, Stack: any) => {
   const routeData = tabNameToRouteData[tabName];
@@ -29,9 +25,9 @@ const buildStack = (tabName: TabName, Stack: any) => {
     return (
       <Stack.Navigator
         initialRouteName={routeData.initialRouteName}
-        screenOptions={({ navigation }: { navigation: any }) => ({
-          headerRight: () => headerRightButton(navigation),
-        })}
+        screenOptions={{
+          headerRight: HeaderMenu,
+        }}
       >
         {routeData.routes.map((route) => (
           <Stack.Screen
