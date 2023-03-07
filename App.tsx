@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { extendTheme, NativeBaseProvider } from 'native-base';
@@ -11,20 +11,28 @@ import AuthProvider from './components/util/AuthProvider';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 import { routes as rootStackRoutes } from './utils/routes/root/routes';
 
-export const theme = extendTheme({
+export const nativeBaseTheme = extendTheme({
   colors: {
     lightMode: {
-      base: '#fafafa',
+      base: '#fff',
       primary: '#e5e5e5',
       secondary: '#a855f7',
     },
     darkMode: {
-      base: '#e3f2f9',
+      base: '#fff',
       primary: '#c5e4f3',
       secondary: '#a2d4ec',
     },
   },
 });
+
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: nativeBaseTheme.colors.lightMode.base,
+  },
+};
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,9 +53,9 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <GestureHandlerRootView style={styles.gestureHandler}>
-            <NativeBaseProvider theme={theme}>
+            <NativeBaseProvider theme={nativeBaseTheme}>
               <StatusBar style="auto" />
-              <NavigationContainer>
+              <NavigationContainer theme={navigationTheme}>
                 <RootStack.Navigator initialRouteName="Tabs">
                   {rootStackRoutes.map((route) => (
                     <RootStack.Screen
