@@ -5,6 +5,7 @@ import {
   Button,
   HStack,
   Icon,
+  Pressable,
   Skeleton,
   Text,
   useColorModeValue,
@@ -14,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedPost, Post as PostObj, UserStatus } from '../../xplat/types';
@@ -62,6 +64,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const navigation = useNavigation<TabGlobalNavigationProp>();
 
   const signedInUser = useRecoilValue(userAtom);
+  const userQuery = useSignedInUserQuery();
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
@@ -75,6 +78,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
 
   const [postData, setPostData] = useState<FetchedPost>();
   const [routeName, setRouteName] = useState<string>();
+  const [viewSpoilers, setViewSpoilers] = useState(false);
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
@@ -198,6 +202,11 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     );
   }
 
+  const showContent =
+    userQuery.data !== undefined
+      ? viewSpoilers ||
+        !(postData.hasSpoilers || postData.videoContent !== undefined)
+      : true;
   const showRouteLink = !isInRouteView && routeName !== undefined;
   return (
     <>
@@ -227,6 +236,19 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
             timestamp={postData.timestamp}
             isNavigationDisabled={isPreview}
           />
+          {!showContent && (
+            <Pressable onPress={() => setViewSpoilers(true)}>
+              <HStack>
+                <Text mr={0.5}>Spoilers</Text>
+                <Icon
+                  width="10%"
+                  as={<Ionicons name="eye-outline" />}
+                  color="black"
+                  size="lg"
+                />
+              </HStack>
+            </Pressable>
+          )}
           <ContextMenu contextOptions={contextOptions} />
         </HStack>
         {showRouteLink ? (
@@ -234,15 +256,19 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
             <RouteLink routeName={routeName} />
           </Box>
         ) : null}
-        <Box p={isPreview ? 1 : 2} pt={0}>
-          <Text>{postData.textContent}</Text>
-        </Box>
-        {mediaList === undefined ? null : (
+
+        {showContent && (
+          <Box p={isPreview ? 1 : 2} pt={0}>
+            <Text>{postData.textContent}</Text>
+          </Box>
+        )}
+        {showContent && mediaList !== undefined && (
           <Box w="full" pt={isPreview ? 0 : 2}>
             <MediaCarousel mediaList={mediaList} preview={isPreview} />
           </Box>
         )}
-        {!isPreview ? (
+
+        {!isPreview && showContent ? (
           <HStack
             w="full"
             justifyContent="center"

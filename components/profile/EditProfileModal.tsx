@@ -8,6 +8,8 @@ import {
   Input,
   KeyboardAvoidingView,
   Modal,
+  Switch,
+  Text,
   useColorModeValue,
 } from 'native-base';
 import { useState } from 'react';
@@ -46,6 +48,8 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
   const [oldPwd, setOldPwd] = useState<string>();
   const [newPwd, setNewPwd] = useState<string>();
   const [confirmPwd, setConfirmPwd] = useState<string>();
+
+  const [hideSpoilers, setHideSpoilers] = useState(fetchedUser.hideSpoilers);
 
   const [bioSession] = useState<DebounceSession>(new DebounceSession(500));
   const [newBio, setNewBio] = useState<string>();
@@ -183,6 +187,14 @@ function EditProfileModal({ isOpen, onClose, fetchedUser }: Props) {
                       Bio must be at most 200 characters
                     </FormControl.ErrorMessage>
                   </FormControl>
+                  <HStack mt={1} alignItems={'center'}>
+                    <Text>Hide posts that contain beta spoilers</Text>
+                    <Switch
+                      defaultIsChecked={fetchedUser.hideSpoilers}
+                      onValueChange={setHideSpoilers}
+                      size="sm"
+                    />
+                  </HStack>
 
                   <HStack pt="3" space="xs" justifyContent="space-between">
                     <Button

@@ -36,6 +36,7 @@ const HeaderMenu = ({ navigate }: Props) => {
               Verify Knights Email
             </Menu.Item>
           ) : null}
+          <Menu.Item onPress={() => navigate('Settings')}>Settings</Menu.Item>
           <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
         </Menu>
       </HStack>

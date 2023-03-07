@@ -12,6 +12,11 @@ export const isSignedInAtom = atom<boolean>({
   default: false,
 });
 
+export const hideSpoilersAtom = atom<boolean>({
+  key: 'hideSpoilers',
+  default: false,
+});
+
 export const isInitializingAtom = atom<boolean>({
   key: 'isInitializing',
   default: true,
