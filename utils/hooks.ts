@@ -75,8 +75,3 @@ export const useRouteQuery = (routeId: string | undefined) => {
     }
   );
 };
-
-export const useIconColor = () => {
-  const { colorMode } = useColorMode();
-  return colorMode === 'light' ? 'black' : 'gray';
-};

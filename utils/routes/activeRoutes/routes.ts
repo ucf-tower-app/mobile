@@ -10,7 +10,7 @@ export type Route = {
 
 export const routes: Route[] = [
   {
-    name: 'ActiveRoutes',
+    name: 'Active Routes',
     component: ActiveRoutes,
   },
   ...tabGlobalRoutes,

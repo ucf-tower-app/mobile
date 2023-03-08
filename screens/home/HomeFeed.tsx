@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import Post from '../../components/media/Post';
-import { useIconColor, useSignedInUserQuery } from '../../utils/hooks';
+import { useSignedInUserQuery } from '../../utils/hooks';
 import { constructPageData } from '../../xplat/queries';
 import {
   extractNext,
@@ -25,6 +25,7 @@ import {
   getInitialPageParam,
 } from '../../xplat/queries/feed';
 import { Post as PostObj } from '../../xplat/types';
+import LightDarkIcon from '../../components/util/LightDarkIcon';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -87,8 +88,6 @@ type EmptyListProps = {
   isLoading: boolean;
 };
 const EmptyList = ({ isLoading }: EmptyListProps) => {
-  const iconColor = useIconColor();
-
   if (isLoading) {
     return (
       <Center w="full" mt="1/2">
@@ -100,7 +99,7 @@ const EmptyList = ({ isLoading }: EmptyListProps) => {
       <Center w="full" mt="1/2">
         <VStack>
           <Center>
-            <Icon as={Ionicons} name="home-sharp" size="6xl" bg={iconColor} />
+            <LightDarkIcon name="home-sharp" size="6xl" />
           </Center>
           <Text fontSize="lg">No posts.</Text>
         </VStack>

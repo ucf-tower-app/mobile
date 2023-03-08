@@ -1,21 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Icon, Menu, Pressable } from 'native-base';
+import { Menu, Pressable } from 'native-base';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userPermissionLevelAtom } from '../../utils/atoms';
-import { useIconColor } from '../../utils/hooks';
 import { auth } from '../../xplat/Firebase';
 import { UserStatus } from '../../xplat/types';
 import ChangeEmailModal from '../profile/ChangeEmailModal';
+import LightDarkIcon from '../util/LightDarkIcon';
 
 export const PressableDots = (triggerProps: any) => {
-  const iconColor = useIconColor();
-  console.log(iconColor);
-
   return (
     <Pressable {...triggerProps}>
-      <Icon as={Ionicons} name="ellipsis-horizontal" size="lg" bg={iconColor} />
+      <LightDarkIcon name="ellipsis-horizontal" size="lg" />
     </Pressable>
   );
 };

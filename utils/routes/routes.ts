@@ -36,7 +36,7 @@ export const tabNameToRouteData: { [tabName in TabName]: RouteData } = {
     routes: leaderboardsRoutes,
   },
   ActiveRoutesTab: {
-    initialRouteName: 'ActiveRoutes',
+    initialRouteName: 'Active Routes',
     routes: activeRoutesRoutes,
   },
   SearchTab: {
