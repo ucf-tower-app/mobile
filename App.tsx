@@ -84,20 +84,17 @@ const RootStackProvider = () => {
       <NavigationContainer
         theme={{
           ...DefaultTheme,
+          dark: colorMode === 'dark',
           colors: {
             ...DefaultTheme.colors,
+            primary: colorMode === 'dark' ? 'white' : 'black',
             background: backgroundColorHex,
+            card: backgroundColorHex,
+            text: colorMode === 'dark' ? 'white' : 'black',
           },
         }}
       >
-        <RootStack.Navigator
-          initialRouteName="Tabs"
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: backgroundColorHex,
-            },
-          }}
-        >
+        <RootStack.Navigator initialRouteName="Tabs">
           {rootStackRoutes.map((route) => (
             <RootStack.Screen
               name={route.name}
