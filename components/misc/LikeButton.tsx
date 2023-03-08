@@ -3,6 +3,7 @@ import { Flex, Icon, Text } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
+import { useIconColor } from '../../utils/hooks';
 import { DebounceSession } from '../../utils/utils';
 import { User, containsRef } from '../../xplat/types';
 import IconToggle from './IconToggle';
@@ -12,6 +13,8 @@ type Props = {
   onSetIsLiked: (isLiked: boolean) => void;
 };
 const LikeButton = ({ likes, onSetIsLiked }: Props) => {
+  const iconColor = useIconColor();
+
   const user = useRecoilValue(userAtom);
 
   const [userIsInLikes, setUserIsInLikes] = useState<boolean>(false);
@@ -44,7 +47,7 @@ const LikeButton = ({ likes, onSetIsLiked }: Props) => {
         onToggle={toggleIsLikedLocal}
         onIcon={<Icon as={Ionicons} name="heart" size={5} color="red.500" />}
         offIcon={
-          <Icon as={Ionicons} name="heart-outline" size={5} color="black" />
+          <Icon as={Ionicons} name="heart-outline" size={5} bg={iconColor} />
         }
       />
     </Flex>

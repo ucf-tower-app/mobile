@@ -14,7 +14,11 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
+import {
+  hideSpoilersAtom,
+  userAtom,
+  userPermissionLevelAtom,
+} from '../../utils/atoms';
 import { useSignedInUserQuery } from '../../utils/hooks';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 import { TabGlobalNavigationProp } from '../../utils/types';
@@ -79,6 +83,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const [postData, setPostData] = useState<FetchedPost>();
   const [routeName, setRouteName] = useState<string>();
   const [viewSpoilers, setViewSpoilers] = useState(false);
+  const shouldHideSpoilers = useRecoilValue(hideSpoilersAtom);
 
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
@@ -203,10 +208,11 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   }
 
   const showContent =
-    userQuery.data !== undefined
+    !shouldHideSpoilers ||
+    (userQuery.data !== undefined
       ? viewSpoilers ||
         !(postData.hasSpoilers || postData.videoContent !== undefined)
-      : true;
+      : true);
   const showRouteLink = !isInRouteView && routeName !== undefined;
   return (
     <>

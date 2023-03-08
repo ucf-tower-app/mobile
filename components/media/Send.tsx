@@ -10,6 +10,7 @@ import {
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useIconColor } from '../../utils/hooks';
 import { FetchedSend, Send as SendObj } from '../../xplat/types';
 import RouteLink from '../route/RouteLink';
 import Timestamp from './Timestamp';
@@ -32,6 +33,7 @@ type Props = {
 };
 const Send = ({ send }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
+  const iconColor = useIconColor();
 
   const [sendData, setSendData] = useState<FetchedSend>();
 
@@ -64,12 +66,7 @@ const Send = ({ send }: Props) => {
   return (
     <HStack w="full" bg={baseBgColor} space="3" p="3">
       <Center>
-        <Icon
-          as={<Ionicons name="trending-up" />}
-          color="black"
-          opacity={75}
-          size="xl"
-        />
+        <Icon as={Ionicons} name="trending-up" size="xl" bg={iconColor} />
       </Center>
       <VStack>
         <HStack>
