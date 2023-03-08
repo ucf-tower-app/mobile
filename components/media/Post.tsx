@@ -1,10 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import {
   Box,
   Button,
   HStack,
-  Icon,
   Skeleton,
   Text,
   useColorModeValue,
@@ -20,6 +18,7 @@ import { FetchedPost, Post as PostObj, UserStatus } from '../../xplat/types';
 import LikeButton from '../misc/LikeButton';
 import UserTag, { UserTagSkeleton } from '../profile/UserTag';
 import RouteLink from '../route/RouteLink';
+import LightDarkIcon from '../util/LightDarkIcon';
 import ActionedMedia from './actions/ActionedMedia';
 import Deletable from './actions/Deletable';
 import Reportable from './actions/Reportable';
@@ -174,12 +173,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
             isNavigationDisabled={isPreview}
           />
         </Box>
-        <Icon
-          width="10%"
-          as={<Ionicons name="trending-up" />}
-          color="black"
-          size="lg"
-        />
+        <LightDarkIcon name="trending-up" size="lg" />
         {postData.routeInfo !== undefined && (
           <Box width="33%" pl={1}>
             <RouteLink noPadding routeName={postData.routeInfo.name} />

@@ -9,11 +9,9 @@ import {
   View,
   useColorModeValue,
   Center,
-  Icon,
   Text,
   Spinner,
 } from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import Post from '../../components/media/Post';

@@ -1,16 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
-import {
-  Box,
-  Center,
-  HStack,
-  Icon,
-  Text,
-  useColorModeValue,
-} from 'native-base';
+import { Box, Center, HStack, Text, useColorModeValue } from 'native-base';
 import React from 'react';
 import { formatOrdinals } from '../../utils/utils';
 import { LeaderboardEntry } from '../../xplat/queries';
 import UserTag from '../profile/UserTag';
+import LightDarkIcon from '../util/LightDarkIcon';
 
 type Props = {
   ranking: number;
@@ -36,7 +29,7 @@ const LeaderboardRow = ({ ranking, data }: Props) => {
           <UserTag userDocRefId={data.user.getId()} />
         </Box>
         <Box width="13%">
-          <Icon as={<Ionicons name="trending-up" />} size="2xl" />
+          <LightDarkIcon name="trending-up" size="2xl" />
         </Box>
         <Box width="10%">
           <Text fontSize="lg" fontWeight="bold">

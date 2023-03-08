@@ -1,4 +1,4 @@
-import { IToastProps, useColorMode, useToast } from 'native-base';
+import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Route as RouteObj } from '../xplat/types';
