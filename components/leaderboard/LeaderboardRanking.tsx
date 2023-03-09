@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import {
   Avatar,
@@ -6,7 +5,6 @@ import {
   Box,
   Center,
   HStack,
-  Icon,
   Pressable,
   Text,
   VStack,
@@ -17,6 +15,7 @@ import { userAtom } from '../../utils/atoms';
 import { navigateToUserProfile } from '../../utils/nav';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { FetchedUser } from '../../xplat/types';
+import LightDarkIcon from '../util/LightDarkIcon';
 
 type Props = {
   ranking?: number;
@@ -69,7 +68,7 @@ const LeaderboardRanking = ({ ranking, fetchedUser, numOfSends }: Props) => {
                 <HStack space={3} justifyContent="center">
                   <Text fontSize="md">@{fetchedUser.username}</Text>
                   {numOfSends !== undefined && (
-                    <Icon as={<Ionicons name="trending-up" />} size="2xl" />
+                    <LightDarkIcon name="trending-up" size="2xl" />
                   )}
                   {numOfSends !== undefined && (
                     <Text fontSize="xl" bold>

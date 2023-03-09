@@ -1,4 +1,4 @@
-import { IToastProps, useColorMode, useToast } from 'native-base';
+import { IToastProps, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Route as RouteObj } from '../xplat/types';
@@ -74,9 +74,4 @@ export const useRouteQuery = (routeId: string | undefined) => {
       enabled: routeId !== undefined,
     }
   );
-};
-
-export const useIconColor = () => {
-  const { colorMode } = useColorMode();
-  return colorMode === 'light' ? 'black' : 'gray';
 };

@@ -1,9 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
   Box,
   Button,
   HStack,
-  Icon,
   Modal,
   Text,
   useColorModeValue,
@@ -11,6 +9,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useSignedInUserQuery } from '../../utils/hooks';
 import Timestamp from '../media/Timestamp';
+import LightDarkIcon from '../util/LightDarkIcon';
 
 type Props = {
   isOpen: boolean;
@@ -38,12 +37,7 @@ const SendShareModal = ({ isOpen, close, onShare, routeInfo }: Props) => {
                 : userQuery.data.displayName.slice(0, 15) + '...'}
             </Text>
           </Box>
-          <Icon
-            as={<Ionicons name="trending-up" />}
-            color="black"
-            opacity={75}
-            size="lg"
-          />
+          <LightDarkIcon name="trending-up" size="lg" />
           <Text pl={1}>{routeInfo.name}</Text>
           <Box pl={2}>
             <Timestamp relative date={new Date(Date.now())} />

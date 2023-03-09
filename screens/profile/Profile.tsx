@@ -1,11 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
   Box,
   Button,
   Center,
   Divider,
   HStack,
-  Icon,
   Pressable,
   useColorModeValue,
   VStack,
@@ -24,6 +22,7 @@ import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
 import StatBox from '../../components/profile/StatBox';
+import LightDarkIcon from '../../components/util/LightDarkIcon';
 import Tintable from '../../components/util/Tintable';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import { useEarlyLoad, useSignedInUserQuery } from '../../utils/hooks';
@@ -202,7 +201,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
                       return (
                         <Box>
                           <Tintable tinted={isHovered || isPressed} rounded />
-                          <Icon as={<Ionicons name="md-people" />} size="lg" />
+                          <LightDarkIcon name="md-people" size="lg" />
                         </Box>
                       );
                     }}

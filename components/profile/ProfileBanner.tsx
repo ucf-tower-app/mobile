@@ -1,14 +1,12 @@
-import { Avatar, Heading, Text, useColorModeValue, VStack } from 'native-base';
+import { Avatar, Heading, Text, VStack } from 'native-base';
 import { FetchedUser } from '../../xplat/types';
 
 type Props = {
   fetchedUser: FetchedUser;
 };
 const ProfileBanner = ({ fetchedUser }: Props) => {
-  const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
-
   return (
-    <VStack justifyContent="center" alignItems="center" bg={baseBgColor}>
+    <VStack justifyContent="center" alignItems="center">
       <Avatar
         source={{ uri: fetchedUser.avatarUrl }}
         bg="gray.300"

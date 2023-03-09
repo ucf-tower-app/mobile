@@ -1,8 +1,7 @@
 // Route metadata for tabs
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Icon } from 'native-base';
 import HeaderMenu from '../../../components/header/HeaderMenu';
+import LightDarkIcon from '../../../components/util/LightDarkIcon';
 import { ParamList as ActiveRoutesParamList } from '../activeRoutes/paramList';
 import { ParamList as HomeParamList } from '../home/paramList';
 import { ParamList as LeaderboardsParamList } from '../leaderboards/paramList';
@@ -44,30 +43,14 @@ const buildStack = (tabName: TabName, Stack: any) => {
 export const routes: Route[] = [
   {
     name: 'HomeTab',
-    focusedIcon: (
-      <Icon
-        as={<MaterialCommunityIcons name="home" />}
-        color="black"
-        size="xl"
-      />
-    ),
-    unfocusedIcon: (
-      <Icon
-        as={<MaterialCommunityIcons name="home-outline" />}
-        color="black"
-        size="xl"
-      />
-    ),
+    focusedIcon: <LightDarkIcon name="home" size="xl" />,
+    unfocusedIcon: <LightDarkIcon name="home-outline" size="xl" />,
     stack: buildStack('HomeTab', createNativeStackNavigator<HomeParamList>()),
   },
   {
     name: 'LeaderboardsTab',
-    focusedIcon: (
-      <Icon as={<Ionicons name="trophy" />} color="black" size="xl" />
-    ),
-    unfocusedIcon: (
-      <Icon as={<Ionicons name="trophy-outline" />} color="black" size="xl" />
-    ),
+    focusedIcon: <LightDarkIcon name="trophy" size="xl" />,
+    unfocusedIcon: <LightDarkIcon name="trophy-outline" size="xl" />,
     stack: buildStack(
       'LeaderboardsTab',
       createNativeStackNavigator<LeaderboardsParamList>()
@@ -75,16 +58,8 @@ export const routes: Route[] = [
   },
   {
     name: 'ActiveRoutesTab',
-    focusedIcon: (
-      <Icon as={<Ionicons name="analytics" />} color="black" size="xl" />
-    ),
-    unfocusedIcon: (
-      <Icon
-        as={<Ionicons name="analytics-outline" />}
-        color="black"
-        size="xl"
-      />
-    ),
+    focusedIcon: <LightDarkIcon name="analytics" size="xl" />,
+    unfocusedIcon: <LightDarkIcon name="analytics-outline" size="xl" />,
     stack: buildStack(
       'ActiveRoutesTab',
       createNativeStackNavigator<ActiveRoutesParamList>()
@@ -92,12 +67,8 @@ export const routes: Route[] = [
   },
   {
     name: 'SearchTab',
-    focusedIcon: (
-      <Icon as={<Ionicons name="search" />} color="black" size="xl" />
-    ),
-    unfocusedIcon: (
-      <Icon as={<Ionicons name="search-outline" />} color="black" size="xl" />
-    ),
+    focusedIcon: <LightDarkIcon name="search" size="xl" />,
+    unfocusedIcon: <LightDarkIcon name="search-outline" size="xl" />,
     stack: buildStack(
       'SearchTab',
       createNativeStackNavigator<SearchParamList>()
@@ -105,12 +76,8 @@ export const routes: Route[] = [
   },
   {
     name: 'ProfileTab',
-    focusedIcon: (
-      <Icon as={<Ionicons name="person" />} color="black" size="xl" />
-    ),
-    unfocusedIcon: (
-      <Icon as={<Ionicons name="person-outline" />} color="black" size="xl" />
-    ),
+    focusedIcon: <LightDarkIcon name="person" size="xl" />,
+    unfocusedIcon: <LightDarkIcon name="person-outline" size="xl" />,
     stack: buildStack(
       'ProfileTab',
       createNativeStackNavigator<ProfileParamList>()

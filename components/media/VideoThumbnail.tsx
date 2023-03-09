@@ -35,7 +35,8 @@ const VideoThumbnail = ({ thumbnailUrl, onPress, width, height }: Props) => {
           <IconButton
             icon={
               <Icon
-                as={<Ionicons name="play-circle" />}
+                as={Ionicons}
+                name="play-circle"
                 color="white"
                 opacity={75}
                 size="6xl"
