@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tower",
     "slug": "tower",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,12 +18,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tyler.hm.tower",
-      "buildNumber": "5"
+      "buildNumber": "6"
     },
     "android": {
       "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.tyler.hm.tower",
-      "versionCode": "5"
+      "versionCode": "6"
     },
     "web": {
       "favicon": "./assets/favicon.png"
