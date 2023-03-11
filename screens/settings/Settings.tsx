@@ -8,6 +8,8 @@ import {
   ColorMode,
 } from 'native-base';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { isAmoledEnabledAtom } from '../../utils/atoms';
 
 const Settings = () => {
   const colorMode = useColorMode();
@@ -15,12 +17,15 @@ const Settings = () => {
 
   const [selectedColorMode, setSelectedColorMode] = useState<ColorMode>();
 
+  const [isAmoledEnabled, setIsAmoledEnabled] =
+    useRecoilState(isAmoledEnabledAtom);
+
   useEffect(() => {
     setSelectedColorMode(colorMode.colorMode);
   }, [colorMode.colorMode]);
 
   return (
-    <VStack p={4} bg={backgroundColor} h="full">
+    <VStack p={4} bg={backgroundColor} h="full" space={3}>
       <HStack w="full" justifyContent="space-between">
         <Text>Dark mode</Text>
 
@@ -36,6 +41,16 @@ const Settings = () => {
           }}
         />
       </HStack>
+
+      {colorMode.colorMode === 'dark' ? (
+        <HStack w="full" justifyContent="space-between">
+          <Text>AMOLED Dark</Text>
+          <Switch
+            value={isAmoledEnabled}
+            onToggle={() => setIsAmoledEnabled(!isAmoledEnabled)}
+          />
+        </HStack>
+      ) : null}
     </VStack>
   );
 };
