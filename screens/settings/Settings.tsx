@@ -6,6 +6,7 @@ import {
   useColorMode,
   useColorModeValue,
   ColorMode,
+  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -27,7 +28,9 @@ const Settings = () => {
   return (
     <VStack p={4} bg={backgroundColor} h="full" space={3}>
       <HStack w="full" justifyContent="space-between">
-        <Text>Dark mode</Text>
+        <Center>
+          <Text>Dark mode</Text>
+        </Center>
 
         {/* Don't allow the user to toggle the switch before it's done changing */}
         <Switch
@@ -44,7 +47,9 @@ const Settings = () => {
 
       {colorMode.colorMode === 'dark' ? (
         <HStack w="full" justifyContent="space-between">
-          <Text>AMOLED Dark</Text>
+          <Center>
+            <Text>AMOLED Dark</Text>
+          </Center>
           <Switch
             value={isAmoledEnabled}
             onToggle={() => setIsAmoledEnabled(!isAmoledEnabled)}
