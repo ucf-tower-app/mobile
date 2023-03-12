@@ -21,3 +21,8 @@ export const userPermissionLevelAtom = atom<UserStatus | undefined>({
   key: 'userPermissionLevel',
   default: undefined,
 });
+
+export const isAmoledEnabledAtom = atom<boolean>({
+  key: 'isAmoledEnabled',
+  default: false,
+});

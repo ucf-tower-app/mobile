@@ -13,28 +13,13 @@ import { LogBox, StyleSheet } from 'react-native';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import AuthProvider from './components/util/AuthProvider';
 import { ParamList as RootStackParamList } from './utils/routes/root/paramList';
 import { routes as rootStackRoutes } from './utils/routes/root/routes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export const nativeBaseTheme = extendTheme({
-  colors: {
-    lightMode: {
-      base: '#fff',
-      primary: '#e5e5e5',
-      secondary: '#a855f7',
-    },
-    darkMode: {
-      base: '#0D1821',
-      primary: '#344966',
-      secondary: '#B4CDED',
-    },
-  },
-  useSystemColorMode: false,
-  initialColorMode: 'dark',
-});
+import InitSettings from './components/util/InitSettings';
+import { isAmoledEnabledAtom } from './utils/atoms';
 
 // Build a color mode manager to persist chosen theme across sessions
 const colorModeManager: StorageManager = {
@@ -70,6 +55,7 @@ LogBox.ignoreLogs(['Require cycle:', 'AsyncStorage has been extracted']);
 
 const RootStackProvider = () => {
   const { colorMode } = useColorMode();
+
   const backgroundColorKey = useColorModeValue(
     'lightMode.base',
     'darkMode.base'
@@ -111,10 +97,29 @@ const RootStackProvider = () => {
   );
 };
 
-// Construct tabs and their subtrees
-export default function App() {
+const RecoilEnabledApp = () => {
+  const isAmoledEnabled = useRecoilValue(isAmoledEnabledAtom);
+
+  const nativeBaseTheme = extendTheme({
+    colors: {
+      lightMode: {
+        base: '#fff',
+        primary: '#e5e5e5',
+        secondary: '#a855f7',
+      },
+      darkMode: {
+        base: isAmoledEnabled ? '#000' : '#0D1821',
+        primary: '#344966',
+        secondary: '#B4CDED',
+      },
+    },
+    useSystemColorMode: false,
+    initialColorMode: 'dark',
+  });
+
   return (
-    <RecoilRoot>
+    <>
+      <InitSettings />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <GestureHandlerRootView style={styles.gestureHandler}>
@@ -127,6 +132,14 @@ export default function App() {
           </GestureHandlerRootView>
         </AuthProvider>
       </QueryClientProvider>
+    </>
+  );
+};
+
+export default function App() {
+  return (
+    <RecoilRoot>
+      <RecoilEnabledApp />
     </RecoilRoot>
   );
 }

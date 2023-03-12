@@ -261,7 +261,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
                       relative
                       date={fetchedSend.timestamp}
                       fontSize="sm"
-                      color="black"
+                      color="gray"
                     />
                   </Text>
                 ) : (
