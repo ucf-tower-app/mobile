@@ -98,6 +98,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: true,
         aspect: [4, 3],
+        videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
       });
 
       const asset = result.assets?.at(0);
