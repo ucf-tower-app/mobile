@@ -30,6 +30,7 @@ const BestSend = ({ type, fetchedUser }: Props) => {
           params: {
             routeDocRefId: send.route.getId(),
           },
+          initial: false,
         },
       });
     } catch (error: any) {
