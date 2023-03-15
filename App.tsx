@@ -103,7 +103,7 @@ const RecoilEnabledApp = () => {
   const nativeBaseTheme = extendTheme({
     colors: {
       lightMode: {
-        base: '#fff',
+        base: '#ffffff',
         primary: '#e5e5e5',
         secondary: '#a855f7',
       },
