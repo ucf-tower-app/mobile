@@ -44,9 +44,7 @@ const Settings = () => {
 
       {colorMode.colorMode === 'dark' ? (
         <HStack w="full" justifyContent="space-between">
-          <Center>
-            <Text>AMOLED Dark</Text>
-          </Center>
+          <Text>AMOLED Dark</Text>
           <Switch
             value={isAmoledEnabled}
             onToggle={() => setIsAmoledEnabled(!isAmoledEnabled)}
