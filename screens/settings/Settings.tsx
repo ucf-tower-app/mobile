@@ -27,9 +27,7 @@ const Settings = () => {
   return (
     <VStack p={4} bg={backgroundColor} h="full" space={3}>
       <HStack w="full" justifyContent="space-between">
-        <Center>
-          <Text>Dark mode</Text>
-        </Center>
+        <Text>Dark mode</Text>
 
         {/* Don't allow the user to toggle the switch before it's done changing */}
         <Switch
