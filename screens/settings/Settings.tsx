@@ -6,7 +6,6 @@ import {
   useColorMode,
   useColorModeValue,
   ColorMode,
-  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
