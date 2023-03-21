@@ -9,7 +9,7 @@ type Props = {
 };
 const ContextMenu = ({ contextOptions }: Props) => {
   return Object.keys(contextOptions).length > 0 ? (
-    <Box h={0} minH="100%">
+    <Box>
       <Menu trigger={PressableDots}>
         {Object.keys(contextOptions).map((key) => (
           <Menu.Item key={key} onPress={contextOptions[key]}>
