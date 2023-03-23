@@ -144,6 +144,7 @@ const HomeFeed = () => {
     navigation.setOptions({
       headerRight: HeaderWithPostOption,
       headerLeft: FeedSelectorMemo,
+      headerTitleAlign: 'center',
     });
   }, [navigation, FeedSelectorMemo]);
 
