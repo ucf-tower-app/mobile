@@ -56,9 +56,9 @@ const FeedSelector = ({ activeFeed, setActiveFeed }: FeedSelectorProps) => {
 };
 
 type EmptyListProps = {
-  isLoading: boolean;
+  isLoading?: boolean;
 };
-const EmptyList = ({ isLoading }: EmptyListProps) => {
+const EmptyList = ({ isLoading = false }: EmptyListProps) => {
   if (isLoading) {
     return (
       <Center w="full" mt="1/2">
@@ -174,14 +174,8 @@ const HomeFeed = () => {
     }
   }, [justSwitchedActiveFeed]);
 
-  if (activeFeed === 'none')
-    return (
-      <Box>
-        <Button onPress={() => setActiveFeed('following')}>Enable</Button>
-      </Box>
-    );
-
-  if (justSwitchedActiveFeed) return <EmptyList isLoading={true} />;
+  if (activeFeed === 'none') return <EmptyList />;
+  if (justSwitchedActiveFeed) return <EmptyList isLoading />;
 
   const getNextPosts = () => {
     if (activeFeed === 'all') {
