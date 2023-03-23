@@ -16,7 +16,10 @@ export const PressableDots = (triggerProps: any) => {
   );
 };
 
-const HeaderMenu = () => {
+type Props = {
+  hasPostOption?: boolean;
+};
+const HeaderMenu = ({ hasPostOption = false }: Props) => {
   const navigation = useNavigation();
 
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
@@ -38,9 +41,26 @@ const HeaderMenu = () => {
         <Menu.Item onPress={() => navigation.navigate('Settings')}>
           Settings
         </Menu.Item>
+        {hasPostOption ? (
+          <Menu.Item
+            onPress={() =>
+              navigation.navigate('Tabs', {
+                screen: 'HomeTab',
+                params: {
+                  screen: 'CreatePost',
+                  params: {},
+                },
+              })
+            }
+          >
+            Post
+          </Menu.Item>
+        ) : null}
       </Menu>
     </>
   );
 };
 
 export default HeaderMenu;
+
+export const HeaderWithPostOption = () => <HeaderMenu hasPostOption />;

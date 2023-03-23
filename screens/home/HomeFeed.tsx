@@ -24,6 +24,9 @@ import {
 } from '../../xplat/queries/feed';
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
+import HeaderMenu, {
+  HeaderWithPostOption,
+} from '../../components/header/HeaderMenu';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -32,8 +35,6 @@ type HeaderProps = {
   setActiveFeed: (newActiveFeed: ActiveFeed) => void;
 };
 const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
-  const navigation = useNavigation();
-
   if (activeFeed === 'none')
     return (
       <Box>
@@ -59,22 +60,6 @@ const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
           onPress={() => setActiveFeed('following')}
         >
           Following
-        </Button>
-        <Button
-          variant="outline"
-          rounded="full"
-          ml={3}
-          onPress={() =>
-            navigation.navigate('Tabs', {
-              screen: 'HomeTab',
-              params: {
-                screen: 'CreatePost',
-                params: {},
-              },
-            })
-          }
-        >
-          Post
         </Button>
       </HStack>
       <Divider mt={1} mb={1} orientation="horizontal" />
@@ -121,6 +106,8 @@ const HomeFeed = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
 
+  const navigation = useNavigation();
+
   const [activeFeed, setActiveFeed] = useState<ActiveFeed>(
     process.env.NODE_ENV === 'development' ? 'none' : 'all'
   );
@@ -151,6 +138,12 @@ const HomeFeed = () => {
 
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: HeaderWithPostOption,
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (allPostsIQ.data !== undefined)
