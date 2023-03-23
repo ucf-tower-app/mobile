@@ -101,6 +101,13 @@ const RouteView = ({ route }: TabGlobalScreenProps<'Route View'>) => {
   );
 
   useEffect(() => {
+    if (data === undefined) return;
+    navigation.setOptions({
+      headerTitle: data.name,
+    });
+  }, [navigation, data]);
+
+  useEffect(() => {
     if (user === undefined || data === undefined) return;
 
     data.routeObject.getSendByUser(user).then((send) => {
