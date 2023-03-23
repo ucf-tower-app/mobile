@@ -8,10 +8,10 @@ export type ParamList = {
   Follows: {
     userDocRefId: string;
   };
-  RouteView: {
+  'Route View': {
     routeDocRefId: string;
   };
-  CreatePost: {
+  'Create Post': {
     routeDocRefId?: string;
   };
   Comments: {

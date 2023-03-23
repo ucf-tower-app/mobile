@@ -30,7 +30,7 @@ const ArchivedRouteRow = ({ title }: Props) => {
           const route = await getRouteByName(title);
           const id = route?.getId();
           if (id)
-            navigation.push('RouteView', {
+            navigation.push('Route View', {
               routeDocRefId: id,
             });
         } catch (error: any) {

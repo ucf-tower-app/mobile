@@ -60,7 +60,7 @@ const RouteRow = ({ route }: Props) => {
   return (
     <Pressable
       onPress={() =>
-        navigation.push('RouteView', { routeDocRefId: route.getId() })
+        navigation.push('Route View', { routeDocRefId: route.getId() })
       }
     >
       <HStack

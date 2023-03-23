@@ -47,7 +47,7 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
               navigation.navigate('Tabs', {
                 screen: 'HomeTab',
                 params: {
-                  screen: 'CreatePost',
+                  screen: 'Create Post',
                   params: {},
                 },
               })

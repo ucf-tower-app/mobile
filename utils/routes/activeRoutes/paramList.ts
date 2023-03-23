@@ -1,5 +1,5 @@
 import { ParamList as TabGlobalParamList } from '../tabGlobal/paramList';
 
 export type ParamList = {
-  ActiveRoutes: undefined;
+  'Active Routes': undefined;
 } & TabGlobalParamList;

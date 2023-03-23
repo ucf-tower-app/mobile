@@ -26,7 +26,7 @@ const BestSend = ({ type, fetchedUser }: Props) => {
       navigation.navigate('Tabs', {
         screen,
         params: {
-          screen: 'RouteView',
+          screen: 'Route View',
           params: {
             routeDocRefId: send.route.getId(),
           },

@@ -41,7 +41,7 @@ import {
  * several entry points. The only difference between entry points is whether
  * or not the Route field is pre-loaded.
  */
-const CreatePost = ({ route }: TabGlobalScreenProps<'CreatePost'>) => {
+const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
   const routeDocRefId = route.params.routeDocRefId;
 
   const navigation = useNavigation();
