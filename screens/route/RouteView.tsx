@@ -68,7 +68,7 @@ const LoadingRouteView = () => {
   );
 };
 
-const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
+const RouteView = ({ route }: TabGlobalScreenProps<'Route View'>) => {
   const isEarly = useEarlyLoad(100);
   const routeDocRefId = route.params.routeDocRefId;
 
@@ -99,6 +99,13 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
     routeDocRefId,
     Route.buildFetcherFromDocRefId(routeDocRefId)
   );
+
+  useEffect(() => {
+    if (data === undefined) return;
+    navigation.setOptions({
+      headerTitle: data.name,
+    });
+  }, [navigation, data]);
 
   useEffect(() => {
     if (user === undefined || data === undefined) return;
@@ -177,7 +184,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'RouteView'>) => {
   };
 
   const post = () => {
-    navigation.push('CreatePost', {
+    navigation.push('Create Post', {
       routeDocRefId: data.routeObject.getId(),
     });
   };

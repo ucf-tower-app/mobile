@@ -3,8 +3,8 @@ export const names = [
   'Follows',
   'Sends',
   'Profile',
-  'RouteView',
-  'CreatePost',
+  'Route View',
+  'Create Post',
   'Comments',
 ] as const;
 export type Name = (typeof names)[number];

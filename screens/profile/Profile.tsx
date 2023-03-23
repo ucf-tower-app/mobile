@@ -82,7 +82,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       };
     else {
       _contextOptions.Post = () => {
-        navigation.navigate('CreatePost', {});
+        navigation.navigate('Create Post', {});
       };
       _contextOptions.Edit = () => {
         setShowModal(true);

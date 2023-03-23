@@ -4,15 +4,14 @@ import {
   Button,
   Divider,
   FlatList,
-  HStack,
   VStack,
-  View,
   useColorModeValue,
   Center,
   Text,
   Spinner,
+  Select,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import Post from '../../components/media/Post';
 import { useSignedInUserQuery } from '../../utils/hooks';
@@ -24,16 +23,15 @@ import {
 } from '../../xplat/queries/feed';
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
+import { HeaderWithPostOption } from '../../components/header/HeaderMenu';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
-type HeaderProps = {
+type FeedSelectorProps = {
   activeFeed: ActiveFeed;
   setActiveFeed: (newActiveFeed: ActiveFeed) => void;
 };
-const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
-  const navigation = useNavigation();
-
+const FeedSelector = ({ activeFeed, setActiveFeed }: FeedSelectorProps) => {
   if (activeFeed === 'none')
     return (
       <Box>
@@ -42,50 +40,25 @@ const Header = ({ activeFeed, setActiveFeed }: HeaderProps) => {
     );
 
   return (
-    <VStack>
-      <View mt={1} />
-      <HStack w="full" alignContent={'center'} justifyContent={'center'}>
-        <Button
-          variant={activeFeed === 'all' ? 'solid' : 'outline'}
-          rounded="full"
-          onPress={() => setActiveFeed('all')}
-        >
-          Anyone
-        </Button>
-        <Button
-          variant={activeFeed === 'following' ? 'solid' : 'outline'}
-          rounded="full"
-          ml={3}
-          onPress={() => setActiveFeed('following')}
-        >
-          Following
-        </Button>
-        <Button
-          variant="outline"
-          rounded="full"
-          ml={3}
-          onPress={() =>
-            navigation.navigate('Tabs', {
-              screen: 'HomeTab',
-              params: {
-                screen: 'CreatePost',
-                params: {},
-              },
-            })
-          }
-        >
-          Post
-        </Button>
-      </HStack>
-      <Divider mt={1} mb={1} orientation="horizontal" />
-    </VStack>
+    <Box w={125}>
+      <Select
+        selectedValue={activeFeed}
+        onValueChange={(_activeFeed) => {
+          if (_activeFeed === activeFeed) return;
+          setActiveFeed(_activeFeed as ActiveFeed);
+        }}
+      >
+        <Select.Item label="Anyone" value="all" />
+        <Select.Item label="Following" value="following" />
+      </Select>
+    </Box>
   );
 };
 
 type EmptyListProps = {
-  isLoading: boolean;
+  isLoading?: boolean;
 };
-const EmptyList = ({ isLoading }: EmptyListProps) => {
+const EmptyList = ({ isLoading = false }: EmptyListProps) => {
   if (isLoading) {
     return (
       <Center w="full" mt="1/2">
@@ -121,6 +94,8 @@ const HomeFeed = () => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
   const userQuery = useSignedInUserQuery();
 
+  const navigation = useNavigation();
+
   const [activeFeed, setActiveFeed] = useState<ActiveFeed>(
     process.env.NODE_ENV === 'development' ? 'none' : 'all'
   );
@@ -152,6 +127,27 @@ const HomeFeed = () => {
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
 
+  const FeedSelectorMemo = useCallback(
+    () => (
+      <FeedSelector
+        activeFeed={activeFeed}
+        setActiveFeed={(_activeFeed) => {
+          setActiveFeed(_activeFeed);
+          setJustSwitchedActiveFeed(true);
+        }}
+      />
+    ),
+    [activeFeed, setActiveFeed, setJustSwitchedActiveFeed]
+  );
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: HeaderWithPostOption,
+      headerLeft: FeedSelectorMemo,
+      headerTitleAlign: 'center',
+    });
+  }, [navigation, FeedSelectorMemo]);
+
   useEffect(() => {
     if (allPostsIQ.data !== undefined)
       setAllPosts(
@@ -179,20 +175,8 @@ const HomeFeed = () => {
     }
   }, [justSwitchedActiveFeed]);
 
-  if (activeFeed === 'none')
-    return (
-      <Box>
-        <Button onPress={() => setActiveFeed('following')}>Enable</Button>
-      </Box>
-    );
-
-  if (justSwitchedActiveFeed)
-    return (
-      <VStack>
-        <Header activeFeed={activeFeed} setActiveFeed={setActiveFeed} />
-        <EmptyList isLoading={true} />
-      </VStack>
-    );
+  if (activeFeed === 'none') return <EmptyList />;
+  if (justSwitchedActiveFeed) return <EmptyList isLoading />;
 
   const getNextPosts = () => {
     if (activeFeed === 'all') {
@@ -205,15 +189,6 @@ const HomeFeed = () => {
   return (
     <FlatList
       bgColor={baseBgColor}
-      ListHeaderComponent={
-        <Header
-          activeFeed={activeFeed}
-          setActiveFeed={(_activeFeed: ActiveFeed) => {
-            setActiveFeed(_activeFeed);
-            setJustSwitchedActiveFeed(true);
-          }}
-        />
-      }
       data={activeFeed === 'all' ? allPosts : followingPosts}
       ListEmptyComponent={
         <EmptyList

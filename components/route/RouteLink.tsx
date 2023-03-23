@@ -31,7 +31,7 @@ const RouteLink = ({ routeName, noPadding = false }: Props) => {
       navigation.navigate('Tabs', {
         screen,
         params: {
-          screen: 'RouteView',
+          screen: 'Route View',
           params: {
             routeDocRefId: route.getId(),
           },

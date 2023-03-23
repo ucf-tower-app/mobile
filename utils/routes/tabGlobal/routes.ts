@@ -26,11 +26,11 @@ export const routes: Route[] = [
     component: Follows,
   },
   {
-    name: 'RouteView',
+    name: 'Route View',
     component: RouteView,
   },
   {
-    name: 'CreatePost',
+    name: 'Create Post',
     component: CreatePost,
   },
   {
