@@ -52,7 +52,7 @@ const Deletable = ({ isConfirming, media, close }: Props) => {
     <Modal isOpen={isConfirming} onClose={close}>
       <Modal.Content maxWidth="lg">
         <Modal.CloseButton />
-        <Modal.Header>Report</Modal.Header>
+        <Modal.Header>Delete</Modal.Header>
         <Modal.Body>Are you sure you want to delete this content?</Modal.Body>
         <Modal.Footer>
           <Button onPress={close} variant="unstyled" colorScheme="coolGray">
