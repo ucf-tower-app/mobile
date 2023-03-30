@@ -86,6 +86,7 @@ const DeletableAccount = ({ isConfirming, user, close }: Props) => {
           <Input
             type="password"
             onChangeText={(_password) => setPassword(_password)}
+            mt={2}
           />
         </Modal.Body>
         <Modal.Footer>
