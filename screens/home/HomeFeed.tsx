@@ -24,6 +24,7 @@ import {
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
 import { HeaderWithPostOption } from '../../components/header/HeaderMenu';
+import { filterPosts } from '../../utils/utils';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -149,21 +150,19 @@ const HomeFeed = () => {
   }, [navigation, FeedSelectorMemo]);
 
   useEffect(() => {
-    if (allPostsIQ.data !== undefined)
-      setAllPosts(
-        allPostsIQ.data.pages.flatMap((page) =>
-          constructPageData(PostObj, page)
-        )
+    if (allPostsIQ.data !== undefined) {
+      const _posts = allPostsIQ.data.pages.flatMap((page) =>
+        constructPageData(PostObj, page)
       );
-    else setAllPosts([]);
+      filterPosts(_posts).then(setAllPosts);
+    } else setAllPosts([]);
   }, [allPostsIQ.data]);
 
   useEffect(() => {
-    if (followingPostsIQ.data !== undefined)
-      setFollowingPosts(
-        followingPostsIQ.data.pages.flatMap((page) => page.result)
-      );
-    else setFollowingPosts([]);
+    if (followingPostsIQ.data !== undefined) {
+      const _posts = followingPostsIQ.data.pages.flatMap((page) => page.result);
+      filterPosts(_posts).then(setFollowingPosts);
+    } else setFollowingPosts([]);
   }, [followingPostsIQ.data]);
 
   // Keep track of if we've *just* switched the feed, so that we can intercept the render to show
