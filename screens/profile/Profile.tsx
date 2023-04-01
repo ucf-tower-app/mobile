@@ -18,6 +18,7 @@ import ContextMenu, {
 } from '../../components/media/ContextMenu';
 import Feed from '../../components/media/Feed';
 import BestSend from '../../components/profile/BestSend';
+import DeletableAccount from '../../components/profile/DeletableAccount';
 import EditProfileModal from '../../components/profile/EditProfileModal';
 import LoadingProfile from '../../components/profile/LoadingProfile';
 import ProfileBanner from '../../components/profile/ProfileBanner';
@@ -61,6 +62,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -86,6 +88,9 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       };
       _contextOptions.Edit = () => {
         setShowModal(true);
+      };
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
       };
     }
 
@@ -156,9 +161,12 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         <Reportable
           isConfirming={isReporting}
           media={profileUserQuery.data.userObject}
-          close={() => {
-            setIsReporting(false);
-          }}
+          close={() => setIsReporting(false)}
+        />
+        <DeletableAccount
+          isConfirming={isDeleting}
+          user={profileUserQuery.data.userObject}
+          close={() => setIsDeleting(false)}
         />
         <VStack space="xs" w="full" bg={baseBgColor}>
           <EditProfileModal
