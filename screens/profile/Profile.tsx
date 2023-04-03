@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
+import Blockable from '../../components/media/actions/Blockable';
 import Reportable from '../../components/media/actions/Reportable';
 import ContextMenu, {
   ContextOptions,
@@ -63,6 +64,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isBlocking, setIsBlocking] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -78,11 +80,14 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (signedInUser !== undefined && !profileIsMine)
+    if (signedInUser !== undefined && !profileIsMine) {
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
-    else {
+      _contextOptions.Block = () => {
+        setIsBlocking(true);
+      };
+    } else {
       _contextOptions.Post = () => {
         navigation.navigate('Create Post', {});
       };
@@ -162,6 +167,11 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           isConfirming={isReporting}
           media={profileUserQuery.data.userObject}
           close={() => setIsReporting(false)}
+        />
+        <Blockable
+          isConfirming={isBlocking}
+          user={profileUserQuery.data.userObject}
+          close={() => setIsBlocking(false)}
         />
         <DeletableAccount
           isConfirming={isDeleting}
