@@ -7,7 +7,7 @@ import { TabGlobalScreenProps } from '../../utils/types';
 import { DebounceSession } from '../../utils/utils';
 import { User } from '../../xplat/types';
 
-type UserTab = 'followers' | 'following' | 'both';
+type UserTab = 'followers' | 'following' | 'both' | 'blocking';
 
 type HeaderProps = {
   setSearchQuery: (q: string) => void;
@@ -45,6 +45,7 @@ const FollowsHeader = ({
           >
             <Select.Item value="followers" label="Followers" />
             <Select.Item value="following" label="Following" />
+            <Select.Item value="blocking" label="Blocked" />
             <Select.Item value="both" label="Followers + Following" />
           </Select>
         </HStack>

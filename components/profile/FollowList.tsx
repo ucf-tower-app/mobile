@@ -6,7 +6,7 @@ import UserRow from './UserRow';
 
 type Props = {
   searchQuery: string;
-  userTab: 'followers' | 'following' | 'both';
+  userTab: 'followers' | 'following' | 'both' | 'blocking';
   fetchedUser: FetchedUser;
   header?: JSX.Element;
 };
@@ -20,6 +20,8 @@ const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
       newUsers = [...fetchedUser.followersList];
     } else if (userTab === 'following') {
       newUsers = [...fetchedUser.followingList];
+    } else if (userTab === 'blocking') {
+      newUsers = [...fetchedUser.blockedList];
     } else {
       newUsers = [...fetchedUser.followersList];
       const ids = new Set<string>(newUsers.map((user) => user.getId()));
@@ -39,6 +41,7 @@ const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
   }, [
     fetchedUser.followersList,
     fetchedUser.followingList,
+    fetchedUser.blockedList,
     searchQuery,
     userCache.data,
     userTab,
