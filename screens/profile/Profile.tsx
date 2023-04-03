@@ -65,6 +65,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const [isReporting, setIsReporting] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isBlocking, setIsBlocking] = useState<boolean>(false);
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -84,9 +85,16 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
-      _contextOptions.Block = () => {
-        setIsBlocking(true);
-      };
+      if (profileUserQuery.data?.blockedByList.includes(signedInUser)) {
+        setIsBlocked(true);
+        _contextOptions.Unblock = () => {
+          setIsBlocking(true);
+        };
+      } else {
+        _contextOptions.Block = () => {
+          setIsBlocking(true);
+        };
+      }
     } else {
       _contextOptions.Post = () => {
         navigation.navigate('Create Post', {});
@@ -100,7 +108,12 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation]);
+  }, [
+    signedInUser,
+    profileIsMine,
+    navigation,
+    profileUserQuery.data?.blockedByList,
+  ]);
 
   useEffect(() => {
     if (
@@ -171,6 +184,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         <Blockable
           isConfirming={isBlocking}
           user={profileUserQuery.data.userObject}
+          isBlocked={isBlocked}
           close={() => setIsBlocking(false)}
         />
         <DeletableAccount
