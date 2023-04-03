@@ -14,6 +14,7 @@ import Comment from '../../components/media/Comment';
 import CommentTextInput from '../../components/media/CommentTextInput';
 import { userAtom, userPermissionLevelAtom } from '../../utils/atoms';
 import {
+  useFindShouldBeFilteredIndices,
   useGenericErrorToast,
   useOffensiveLanguageWarningToast,
 } from '../../utils/hooks';
@@ -34,6 +35,7 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentObj[]>([]);
+  const findShouldBeFilteredIndices = useFindShouldBeFilteredIndices();
 
   const showOffensiveLanguageWarningToast = useOffensiveLanguageWarningToast();
   const showGenericErrorToast = useGenericErrorToast();
@@ -54,32 +56,15 @@ const Comments = ({ route }: TabGlobalScreenProps<'Comments'>) => {
 
   useEffect(() => {
     if (commentsQuery.data === undefined) return;
-
-    // Filters out media that shouldn't be shown and updates state
-    const readAndFilterComments = async () => {
-      let _comments = commentsQuery.data.pages.flatMap((page) =>
-        constructPageData(CommentObj, page)
-      );
-
-      // Get the data, so that `exists` is properly mapped for cache-invalidated data
-      await Promise.all(_comments.map((comment) => comment.getData()));
-
-      // Filter out the bad data
-      const shouldBeOmittedResults = await Promise.all(
-        _comments.map(
-          (comment) => !comment.exists || comment.checkShouldBeHidden()
-        )
-      );
-
-      _comments = _comments.filter(
-        (_, index) => !shouldBeOmittedResults[index]
-      );
-
-      setComments(_comments);
-    };
-
-    readAndFilterComments();
-  }, [commentsQuery.data]);
+    const _comments = commentsQuery.data.pages.flatMap((page) =>
+      constructPageData(CommentObj, page)
+    );
+    findShouldBeFilteredIndices(_comments).then((shouldBeFilteredIndices) =>
+      setComments(
+        _comments.filter((_, index) => !shouldBeFilteredIndices[index])
+      )
+    );
+  }, [commentsQuery.data, findShouldBeFilteredIndices]);
 
   useEffect(() => {
     if (comments.length !== 0 && comments.length < INITIAL_COMMENTS_LOADED)

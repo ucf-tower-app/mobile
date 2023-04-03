@@ -24,7 +24,7 @@ import {
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
 import { HeaderWithPostOption } from '../../components/header/HeaderMenu';
-import { useFilterPosts } from '../../utils/hooks';
+import { useFindShouldBeFilteredIndices } from '../../utils/hooks';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -127,7 +127,7 @@ const HomeFeed = () => {
 
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
-  const filterPosts = useFilterPosts();
+  const findShouldBeFilteredIndices = useFindShouldBeFilteredIndices();
 
   const FeedSelectorMemo = useCallback(
     () => (
@@ -155,16 +155,24 @@ const HomeFeed = () => {
       const _posts = allPostsIQ.data.pages.flatMap((page) =>
         constructPageData(PostObj, page)
       );
-      filterPosts(_posts).then(setAllPosts);
+      findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+        setAllPosts(
+          _posts.filter((_, index) => !shouldBeFilteredIndices[index])
+        )
+      );
     } else setAllPosts([]);
-  }, [allPostsIQ.data, filterPosts]);
+  }, [allPostsIQ.data, findShouldBeFilteredIndices]);
 
   useEffect(() => {
     if (followingPostsIQ.data !== undefined) {
       const _posts = followingPostsIQ.data.pages.flatMap((page) => page.result);
-      filterPosts(_posts).then(setFollowingPosts);
+      findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+        setFollowingPosts(
+          _posts.filter((_, index) => !shouldBeFilteredIndices[index])
+        )
+      );
     } else setFollowingPosts([]);
-  }, [followingPostsIQ.data, filterPosts]);
+  }, [followingPostsIQ.data, findShouldBeFilteredIndices]);
 
   // Keep track of if we've *just* switched the feed, so that we can intercept the render to show
   // a loading symbol while loading

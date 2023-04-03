@@ -1,7 +1,7 @@
 import { IToastProps, useToast } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Post, Route as RouteObj } from '../xplat/types';
+import { Comment, Post, Route as RouteObj } from '../xplat/types';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from './atoms';
 
@@ -77,40 +77,41 @@ export const useRouteQuery = (routeId: string | undefined) => {
 };
 
 /**
- * Returns callback that takes in a list of posts and spits out the posts
- * that should be viewed by this client.
+ * Returns callback that takes in a list of posts and spits out
+ * a list of true/false on whether or not the media at this index should be removed
+ *
+ * This seems obtuse, but it is the only way to get around Typescript's archaic handling
+ * of union type filtering.
  */
-export const useFilterPosts = () => {
+export const useFindShouldBeFilteredIndices = () => {
   const { data: user } = useSignedInUserQuery();
 
   return useCallback(
-    async (posts: Post[]) => {
+    async (media: Post[] | Comment[]) => {
       if (user === undefined) return [];
 
       // Get the data, so that `exists` is properly mapped for cache-invalidated data
-      await Promise.all(posts.map((post) => post.getData()));
+      await Promise.all(media.map((item) => item.getData()));
 
       // Filter out hidden data
       const shouldBeOmittedResults = await Promise.all(
-        posts.map((post) => !post.exists || post.checkShouldBeHidden())
+        media.map((item) => !item.exists || item.checkShouldBeHidden())
       );
 
       // Filter out blocked content
       const isBlockedContentResults = await Promise.all(
-        posts.map((post) =>
-          post.author === undefined
+        media.map((item) =>
+          item.author === undefined
             ? false
-            : user.userObject.isBlocked(post.author) ||
-              post.author?.isBlocked(user.userObject)
+            : user.userObject.isBlocked(item.author) ||
+              item.author?.isBlocked(user.userObject)
         )
       );
 
-      posts = posts.filter(
-        (_, index) =>
-          !(shouldBeOmittedResults[index] || isBlockedContentResults[index])
+      return shouldBeOmittedResults.map(
+        (value, index) =>
+          value === true || isBlockedContentResults[index] === true
       );
-
-      return posts;
     },
     [user]
   );
