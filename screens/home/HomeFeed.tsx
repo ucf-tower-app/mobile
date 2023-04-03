@@ -24,7 +24,7 @@ import {
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
 import { HeaderWithPostOption } from '../../components/header/HeaderMenu';
-import { filterPosts } from '../../utils/utils';
+import { useFilterPosts } from '../../utils/hooks';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -127,6 +127,7 @@ const HomeFeed = () => {
 
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
+  const filterPosts = useFilterPosts();
 
   const FeedSelectorMemo = useCallback(
     () => (
@@ -156,14 +157,14 @@ const HomeFeed = () => {
       );
       filterPosts(_posts).then(setAllPosts);
     } else setAllPosts([]);
-  }, [allPostsIQ.data]);
+  }, [allPostsIQ.data, filterPosts]);
 
   useEffect(() => {
     if (followingPostsIQ.data !== undefined) {
       const _posts = followingPostsIQ.data.pages.flatMap((page) => page.result);
       filterPosts(_posts).then(setFollowingPosts);
     } else setFollowingPosts([]);
-  }, [followingPostsIQ.data]);
+  }, [followingPostsIQ.data, filterPosts]);
 
   // Keep track of if we've *just* switched the feed, so that we can intercept the render to show
   // a loading symbol while loading

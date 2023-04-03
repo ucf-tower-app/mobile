@@ -1,7 +1,7 @@
 import { IToastProps, useToast } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Route as RouteObj } from '../xplat/types';
+import { Post, Route as RouteObj } from '../xplat/types';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from './atoms';
 
@@ -73,5 +73,45 @@ export const useRouteQuery = (routeId: string | undefined) => {
     {
       enabled: routeId !== undefined,
     }
+  );
+};
+
+/**
+ * Returns callback that takes in a list of posts and spits out the posts
+ * that should be viewed by this client.
+ */
+export const useFilterPosts = () => {
+  const { data: user } = useSignedInUserQuery();
+
+  return useCallback(
+    async (posts: Post[]) => {
+      if (user === undefined) return [];
+
+      // Get the data, so that `exists` is properly mapped for cache-invalidated data
+      await Promise.all(posts.map((post) => post.getData()));
+
+      // Filter out hidden data
+      const shouldBeOmittedResults = await Promise.all(
+        posts.map((post) => !post.exists || post.checkShouldBeHidden())
+      );
+
+      // Filter out blocked content
+      const isBlockedContentResults = await Promise.all(
+        posts.map((post) =>
+          post.author === undefined
+            ? false
+            : user.userObject.isBlocked(post.author) ||
+              post.author?.isBlocked(user.userObject)
+        )
+      );
+
+      posts = posts.filter(
+        (_, index) =>
+          !(shouldBeOmittedResults[index] || isBlockedContentResults[index])
+      );
+
+      return posts;
+    },
+    [user]
   );
 };

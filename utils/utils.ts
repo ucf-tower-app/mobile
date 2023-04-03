@@ -1,5 +1,4 @@
 import Filter from 'bad-words';
-import { Post } from '../xplat/types';
 
 /**
  * A debounce session provides the `trigger` method which
@@ -25,20 +24,3 @@ export function formatOrdinals(n: number) {
 }
 
 export const wordFilter = new Filter();
-
-/**
- * Takes in a list of posts and spits out the posts
- * that should be viewed by this client.
- */
-export const filterPosts = async (posts: Post[]) => {
-  // Get the data, so that `exists` is properly mapped for cache-invalidated data
-  await Promise.all(posts.map((post) => post.getData()));
-
-  // Filter out the bad data
-  const shouldBeOmittedResults = await Promise.all(
-    posts.map((post) => !post.exists || post.checkShouldBeHidden())
-  );
-  posts = posts.filter((_, index) => !shouldBeOmittedResults[index]);
-
-  return posts;
-};

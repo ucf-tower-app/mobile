@@ -7,7 +7,7 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
-import { filterPosts } from '../../utils/utils';
+import { useFilterPosts } from '../../utils/hooks';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
 import { getIQParams_ForumPosts } from '../../xplat/queries/forum';
 import { Post as PostObj } from '../../xplat/types';
@@ -30,6 +30,7 @@ const Feed = ({
   isInRouteView = false,
 }: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
+  const filterPosts = useFilterPosts();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -45,7 +46,7 @@ const Feed = ({
 
     let _posts = data.pages.flatMap((page) => constructPageData(PostObj, page));
     filterPosts(_posts).then(setPosts);
-  }, [data]);
+  }, [data, filterPosts]);
 
   const loadNextPosts = useCallback(async () => {
     if (hasNextPage && !isFetchingNextPage) {
