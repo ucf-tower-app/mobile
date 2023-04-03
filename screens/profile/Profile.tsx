@@ -34,6 +34,7 @@ import {
   invalidateDocRefId,
   RouteType,
   User,
+  UserStatus,
 } from '../../xplat/types';
 
 /**
@@ -78,24 +79,27 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (signedInUser !== undefined && !profileIsMine)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
-    else {
-      _contextOptions.Post = () => {
-        navigation.navigate('Create Post', {});
-      };
-      _contextOptions.Edit = () => {
-        setShowModal(true);
-      };
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
+
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (signedInUser !== undefined && !profileIsMine)
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+      else {
+        _contextOptions.Post = () => {
+          navigation.navigate('Create Post', {});
+        };
+        _contextOptions.Edit = () => {
+          setShowModal(true);
+        };
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+      }
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation]);
+  }, [signedInUser, profileIsMine, navigation, userPermissionLevel]);
 
   useEffect(() => {
     if (
