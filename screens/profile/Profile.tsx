@@ -34,6 +34,7 @@ import {
   invalidateDocRefId,
   RouteType,
   User,
+  UserStatus,
 } from '../../xplat/types';
 
 /**
@@ -78,11 +79,16 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (signedInUser !== undefined && !profileIsMine)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
-    else {
+    if (signedInUser !== undefined && !profileIsMine) {
+      const profileUser = profileUserQuery.data;
+      if (
+        profileUser?.status !== undefined &&
+        profileUser.status < UserStatus.Employee
+      )
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+    } else {
       _contextOptions.Post = () => {
         navigation.navigate('Create Post', {});
       };
@@ -95,7 +101,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation]);
+  }, [signedInUser, profileIsMine, navigation, profileUserQuery.data]);
 
   useEffect(() => {
     if (

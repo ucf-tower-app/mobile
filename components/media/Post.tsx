@@ -78,13 +78,20 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
+  const [authorStatus, setAuthorStatus] = useState<UserStatus>();
+
+  useEffect(() => {
+    if (realQR.data === undefined) return;
+    realQR.data.author.getStatus().then(setAuthorStatus);
+  }, [realQR.data]);
 
   // Set up the context menu
   useEffect(() => {
     if (
       signedInUser === undefined ||
       userPermissionLevel === undefined ||
-      postData === undefined
+      postData === undefined ||
+      authorStatus === undefined
     )
       return;
 
@@ -97,13 +104,19 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
         setIsDeleting(true);
       };
 
-    if (!signedInUserOwnsPost)
+    if (!signedInUserOwnsPost && authorStatus < UserStatus.Employee)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
 
     setContextOptions(_contextOptions);
-  }, [contextOptions, signedInUser, userPermissionLevel, postData]);
+  }, [
+    contextOptions,
+    signedInUser,
+    userPermissionLevel,
+    postData,
+    authorStatus,
+  ]);
 
   useEffect(() => {
     if (

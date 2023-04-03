@@ -46,12 +46,19 @@ const Comment = ({ comment }: Props) => {
     comment.getId(),
     comment.buildFetcher()
   );
+  const [authorStatus, setAuthorStatus] = useState<UserStatus>();
+
+  useEffect(() => {
+    if (data === undefined) return;
+    data.author.getStatus().then(setAuthorStatus);
+  }, [data]);
 
   useEffect(() => {
     if (
       signedInUser === undefined ||
       userPermissionLevel === undefined ||
-      data === undefined
+      data === undefined ||
+      authorStatus === undefined
     )
       return;
 
@@ -64,13 +71,13 @@ const Comment = ({ comment }: Props) => {
         setIsDeleting(true);
       };
 
-    if (!signedInUserOwnsComment)
+    if (!signedInUserOwnsComment && authorStatus < UserStatus.Employee)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
 
     setContextOptions(_contextOptions);
-  }, [contextOptions, signedInUser, userPermissionLevel, data]);
+  }, [contextOptions, signedInUser, userPermissionLevel, data, authorStatus]);
 
   if (isLoading) return <CommentSkeleton />;
 
