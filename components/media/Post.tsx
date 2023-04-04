@@ -101,16 +101,18 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     const _contextOptions: ContextOptions = {};
 
     // If we're an employee or own the post, allow deletion
-    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
 
-    // If we don't own it, and the poster is not an emplyee, allow reporting
-    if (!signedInUserOwnsPost && authorStatus < UserStatus.Employee)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
+      // If we don't own it, and the poster is not an emplyee, allow reporting
+      if (!signedInUserOwnsPost && authorStatus < UserStatus.Employee)
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+    }
 
     setContextOptions(_contextOptions);
   }, [signedInUser, userPermissionLevel, postData, authorStatus]);

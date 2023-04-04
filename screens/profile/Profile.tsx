@@ -7,6 +7,7 @@ import {
   Pressable,
   useColorModeValue,
   VStack,
+  Heading,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -68,6 +69,9 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
+  const [isBlockedBy, setIsBlockedBy] = useState<boolean>(false);
+
   const signedInUserQuery = useSignedInUserQuery();
   const profileUserQuery = useQuery(
     userDocRefId !== undefined ? userDocRefId : 'nullQuery',
@@ -77,6 +81,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     { enabled: userDocRefId !== undefined }
   );
 
+  // Set up blocked and blocked by values
+  useEffect(() => {
+    const checkedBlocked = async () => {
+      const me = signedInUserQuery.data;
+      const prof = profileUserQuery.data;
+
+      if (me === undefined || prof === undefined) return;
+
+      setIsBlocked((await me.userObject.isBlocked(prof.userObject)) === true);
+      setIsBlockedBy((await prof.userObject.isBlocked(me.userObject)) === true);
+    };
+
+    checkedBlocked();
+  }, [signedInUserQuery.data, profileUserQuery.data]);
+
   // Setup the context options
   useEffect(() => {
     if (signedInUser === undefined || profileUserQuery.data === undefined)
@@ -84,27 +103,35 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
     const _contextOptions: ContextOptions = {};
 
-    if (!profileIsMine) {
-      // If the profile isn't mine, and is not an employee's, allow reporting
-      if (profileUserQuery.data.status < UserStatus.Employee)
-        _contextOptions.Report = () => {
-          setIsReporting(true);
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (!profileIsMine) {
+        // If the profile isn't mine, and is not an employee's, allow reporting
+        if (profileUserQuery.data.status < UserStatus.Employee)
+          _contextOptions.Report = () => {
+            setIsReporting(true);
+          };
+      } else {
+        // The profile is mine
+        _contextOptions.Post = () => {
+          navigation.navigate('Create Post', {});
         };
-    } else {
-      // The profile is mine
-      _contextOptions.Post = () => {
-        navigation.navigate('Create Post', {});
-      };
-      _contextOptions.Edit = () => {
-        setShowModal(true);
-      };
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
+        _contextOptions.Edit = () => {
+          setShowModal(true);
+        };
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+      }
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation, profileUserQuery.data]);
+  }, [
+    signedInUser,
+    profileIsMine,
+    navigation,
+    profileUserQuery.data,
+    userPermissionLevel,
+  ]);
 
   useEffect(() => {
     if (
@@ -251,6 +278,22 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       </>
     );
   };
+
+  // Don't show content if they are blocked or blocked by
+  // But only let the user know that the reason for not showing content
+  // if they are the one who blocked the other user
+  if (isBlocked || isBlockedBy) {
+    return (
+      <>
+        {profileComponent()}
+        {isBlocked ? (
+          <HStack w="full" mt={12} justifyContent="center">
+            <Heading size="md">Unblock this user to see their content.</Heading>
+          </HStack>
+        ) : null}
+      </>
+    );
+  }
 
   return <Feed topComponent={profileComponent} userDocRefId={userDocRefId} />;
 };
