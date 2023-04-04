@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../App';
+import Blockable from '../../components/media/actions/Blockable';
 import Reportable from '../../components/media/actions/Reportable';
 import ContextMenu, {
   ContextOptions,
@@ -65,6 +66,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
   const [contextOptions, setContextOptions] = useState<ContextOptions>({});
   const [isReporting, setIsReporting] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isBlocking, setIsBlocking] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -110,6 +112,16 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           _contextOptions.Report = () => {
             setIsReporting(true);
           };
+
+        if (isBlocked) {
+          _contextOptions.Unblock = () => {
+            setIsBlocking(true);
+          };
+        } else {
+          _contextOptions.Block = () => {
+            setIsBlocking(true);
+          };
+        }
       } else {
         // The profile is mine
         _contextOptions.Post = () => {
@@ -121,6 +133,9 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
         _contextOptions.Delete = () => {
           setIsDeleting(true);
         };
+        _contextOptions['Blocked List'] = () => {
+          navigation.navigate('Blocked List');
+        };
       }
     }
 
@@ -131,6 +146,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     navigation,
     profileUserQuery.data,
     userPermissionLevel,
+    isBlocked,
   ]);
 
   useEffect(() => {
@@ -199,6 +215,12 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
           media={profileUserQuery.data.userObject}
           close={() => setIsReporting(false)}
         />
+        <Blockable
+          isConfirming={isBlocking}
+          user={profileUserQuery.data.userObject}
+          isBlocked={isBlocked}
+          close={() => setIsBlocking(false)}
+        />
         <DeletableAccount
           isConfirming={isDeleting}
           user={profileUserQuery.data.userObject}
@@ -220,7 +242,8 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             <Center>
               <HStack space="md">
                 {permissionLevelCanWrite(userPermissionLevel) &&
-                !profileIsMine ? (
+                !profileIsMine &&
+                !isBlocked ? (
                   <Button
                     variant="subtle"
                     size="md"

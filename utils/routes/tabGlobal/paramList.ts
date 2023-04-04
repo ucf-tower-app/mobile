@@ -17,4 +17,5 @@ export type ParamList = {
   Comments: {
     postDocRefId: string;
   };
+  'Blocked List': undefined;
 };

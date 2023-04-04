@@ -1,6 +1,7 @@
 // Route metadata for tab-global routes
 import Comments from '../../../screens/media/Comments';
 import CreatePost from '../../../screens/media/CreatePost';
+import BlockedList from '../../../screens/profile/BlockedList';
 import Follows from '../../../screens/profile/Follows';
 import Profile from '../../../screens/profile/Profile';
 import Sends from '../../../screens/profile/Sends';
@@ -36,5 +37,9 @@ export const routes: Route[] = [
   {
     name: 'Comments',
     component: Comments,
+  },
+  {
+    name: 'Blocked List',
+    component: BlockedList,
   },
 ];
