@@ -21,50 +21,49 @@ const Blockable = ({ isConfirming, user, isBlocked, close }: Props) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const blockAndClose = () => {
+  const blockOrUnblock = () => {
     if (signedInUser === undefined) return;
     setIsLoading(true);
-    signedInUser
-      .blockUser(user)
-      .then(() => {
-        toast.show({
-          title: 'Blocked user.',
-          placement: 'top',
-        });
-        invalidateDocRefId(signedInUser.getId());
-        queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-      })
-      .catch((error) => {
-        console.error(error);
-        genericToast();
-      })
-      .finally(() => {
-        setIsLoading(false);
-        close();
-      });
-  };
 
-  const unblockAndClose = () => {
-    if (signedInUser === undefined) return;
-    setIsLoading(true);
-    signedInUser
-      .unblockUser(user)
-      .then(() => {
-        toast.show({
-          title: 'Unblocked user.',
-          placement: 'top',
+    if (isBlocked) {
+      signedInUser
+        .unblockUser(user)
+        .then(() => {
+          toast.show({
+            title: 'Unblocked user.',
+            placement: 'top',
+          });
+          invalidateDocRefId(signedInUser.getId());
+          queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
+        })
+        .catch((error) => {
+          console.error(error);
+          genericToast();
+        })
+        .finally(() => {
+          setIsLoading(false);
+          close();
         });
-        invalidateDocRefId(signedInUser.getId());
-        queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
-      })
-      .catch((error) => {
-        console.error(error);
-        genericToast();
-      })
-      .finally(() => {
-        setIsLoading(false);
-        close();
-      });
+    } else {
+      signedInUser
+        .blockUser(user)
+        .then(() => {
+          toast.show({
+            title: 'Blocked user.',
+            placement: 'top',
+          });
+          invalidateDocRefId(signedInUser.getId());
+          queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
+        })
+        .catch((error) => {
+          console.error(error);
+          genericToast();
+        })
+        .finally(() => {
+          setIsLoading(false);
+          close();
+        });
+    }
   };
 
   return (
@@ -83,7 +82,7 @@ const Blockable = ({ isConfirming, user, isBlocked, close }: Props) => {
           </Button>
           <Button
             isLoading={isLoading}
-            onPress={() => (isBlocked ? unblockAndClose() : blockAndClose())}
+            onPress={blockOrUnblock}
             colorScheme="danger"
           >
             {action}
