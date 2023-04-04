@@ -73,7 +73,9 @@ const Blockable = ({ isConfirming, user, isBlocked, close }: Props) => {
         <Modal.CloseButton />
         <Modal.Header>{action}</Modal.Header>
         <Modal.Body>
-          Are you sure you want to {action.toLowerCase()} this user?
+          {isBlocked
+            ? 'Are you sure you want to unblock this user?'
+            : 'Are you sure you want to block this user?'}
         </Modal.Body>
         <Modal.Footer>
           <Button onPress={close} variant="unstyled" colorScheme="coolGray">
