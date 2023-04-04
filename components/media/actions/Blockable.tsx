@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { queryClient } from '../../../App';
 import { userAtom } from '../../../utils/atoms';
 import { useGenericErrorToast } from '../../../utils/hooks';
-import { User as UserObj } from '../../../xplat/types';
+import { User as UserObj, invalidateDocRefId } from '../../../xplat/types';
 
 type Props = {
   isConfirming: boolean;
@@ -31,6 +31,7 @@ const Blockable = ({ isConfirming, user, isBlocked, close }: Props) => {
           title: 'Blocked user.',
           placement: 'top',
         });
+        invalidateDocRefId(signedInUser.getId());
         queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
       })
       .catch((error) => {
@@ -53,6 +54,7 @@ const Blockable = ({ isConfirming, user, isBlocked, close }: Props) => {
           title: 'Unblocked user.',
           placement: 'top',
         });
+        invalidateDocRefId(signedInUser.getId());
         queryClient.invalidateQueries({ queryKey: [signedInUser.getId()] });
       })
       .catch((error) => {
