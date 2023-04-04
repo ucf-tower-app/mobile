@@ -36,7 +36,6 @@ import {
   invalidateDocRefId,
   RouteType,
   User,
-  UserStatus,
 } from '../../xplat/types';
 
 /**
@@ -99,35 +98,36 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (permissionLevelCanWrite(userPermissionLevel)) {
-      if (signedInUser !== undefined && !profileIsMine) {
-        _contextOptions.Report = () => {
-          setIsReporting(true);
+    if (signedInUser !== undefined && !profileIsMine) {
+      _contextOptions.Report = () => {
+        setIsReporting(true);
+      };
+      if (isBlocked) {
+        _contextOptions.Unblock = () => {
+          setIsBlocking(true);
         };
-        if (isBlocked) {
-          _contextOptions.Unblock = () => {
-            setIsBlocking(true);
-          };
-        } else {
-          _contextOptions.Block = () => {
-            setIsBlocking(true);
-          };
-        }
       } else {
-        _contextOptions.Post = () => {
-          navigation.navigate('Create Post', {});
-        };
-        _contextOptions.Edit = () => {
-          setShowModal(true);
-        };
-        _contextOptions.Delete = () => {
-          setIsDeleting(true);
+        _contextOptions.Block = () => {
+          setIsBlocking(true);
         };
       }
+    } else {
+      _contextOptions.Post = () => {
+        navigation.navigate('Create Post', {});
+      };
+      _contextOptions.Edit = () => {
+        setShowModal(true);
+      };
+      _contextOptions.Delete = () => {
+        setIsDeleting(true);
+      };
+      _contextOptions['Blocked List'] = () => {
+        navigation.navigate('Blocked List');
+      };
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation, userPermissionLevel, isBlocked]);
+  }, [signedInUser, profileIsMine, navigation, isBlocked]);
 
   useEffect(() => {
     if (
@@ -222,7 +222,8 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
             <Center>
               <HStack space="md">
                 {permissionLevelCanWrite(userPermissionLevel) &&
-                !profileIsMine ? (
+                !profileIsMine &&
+                !isBlocked ? (
                   <Button
                     variant="subtle"
                     size="md"
