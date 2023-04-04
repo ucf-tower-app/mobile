@@ -92,28 +92,21 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
       signedInUser.getId() === postData.author.getId();
 
     const _contextOptions = contextOptions;
-    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
 
-    if (!signedInUserOwnsPost)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+
+      if (!signedInUserOwnsPost)
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+    }
 
     setContextOptions(_contextOptions);
   }, [contextOptions, signedInUser, userPermissionLevel, postData]);
-
-  useEffect(() => {
-    if (
-      userPermissionLevel === undefined ||
-      userPermissionLevel < UserStatus.Employee
-    )
-      return;
-    const _contextOptions = contextOptions;
-    setContextOptions(_contextOptions);
-  }, [userPermissionLevel, contextOptions]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {

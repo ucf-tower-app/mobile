@@ -59,15 +59,18 @@ const Comment = ({ comment }: Props) => {
       signedInUser.getId() === data.author.getId();
 
     const _contextOptions = contextOptions;
-    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsComment)
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
 
-    if (!signedInUserOwnsComment)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsComment)
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+
+      if (!signedInUserOwnsComment)
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+    }
 
     setContextOptions(_contextOptions);
   }, [contextOptions, signedInUser, userPermissionLevel, data]);

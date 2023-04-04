@@ -7,7 +7,7 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
-import { filterPosts } from '../../utils/utils';
+import { useFindShouldBeFilteredIndices } from '../../utils/hooks';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
 import { getIQParams_ForumPosts } from '../../xplat/queries/forum';
 import { Post as PostObj } from '../../xplat/types';
@@ -30,6 +30,7 @@ const Feed = ({
   isInRouteView = false,
 }: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
+  const findShouldBeFilteredIndices = useFindShouldBeFilteredIndices();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -43,9 +44,13 @@ const Feed = ({
   useEffect(() => {
     if (data === undefined) return;
 
-    let _posts = data.pages.flatMap((page) => constructPageData(PostObj, page));
-    filterPosts(_posts).then(setPosts);
-  }, [data]);
+    const _posts = data.pages.flatMap((page) =>
+      constructPageData(PostObj, page)
+    );
+    findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+      setPosts(_posts.filter((_, index) => !shouldBeFilteredIndices[index]))
+    );
+  }, [data, findShouldBeFilteredIndices]);
 
   const loadNextPosts = useCallback(async () => {
     if (hasNextPage && !isFetchingNextPage) {
