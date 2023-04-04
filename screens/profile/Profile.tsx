@@ -98,36 +98,39 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   useEffect(() => {
     const _contextOptions: ContextOptions = {};
-    if (signedInUser !== undefined && !profileIsMine) {
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
-      if (isBlocked) {
-        _contextOptions.Unblock = () => {
-          setIsBlocking(true);
+
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (signedInUser !== undefined && !profileIsMine) {
+        _contextOptions.Report = () => {
+          setIsReporting(true);
         };
+        if (isBlocked) {
+          _contextOptions.Unblock = () => {
+            setIsBlocking(true);
+          };
+        } else {
+          _contextOptions.Block = () => {
+            setIsBlocking(true);
+          };
+        }
       } else {
-        _contextOptions.Block = () => {
-          setIsBlocking(true);
+        _contextOptions.Post = () => {
+          navigation.navigate('Create Post', {});
+        };
+        _contextOptions.Edit = () => {
+          setShowModal(true);
+        };
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+        _contextOptions['Blocked List'] = () => {
+          navigation.navigate('Blocked List');
         };
       }
-    } else {
-      _contextOptions.Post = () => {
-        navigation.navigate('Create Post', {});
-      };
-      _contextOptions.Edit = () => {
-        setShowModal(true);
-      };
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
-      _contextOptions['Blocked List'] = () => {
-        navigation.navigate('Blocked List');
-      };
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation, isBlocked]);
+  }, [signedInUser, profileIsMine, navigation, isBlocked, userPermissionLevel]);
 
   useEffect(() => {
     if (
