@@ -77,18 +77,21 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     { enabled: userDocRefId !== undefined }
   );
 
+  // Setup the context options
   useEffect(() => {
+    if (signedInUser === undefined || profileUserQuery.data === undefined)
+      return;
+
     const _contextOptions: ContextOptions = {};
-    if (signedInUser !== undefined && !profileIsMine) {
-      const profileUser = profileUserQuery.data;
-      if (
-        profileUser?.status !== undefined &&
-        profileUser.status < UserStatus.Employee
-      )
+
+    if (!profileIsMine) {
+      // If the profile isn't mine, and is not an employee's, allow reporting
+      if (profileUserQuery.data.status < UserStatus.Employee)
         _contextOptions.Report = () => {
           setIsReporting(true);
         };
     } else {
+      // The profile is mine
       _contextOptions.Post = () => {
         navigation.navigate('Create Post', {});
       };

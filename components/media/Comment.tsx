@@ -53,6 +53,7 @@ const Comment = ({ comment }: Props) => {
     data.author.getStatus().then(setAuthorStatus);
   }, [data]);
 
+  // Prep the context options for this item
   useEffect(() => {
     if (
       signedInUser === undefined ||
@@ -65,19 +66,22 @@ const Comment = ({ comment }: Props) => {
     const signedInUserOwnsComment =
       signedInUser.getId() === data.author.getId();
 
-    const _contextOptions = contextOptions;
+    const _contextOptions: ContextOptions = {};
+
+    // If we're an employee or own the comment, allow deletion
     if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsComment)
       _contextOptions.Delete = () => {
         setIsDeleting(true);
       };
 
+    // If we don't own it, and the poster is not an emplyee, allow reporting
     if (!signedInUserOwnsComment && authorStatus < UserStatus.Employee)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
 
     setContextOptions(_contextOptions);
-  }, [contextOptions, signedInUser, userPermissionLevel, data, authorStatus]);
+  }, [signedInUser, userPermissionLevel, data, authorStatus]);
 
   if (isLoading) return <CommentSkeleton />;
 

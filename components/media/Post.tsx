@@ -98,35 +98,22 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     const signedInUserOwnsPost =
       signedInUser.getId() === postData.author.getId();
 
-    const _contextOptions = contextOptions;
+    const _contextOptions: ContextOptions = {};
+
+    // If we're an employee or own the post, allow deletion
     if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
       _contextOptions.Delete = () => {
         setIsDeleting(true);
       };
 
+    // If we don't own it, and the poster is not an emplyee, allow reporting
     if (!signedInUserOwnsPost && authorStatus < UserStatus.Employee)
       _contextOptions.Report = () => {
         setIsReporting(true);
       };
 
     setContextOptions(_contextOptions);
-  }, [
-    contextOptions,
-    signedInUser,
-    userPermissionLevel,
-    postData,
-    authorStatus,
-  ]);
-
-  useEffect(() => {
-    if (
-      userPermissionLevel === undefined ||
-      userPermissionLevel < UserStatus.Employee
-    )
-      return;
-    const _contextOptions = contextOptions;
-    setContextOptions(_contextOptions);
-  }, [userPermissionLevel, contextOptions]);
+  }, [signedInUser, userPermissionLevel, postData, authorStatus]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {
@@ -156,7 +143,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
       newMediaList.push({ imageUrl: url })
     );
     setMediaList(newMediaList);
-  }, [post, postData]);
+  }, [postData]);
 
   // Like the post
   const onSetIsLiked = (isLiked: boolean) => {
