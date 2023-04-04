@@ -81,6 +81,7 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     { enabled: userDocRefId !== undefined }
   );
 
+  // Set up blocked and blocked by values
   useEffect(() => {
     const checkedBlocked = async () => {
       const me = signedInUserQuery.data;
@@ -95,15 +96,22 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     checkedBlocked();
   }, [signedInUserQuery.data, profileUserQuery.data]);
 
+  // Setup the context options
   useEffect(() => {
+    if (signedInUser === undefined || profileUserQuery.data === undefined)
+      return;
+
     const _contextOptions: ContextOptions = {};
 
     if (permissionLevelCanWrite(userPermissionLevel)) {
-      if (signedInUser !== undefined && !profileIsMine)
-        _contextOptions.Report = () => {
-          setIsReporting(true);
-        };
-      else {
+      if (!profileIsMine) {
+        // If the profile isn't mine, and is not an employee's, allow reporting
+        if (profileUserQuery.data.status < UserStatus.Employee)
+          _contextOptions.Report = () => {
+            setIsReporting(true);
+          };
+      } else {
+        // The profile is mine
         _contextOptions.Post = () => {
           navigation.navigate('Create Post', {});
         };
@@ -117,7 +125,13 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
     }
 
     setContextOptions(_contextOptions);
-  }, [signedInUser, profileIsMine, navigation, userPermissionLevel]);
+  }, [
+    signedInUser,
+    profileIsMine,
+    navigation,
+    profileUserQuery.data,
+    userPermissionLevel,
+  ]);
 
   useEffect(() => {
     if (
