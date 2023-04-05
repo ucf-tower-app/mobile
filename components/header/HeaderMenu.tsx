@@ -9,8 +9,7 @@ import ChangeEmailModal from '../profile/ChangeEmailModal';
 import LightDarkIcon from '../util/LightDarkIcon';
 import { openURL } from 'expo-linking';
 
-export const TERMS_OF_SERVICE_URL =
-  'https://app.termly.io/document/eula/4cbdc6b4-5dda-4e15-b7f1-329263b49ba3';
+export const TERMS_OF_SERVICE_URL = 'https://tylerhm.dev/tower-eula';
 
 export const PressableDots = (triggerProps: any) => {
   return (
