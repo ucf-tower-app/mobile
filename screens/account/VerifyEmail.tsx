@@ -44,7 +44,7 @@ const VerifyEmail = () => {
         <Text fontSize="md" color="gray.600">
           Verify your email to continue
         </Text>
-        <Input onChangeText={setAttemptCode} />
+        <Input mt={4} onChangeText={setAttemptCode} keyboardType="number-pad" />
         <Button
           mt={16}
           variant="link"
