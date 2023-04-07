@@ -43,7 +43,7 @@ const RouteSearchHeader = ({
   const [debounceSession] = useState<DebounceSession>(new DebounceSession(500));
 
   return (
-    <VStack my={1} px={2}>
+    <VStack my={2} px={2}>
       <SearchBar
         queryHandler={{
           onChangeQuery: (newQuery: string) => setQuery(newQuery.toLowerCase()),
