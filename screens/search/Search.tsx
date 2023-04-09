@@ -144,7 +144,7 @@ const Search = () => {
               onChangeQueryDebounceSession: new DebounceSession(100),
             }}
           />
-          <HStack w="full" justifyContent="space-between" mt={2} space={2}>
+          <HStack w="full" justifyContent="space-between" my={2} space={2}>
             <Button
               w="31%"
               onPress={() => setTabViewed('archived')}
