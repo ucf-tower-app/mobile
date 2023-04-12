@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tyler.hm.tower",
-      "buildNumber": 10
+      "buildNumber": "10"
     },
     "android": {
       "permissions": ["android.permission.RECORD_AUDIO"],
