@@ -24,9 +24,11 @@ const AuthProvider = ({ children }: Props) => {
         if (user !== null) {
           setIsSignedIn(true);
           const lazyUser = await getCurrentUser();
-          setUserPermissionLevel(await lazyUser.getStatus());
-          setUser(lazyUser);
-          setTimeout(() => setIsInitializing(false), 200);
+          await setTimeout(async () => {
+            setUserPermissionLevel(await lazyUser.getStatus());
+            setUser(lazyUser);
+            setTimeout(() => setIsInitializing(false), 200);
+          }, 1500);
         } else {
           setIsSignedIn(false);
           setUserPermissionLevel(undefined);
