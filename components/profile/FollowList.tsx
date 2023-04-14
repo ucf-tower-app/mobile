@@ -1,4 +1,10 @@
-import { Divider, FlatList, Text, useColorModeValue } from 'native-base';
+import {
+  Center,
+  Divider,
+  FlatList,
+  Text,
+  useColorModeValue,
+} from 'native-base';
 import { useEffect, useState } from 'react';
 import { useUserCacheMap } from '../../utils/queries';
 import { FetchedUser, User } from '../../xplat/types';
@@ -28,7 +34,7 @@ const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
       });
     }
     if (searchQuery === '' || userCache.data === undefined) setUsers(newUsers);
-    else
+    else {
       setUsers(
         newUsers.filter((user) => {
           const entry = userCache.data.get(user.getId());
@@ -36,6 +42,7 @@ const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
           return entry.username.includes(searchQuery);
         })
       );
+    }
   }, [
     fetchedUser.followersList,
     fetchedUser.followingList,
@@ -47,7 +54,11 @@ const FollowList = ({ searchQuery, userTab, fetchedUser, header }: Props) => {
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const renderDivider = () => <Divider mt={2} mb={2} />;
-  const renderEmptyComponent = () => <Text>There's nothing here!</Text>;
+  const renderEmptyComponent = () => (
+    <Center>
+      <Text>There's nothing here!</Text>
+    </Center>
+  );
 
   return (
     <FlatList

@@ -3,11 +3,11 @@ import {
   Button,
   Center,
   Divider,
+  Heading,
   HStack,
   Pressable,
   useColorModeValue,
   VStack,
-  Heading,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -100,18 +100,20 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
 
   // Setup the context options
   useEffect(() => {
-    if (signedInUser === undefined || profileUserQuery.data === undefined)
+    if (signedInUser === undefined || profileUserQuery.data === undefined) {
       return;
+    }
 
     const _contextOptions: ContextOptions = {};
 
     if (permissionLevelCanWrite(userPermissionLevel)) {
       if (!profileIsMine) {
         // If the profile isn't mine, and is not an employee's, allow reporting
-        if (profileUserQuery.data.status < UserStatus.Employee)
+        if (profileUserQuery.data.status < UserStatus.Employee) {
           _contextOptions.Report = () => {
             setIsReporting(true);
           };
+        }
 
         if (isBlocked) {
           _contextOptions.Unblock = () => {
@@ -301,6 +303,17 @@ const Profile = ({ route, navigation }: TabGlobalScreenProps<'Profile'>) => {
       </>
     );
   };
+
+  if (!permissionLevelCanWrite(userPermissionLevel)) {
+    return (
+      <>
+        {profileComponent()}
+          <HStack w="full" mt={12} justifyContent="center">
+            <Heading size="md">Verify a Knights Email to make a post.</Heading>
+          </HStack>
+      </>
+    );
+  }
 
   // Don't show content if they are blocked or blocked by
   // But only let the user know that the reason for not showing content
