@@ -8,6 +8,7 @@ import { UserStatus } from '../../xplat/types';
 import ChangeEmailModal from '../profile/ChangeEmailModal';
 import LightDarkIcon from '../util/LightDarkIcon';
 import { openURL } from 'expo-linking';
+import { permissionLevelCanWrite } from '../../utils/permissions';
 
 export const TERMS_OF_SERVICE_URL = 'https://tylerhm.dev/tower-eula';
 
@@ -28,6 +29,9 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [changeEmail, setChangeEmail] = useState<boolean>(false);
 
+  const shouldDisplayPostOption =
+    hasPostOption && permissionLevelCanWrite(userPermissionLevel);
+
   return (
     <>
       <ChangeEmailModal
@@ -47,7 +51,7 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
         <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
           Term of Service
         </Menu.Item>
-        {hasPostOption ? (
+        {shouldDisplayPostOption ? (
           <Menu.Item
             onPress={() =>
               navigation.navigate('Tabs', {
