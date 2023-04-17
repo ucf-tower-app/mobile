@@ -216,6 +216,11 @@ const RouteView = ({ route }: TabGlobalScreenProps<'Route View'>) => {
           <Text fontSize="2xl" color="grey" mx={4}>
             {data.stringifiedTags}
           </Text>
+          {data.naturalRules !== undefined ? (
+            <Text fontSize="lg" color="grey" fontWeight="bold" mb={2} mx={4}>
+              Natural Rules: {data.naturalRules}
+            </Text>
+          ) : null}
           <HStack flexWrap="wrap" justifyContent="space-between" mx={4} mt={2}>
             {data.setter !== undefined ? (
               <VStack justifyContent="flex-start" flexGrow={0}>
