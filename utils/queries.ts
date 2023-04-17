@@ -3,6 +3,7 @@ import {
   buildMatcher,
   buildSet,
   buildUserCacheMap,
+  buildUserReferenceIdSet,
   buildUserSubstringMatcher,
   getActiveRoutesCursor,
   getArchivedRouteNames,
@@ -49,6 +50,14 @@ export const useActiveRoutes = () => {
 export const useUserCacheMap = () => {
   return useQuery(USER_CACHE_KEY, getUserCache, {
     select: buildUserCacheMap,
+    staleTime: TWO_HOURS,
+    cacheTime: TWO_HOURS,
+  });
+};
+
+export const useUserReferenceIdSet = () => {
+  return useQuery(USER_CACHE_KEY, getUserCache, {
+    select: buildUserReferenceIdSet,
     staleTime: TWO_HOURS,
     cacheTime: TWO_HOURS,
   });
