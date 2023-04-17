@@ -11,6 +11,7 @@ import { useRecoilValue } from 'recoil';
 import Leaderboard from '../../components/leaderboard/Leaderboard';
 import { userAtom } from '../../utils/atoms';
 import { useSignedInUserQuery } from '../../utils/hooks';
+import { useUserReferenceIdSet } from '../../utils/queries';
 import {
   LeaderboardEntry,
   getRQParams_MonthlyLeaderboard,
@@ -32,8 +33,10 @@ const Leaderboards = () => {
     getRQParams_SemesterLeaderboard(new Date())
   );
   const userQuery = useSignedInUserQuery();
+  const userIdsQuery = useUserReferenceIdSet();
 
   useEffect(() => {
+    if (userIdsQuery.data === undefined) return;
     var newData =
       tabViewed === 'Monthly'
         ? monthlyRQResult.data ?? []
@@ -45,6 +48,11 @@ const Leaderboards = () => {
           containsRef(userQuery.data!.followingList, entry.user)
       );
     }
+
+    newData = newData.filter((entry) =>
+      userIdsQuery.data.has(entry.user.getId())
+    );
+
     newData.sort((a, b) =>
       a.points === b.points ? b.sends - a.sends : b.points - a.points
     );
@@ -56,6 +64,7 @@ const Leaderboards = () => {
     semesterRQResult.data,
     signedInUser,
     tabViewed,
+    userIdsQuery.data,
   ]);
 
   return (
