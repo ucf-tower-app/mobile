@@ -227,6 +227,10 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
         isSend: false,
       });
 
+      videoBlob?.video.close();
+      videoBlob?.thumbnail.close();
+      imageBlobs.forEach((blob) => blob.close());
+
       // Invalidate places where this post could show up locally
       queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
       if (forum)
