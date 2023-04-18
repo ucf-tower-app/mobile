@@ -70,6 +70,8 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     undefined
   );
 
+  const [commentCount, setCommentCount] = useState<number>();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
@@ -83,6 +85,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   useEffect(() => {
     if (realQR.data === undefined) return;
     realQR.data.author.getStatus().then(setAuthorStatus);
+    realQR.data.postObject.getCommentCount().then(setCommentCount);
   }, [realQR.data]);
 
   // Set up the context menu
@@ -195,6 +198,10 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   }
 
   const showRouteLink = !isInRouteView && routeName !== undefined;
+  let commentButtonText = 'Comments';
+  if (commentCount !== undefined && commentCount > 0) {
+    commentButtonText += ` (${commentCount})`;
+  }
   return (
     <>
       <Reportable
@@ -247,13 +254,14 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           >
             <Button
               variant="link"
+              alignItems="center"
               onPress={() =>
                 navigation.push('Comments', {
                   postDocRefId: postData.postObject.getId(),
                 })
               }
             >
-              Comments
+              {commentButtonText}
             </Button>
             {permissionLevelCanWrite(userPermissionLevel) ? (
               <Box position="absolute" right={2}>
