@@ -194,6 +194,14 @@ const HomeFeed = () => {
     }
   };
 
+  const renderSpinner = () => {
+    if (activeFeed === 'all' && allPostsIQ.hasNextPage)
+      return <Spinner size="lg" />;
+    if (activeFeed === 'following' && followingPostsIQ.hasNextPage)
+      return <Spinner size="lg" />;
+    else return null;
+  };
+
   return (
     <FlatList
       bgColor={baseBgColor}
@@ -207,6 +215,7 @@ const HomeFeed = () => {
           }
         />
       }
+      ListFooterComponent={renderSpinner}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
       renderItem={Item}
