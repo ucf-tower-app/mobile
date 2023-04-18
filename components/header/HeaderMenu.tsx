@@ -11,6 +11,7 @@ import { openURL } from 'expo-linking';
 import { permissionLevelCanWrite } from '../../utils/permissions';
 
 export const TERMS_OF_SERVICE_URL = 'https://tylerhm.dev/tower-eula';
+export const FAQ_URL = 'https://ucf-tower.web.app/faq';
 
 export const PressableDots = (triggerProps: any) => {
   return (
@@ -44,13 +45,6 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Verify Knights Email
           </Menu.Item>
         ) : null}
-        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
-        <Menu.Item onPress={() => navigation.navigate('Settings')}>
-          Settings
-        </Menu.Item>
-        <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
-          Term of Service
-        </Menu.Item>
         {shouldDisplayPostOption ? (
           <Menu.Item
             onPress={() =>
@@ -66,6 +60,14 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Post
           </Menu.Item>
         ) : null}
+        <Menu.Item onPress={() => navigation.navigate('Settings')}>
+          Settings
+        </Menu.Item>
+        <Menu.Item onPress={() => openURL(FAQ_URL)}>FAQ</Menu.Item>
+        <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
+          Term of Service
+        </Menu.Item>
+        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
       </Menu>
     </>
   );
