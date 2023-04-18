@@ -44,13 +44,6 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Verify Knights Email
           </Menu.Item>
         ) : null}
-        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
-        <Menu.Item onPress={() => navigation.navigate('Settings')}>
-          Settings
-        </Menu.Item>
-        <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
-          Term of Service
-        </Menu.Item>
         {shouldDisplayPostOption ? (
           <Menu.Item
             onPress={() =>
@@ -66,6 +59,13 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Post
           </Menu.Item>
         ) : null}
+        <Menu.Item onPress={() => navigation.navigate('Settings')}>
+          Settings
+        </Menu.Item>
+        <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
+          Term of Service
+        </Menu.Item>
+        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
       </Menu>
     </>
   );
