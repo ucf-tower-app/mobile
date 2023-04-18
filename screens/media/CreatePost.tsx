@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { manipulateAsync } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import {
   Box,
@@ -43,6 +44,7 @@ import {
  */
 const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
   const routeDocRefId = route.params.routeDocRefId;
+  const maxVideoSize = 50;
 
   const navigation = useNavigation();
   const user = useRecoilValue(userAtom);
@@ -89,6 +91,11 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
     );
   }, [textContent, videoContent, imageContent, user]);
 
+  const isVideoTooBig = (fileInfo: FileSystem.FileInfo) => {
+    const sizeInMb = fileInfo.size! / 1024 / 1024;
+    return sizeInMb >= maxVideoSize;
+  };
+
   // Opens up a video picker and updates state
   const pickVideo = async () => {
     try {
@@ -103,6 +110,24 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
 
       const asset = result.assets?.at(0);
       if (result.canceled || asset === undefined) return;
+
+      const fileInfo = await FileSystem.getInfoAsync(asset.uri, { size: true });
+
+      if (!fileInfo?.size) {
+        toast.show({
+          description: "Can't select this file as the size is unknown.",
+          placement: 'top',
+        });
+        return;
+      }
+
+      if (isVideoTooBig(fileInfo)) {
+        toast.show({
+          description: `File size is too big. Max file size is ${maxVideoSize} MB.`,
+          placement: 'top',
+        });
+        return;
+      }
 
       // Get the first frame as a thumbnail
       const thumbnailResult = await VideoThumbnails.getThumbnailAsync(
