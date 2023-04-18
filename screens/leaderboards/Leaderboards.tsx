@@ -3,6 +3,7 @@ import {
   Center,
   Divider,
   HStack,
+  VStack,
   useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -69,38 +70,40 @@ const Leaderboards = () => {
 
   return (
     <Center bgColor={baseBgColor}>
-      <HStack space="1" p={1} mt={1}>
-        <Button
-          onPress={() => setTabViewed('Monthly')}
-          variant={tabViewed === 'Monthly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Monthly
-        </Button>
-        <Button
-          onPress={() => setTabViewed('Semesterly')}
-          variant={tabViewed === 'Semesterly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Semesterly
-        </Button>
-        <Divider orientation="vertical" />
-        <Button
-          onPress={() => setFilter('Anyone')}
-          variant={filter === 'Anyone' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Anyone
-        </Button>
-        <Button
-          onPress={() => setFilter('Following')}
-          variant={filter === 'Following' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Following
-        </Button>
-      </HStack>
-      <Leaderboard data={data} />
+      <VStack>
+        <HStack space="1" p={1} mt={1}>
+          <Button
+            onPress={() => setTabViewed('Monthly')}
+            variant={tabViewed === 'Monthly' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Monthly
+          </Button>
+          <Button
+            onPress={() => setTabViewed('Semesterly')}
+            variant={tabViewed === 'Semesterly' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Semesterly
+          </Button>
+          <Divider orientation="vertical" />
+          <Button
+            onPress={() => setFilter('Anyone')}
+            variant={filter === 'Anyone' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Anyone
+          </Button>
+          <Button
+            onPress={() => setFilter('Following')}
+            variant={filter === 'Following' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Following
+          </Button>
+        </HStack>
+        <Leaderboard data={data} />
+      </VStack>
     </Center>
   );
 };
