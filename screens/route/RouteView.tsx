@@ -146,6 +146,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'Route View'>) => {
           queryKey: getRQKey_SemesterLeaderboard(new Date()),
         });
         queryClient.invalidateQueries({ queryKey: user.getId() });
+        queryClient.invalidateQueries({ queryKey: ['sends', user.getId()] });
       });
     }
   };
