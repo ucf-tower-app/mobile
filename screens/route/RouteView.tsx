@@ -167,6 +167,7 @@ const RouteView = ({ route }: TabGlobalScreenProps<'Route View'>) => {
           queryClient.invalidateQueries({
             queryKey: ['posts', data.forumDocRefID],
           });
+          queryClient.invalidateQueries({ queryKey: 'all-posts' });
         });
       } catch (e: any) {
         var msg: string | undefined;

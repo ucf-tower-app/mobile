@@ -233,6 +233,7 @@ const CreatePost = ({ route }: TabGlobalScreenProps<'Create Post'>) => {
 
       // Invalidate places where this post could show up locally
       queryClient.invalidateQueries({ queryKey: ['posts', user.getId()] });
+      queryClient.invalidateQueries({ queryKey: 'all-posts' });
       if (forum)
         queryClient.invalidateQueries({ queryKey: ['posts', forum.getId()] });
 
