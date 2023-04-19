@@ -70,7 +70,7 @@ const Leaderboards = () => {
 
   return (
     <Center bgColor={baseBgColor}>
-      <VStack>
+      <VStack alignItems="center">
         <HStack space="1" p={1} mt={1}>
           <Button
             onPress={() => setTabViewed('Monthly')}
