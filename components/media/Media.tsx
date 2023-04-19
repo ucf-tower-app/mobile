@@ -12,8 +12,9 @@ type Props = {
   media: MediaType;
   width: number;
   height: number;
+  borderRadius?: number;
 };
-const Media = ({ media, width, height }: Props) => {
+const Media = ({ media, width, height, borderRadius = 0 }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   return media.videoUrl === undefined ? (
@@ -21,6 +22,7 @@ const Media = ({ media, width, height }: Props) => {
       <Image
         w={width}
         h={height}
+        borderRadius={borderRadius}
         resizeMode={ResizeMode.COVER}
         source={{ uri: media.imageUrl }}
         onLoad={() => setIsLoading(false)}

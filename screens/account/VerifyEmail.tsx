@@ -5,6 +5,7 @@ import { userPermissionLevelAtom } from '../../utils/atoms';
 import { auth } from '../../xplat/Firebase';
 import { confirmEmailCode, sendEmailCode } from '../../xplat/api';
 import { UserStatus } from '../../xplat/types';
+import { Keyboard, TouchableWithoutFeedback } from 'react-native';
 
 const VerifyEmail = () => {
   const [userPermissionLevel, setUserPermissionLevel] = useRecoilState(
@@ -31,32 +32,38 @@ const VerifyEmail = () => {
   }, [attemptCode, setUserPermissionLevel, targCode]);
 
   return (
-    <Center>
-      <VStack
-        w="90%"
-        h="full"
-        mx="3"
-        maxW="300px"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Heading size="xl">You're almost there</Heading>
-        <Text fontSize="md" color="gray.600">
-          Verify your email to continue
-        </Text>
-        <Input onChangeText={setAttemptCode} />
-        <Button
-          mt={16}
-          variant="link"
-          onPress={() => sendEmailCode().then(setTargCode)}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Center>
+        <VStack
+          w="90%"
+          h="full"
+          mx="3"
+          maxW="300px"
+          justifyContent="center"
+          alignItems="center"
         >
-          Didn't get the email? Send another
-        </Button>
-        <Button mt={4} variant="outline" onPress={() => auth.signOut()}>
-          Sign out
-        </Button>
-      </VStack>
-    </Center>
+          <Heading size="xl">You're almost there</Heading>
+          <Text fontSize="md" color="gray.600">
+            Verify your email to continue
+          </Text>
+          <Input
+            mt={4}
+            onChangeText={setAttemptCode}
+            keyboardType="number-pad"
+          />
+          <Button
+            mt={16}
+            variant="link"
+            onPress={() => sendEmailCode().then(setTargCode)}
+          >
+            Didn't get the email? Send another
+          </Button>
+          <Button mt={4} variant="outline" onPress={() => auth.signOut()}>
+            Sign out
+          </Button>
+        </VStack>
+      </Center>
+    </TouchableWithoutFeedback>
   );
 };
 

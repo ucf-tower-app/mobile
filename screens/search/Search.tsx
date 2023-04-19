@@ -132,6 +132,7 @@ const Search = () => {
           );
         })
       : null;
+
   return (
     <ScrollView w="full" bg={baseBgColor} p="2">
       <Center w="full">
@@ -143,8 +144,9 @@ const Search = () => {
               onChangeQueryDebounceSession: new DebounceSession(100),
             }}
           />
-          <HStack w="full" justifyContent="space-around" p="3" space="md">
+          <HStack w="full" justifyContent="space-between" my={2} space={2}>
             <Button
+              w="31%"
               onPress={() => setTabViewed('archived')}
               variant={tabViewed === 'archived' ? 'solid' : 'outline'}
               rounded="full"
@@ -152,6 +154,7 @@ const Search = () => {
               Archived Routes
             </Button>
             <Button
+              w="31%"
               onPress={() => setTabViewed('active')}
               variant={tabViewed === 'active' ? 'solid' : 'outline'}
               rounded="full"
@@ -159,6 +162,7 @@ const Search = () => {
               Active Routes
             </Button>
             <Button
+              w="31%"
               onPress={() => setTabViewed('users')}
               variant={tabViewed === 'users' ? 'solid' : 'outline'}
               rounded="full"

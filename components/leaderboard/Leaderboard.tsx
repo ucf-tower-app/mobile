@@ -1,4 +1,4 @@
-import { Box, FlatList, Spacer, VStack } from 'native-base';
+import { Box, Divider, FlatList } from 'native-base';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../utils/atoms';
@@ -37,15 +37,14 @@ const Leaderboard = ({ data }: Props) => {
 
   return (
     <FlatList
-      h="full"
-      ListHeaderComponent={topComponent}
       data={data}
+      ListHeaderComponent={topComponent}
       renderItem={({ item, index }) => (
-        <VStack pt={4}>
+        <Box py={4}>
           <LeaderboardRow data={item} ranking={index + 1} />
-          {index < data.length - 1 ? <Spacer /> : null}
-        </VStack>
+        </Box>
       )}
+      ItemSeparatorComponent={Divider}
       keyExtractor={(item) => item.user.getId()}
     />
   );

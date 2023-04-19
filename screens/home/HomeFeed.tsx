@@ -24,6 +24,7 @@ import {
 import { Post as PostObj } from '../../xplat/types';
 import LightDarkIcon from '../../components/util/LightDarkIcon';
 import { HeaderWithPostOption } from '../../components/header/HeaderMenu';
+import { useFindShouldBeFilteredIndices } from '../../utils/hooks';
 
 type ActiveFeed = 'none' | 'all' | 'following';
 
@@ -126,6 +127,7 @@ const HomeFeed = () => {
 
   const [allPosts, setAllPosts] = useState<PostObj[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostObj[]>([]);
+  const findShouldBeFilteredIndices = useFindShouldBeFilteredIndices();
 
   const FeedSelectorMemo = useCallback(
     () => (
@@ -149,22 +151,28 @@ const HomeFeed = () => {
   }, [navigation, FeedSelectorMemo]);
 
   useEffect(() => {
-    if (allPostsIQ.data !== undefined)
-      setAllPosts(
-        allPostsIQ.data.pages.flatMap((page) =>
-          constructPageData(PostObj, page)
+    if (allPostsIQ.data !== undefined) {
+      const _posts = allPostsIQ.data.pages.flatMap((page) =>
+        constructPageData(PostObj, page)
+      );
+      findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+        setAllPosts(
+          _posts.filter((_, index) => !shouldBeFilteredIndices[index])
         )
       );
-    else setAllPosts([]);
-  }, [allPostsIQ.data]);
+    } else setAllPosts([]);
+  }, [allPostsIQ.data, findShouldBeFilteredIndices]);
 
   useEffect(() => {
-    if (followingPostsIQ.data !== undefined)
-      setFollowingPosts(
-        followingPostsIQ.data.pages.flatMap((page) => page.result)
+    if (followingPostsIQ.data !== undefined) {
+      const _posts = followingPostsIQ.data.pages.flatMap((page) => page.result);
+      findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+        setFollowingPosts(
+          _posts.filter((_, index) => !shouldBeFilteredIndices[index])
+        )
       );
-    else setFollowingPosts([]);
-  }, [followingPostsIQ.data]);
+    } else setFollowingPosts([]);
+  }, [followingPostsIQ.data, findShouldBeFilteredIndices]);
 
   // Keep track of if we've *just* switched the feed, so that we can intercept the render to show
   // a loading symbol while loading
@@ -186,6 +194,14 @@ const HomeFeed = () => {
     }
   };
 
+  const renderSpinner = () => {
+    if (activeFeed === 'all' && allPostsIQ.hasNextPage)
+      return <Spinner size="lg" />;
+    if (activeFeed === 'following' && followingPostsIQ.hasNextPage)
+      return <Spinner size="lg" />;
+    else return null;
+  };
+
   return (
     <FlatList
       bgColor={baseBgColor}
@@ -199,6 +215,7 @@ const HomeFeed = () => {
           }
         />
       }
+      ListFooterComponent={renderSpinner}
       onEndReached={getNextPosts}
       ItemSeparatorComponent={Divider}
       renderItem={Item}

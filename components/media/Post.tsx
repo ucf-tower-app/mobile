@@ -70,6 +70,8 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
     undefined
   );
 
+  const [commentCount, setCommentCount] = useState<number>();
+
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
   const [postData, setPostData] = useState<FetchedPost>();
@@ -78,42 +80,45 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   const realQR = useQuery(post.getId(), post.buildFetcher(), {
     enabled: !post.isMock(),
   });
+  const [authorStatus, setAuthorStatus] = useState<UserStatus>();
+
+  useEffect(() => {
+    if (realQR.data === undefined) return;
+    realQR.data.author.getStatus().then(setAuthorStatus);
+    realQR.data.postObject.getCommentCount().then(setCommentCount);
+  }, [realQR.data]);
 
   // Set up the context menu
   useEffect(() => {
     if (
       signedInUser === undefined ||
       userPermissionLevel === undefined ||
-      postData === undefined
+      postData === undefined ||
+      authorStatus === undefined
     )
       return;
 
     const signedInUserOwnsPost =
       signedInUser.getId() === postData.author.getId();
 
-    const _contextOptions = contextOptions;
-    if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
-      _contextOptions.Delete = () => {
-        setIsDeleting(true);
-      };
+    const _contextOptions: ContextOptions = {};
 
-    if (!signedInUserOwnsPost)
-      _contextOptions.Report = () => {
-        setIsReporting(true);
-      };
+    // If we're an employee or own the post, allow deletion
+    if (permissionLevelCanWrite(userPermissionLevel)) {
+      if (userPermissionLevel >= UserStatus.Employee || signedInUserOwnsPost)
+        _contextOptions.Delete = () => {
+          setIsDeleting(true);
+        };
+
+      // If we don't own it, and the poster is not an emplyee, allow reporting
+      if (!signedInUserOwnsPost && authorStatus < UserStatus.Employee)
+        _contextOptions.Report = () => {
+          setIsReporting(true);
+        };
+    }
 
     setContextOptions(_contextOptions);
-  }, [contextOptions, signedInUser, userPermissionLevel, postData]);
-
-  useEffect(() => {
-    if (
-      userPermissionLevel === undefined ||
-      userPermissionLevel < UserStatus.Employee
-    )
-      return;
-    const _contextOptions = contextOptions;
-    setContextOptions(_contextOptions);
-  }, [userPermissionLevel, contextOptions]);
+  }, [signedInUser, userPermissionLevel, postData, authorStatus]);
 
   useEffect(() => {
     if (realQR.data !== undefined) {
@@ -143,7 +148,7 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
       newMediaList.push({ imageUrl: url })
     );
     setMediaList(newMediaList);
-  }, [post, postData]);
+  }, [postData]);
 
   // Like the post
   const onSetIsLiked = (isLiked: boolean) => {
@@ -193,6 +198,10 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
   }
 
   const showRouteLink = !isInRouteView && routeName !== undefined;
+  let commentButtonText = 'Comments';
+  if (commentCount !== undefined && commentCount > 0) {
+    commentButtonText += ` (${commentCount})`;
+  }
   return (
     <>
       <Reportable
@@ -245,13 +254,14 @@ const Post = ({ post, isInRouteView = false, isPreview = false }: Props) => {
           >
             <Button
               variant="link"
+              alignItems="center"
               onPress={() =>
                 navigation.push('Comments', {
                   postDocRefId: postData.postObject.getId(),
                 })
               }
             >
-              Comments
+              {commentButtonText}
             </Button>
             {permissionLevelCanWrite(userPermissionLevel) ? (
               <Box position="absolute" right={2}>

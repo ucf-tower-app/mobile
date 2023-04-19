@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { TabGlobalNavigationProp } from '../../utils/types';
 import { Route } from '../../xplat/types';
+import Media from '../media/Media';
 
 type Props = {
   route: Route;
@@ -69,11 +70,11 @@ const RouteRow = ({ route }: Props) => {
         justifyContent="flex-start"
         alignItems="center"
       >
-        <Image
-          size={16}
+        <Media
+          width={16}
+          height={16}
           borderRadius={5}
-          source={{ uri: data.thumbnailUrl }}
-          alt={data.name}
+          media={{ imageUrl: data.thumbnailUrl }}
         />
         <VStack pl={2} pt={2} maxW="70%">
           <Text fontSize="xl" fontWeight="bold">

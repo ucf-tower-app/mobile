@@ -7,6 +7,7 @@ import {
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import { useFindShouldBeFilteredIndices } from '../../utils/hooks';
 import { constructPageData, getIQParams_UserPosts } from '../../xplat/queries';
 import { getIQParams_ForumPosts } from '../../xplat/queries/forum';
 import { Post as PostObj } from '../../xplat/types';
@@ -29,6 +30,7 @@ const Feed = ({
   isInRouteView = false,
 }: Props) => {
   const [posts, setPosts] = useState<PostObj[]>([]);
+  const findShouldBeFilteredIndices = useFindShouldBeFilteredIndices();
 
   const baseBgColor = useColorModeValue('lightMode.base', 'darkMode.base');
 
@@ -42,26 +44,13 @@ const Feed = ({
   useEffect(() => {
     if (data === undefined) return;
 
-    // Filters out media that shouldn't be shown and updates state
-    const readAndFilterPosts = async () => {
-      let _posts = data.pages.flatMap((page) =>
-        constructPageData(PostObj, page)
-      );
-
-      // Get the data, so that `exists` is properly mapped for cache-invalidated data
-      await Promise.all(_posts.map((post) => post.getData()));
-
-      // Filter out the bad data
-      const shouldBeOmittedResults = await Promise.all(
-        _posts.map((post) => !post.exists || post.checkShouldBeHidden())
-      );
-      _posts = _posts.filter((_, index) => !shouldBeOmittedResults[index]);
-
-      setPosts(_posts);
-    };
-
-    readAndFilterPosts();
-  }, [data]);
+    const _posts = data.pages.flatMap((page) =>
+      constructPageData(PostObj, page)
+    );
+    findShouldBeFilteredIndices(_posts).then((shouldBeFilteredIndices) =>
+      setPosts(_posts.filter((_, index) => !shouldBeFilteredIndices[index]))
+    );
+  }, [data, findShouldBeFilteredIndices]);
 
   const loadNextPosts = useCallback(async () => {
     if (hasNextPage && !isFetchingNextPage) {

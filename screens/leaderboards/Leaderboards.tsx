@@ -3,6 +3,7 @@ import {
   Center,
   Divider,
   HStack,
+  VStack,
   useColorModeValue,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import { useRecoilValue } from 'recoil';
 import Leaderboard from '../../components/leaderboard/Leaderboard';
 import { userAtom } from '../../utils/atoms';
 import { useSignedInUserQuery } from '../../utils/hooks';
+import { useUserReferenceIdSet } from '../../utils/queries';
 import {
   LeaderboardEntry,
   getRQParams_MonthlyLeaderboard,
@@ -32,8 +34,10 @@ const Leaderboards = () => {
     getRQParams_SemesterLeaderboard(new Date())
   );
   const userQuery = useSignedInUserQuery();
+  const userIdsQuery = useUserReferenceIdSet();
 
   useEffect(() => {
+    if (userIdsQuery.data === undefined) return;
     var newData =
       tabViewed === 'Monthly'
         ? monthlyRQResult.data ?? []
@@ -45,6 +49,11 @@ const Leaderboards = () => {
           containsRef(userQuery.data!.followingList, entry.user)
       );
     }
+
+    newData = newData.filter((entry) =>
+      userIdsQuery.data.has(entry.user.getId())
+    );
+
     newData.sort((a, b) =>
       a.points === b.points ? b.sends - a.sends : b.points - a.points
     );
@@ -56,42 +65,45 @@ const Leaderboards = () => {
     semesterRQResult.data,
     signedInUser,
     tabViewed,
+    userIdsQuery.data,
   ]);
 
   return (
     <Center bgColor={baseBgColor}>
-      <HStack space="1" p={1} mt={1}>
-        <Button
-          onPress={() => setTabViewed('Monthly')}
-          variant={tabViewed === 'Monthly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Monthly
-        </Button>
-        <Button
-          onPress={() => setTabViewed('Semesterly')}
-          variant={tabViewed === 'Semesterly' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Semesterly
-        </Button>
-        <Divider orientation="vertical" />
-        <Button
-          onPress={() => setFilter('Anyone')}
-          variant={filter === 'Anyone' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Anyone
-        </Button>
-        <Button
-          onPress={() => setFilter('Following')}
-          variant={filter === 'Following' ? 'solid' : 'outline'}
-          rounded="full"
-        >
-          Following
-        </Button>
-      </HStack>
-      <Leaderboard data={data} />
+      <VStack alignItems="center">
+        <HStack space="1" p={1} mt={1}>
+          <Button
+            onPress={() => setTabViewed('Monthly')}
+            variant={tabViewed === 'Monthly' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Monthly
+          </Button>
+          <Button
+            onPress={() => setTabViewed('Semesterly')}
+            variant={tabViewed === 'Semesterly' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Semesterly
+          </Button>
+          <Divider orientation="vertical" />
+          <Button
+            onPress={() => setFilter('Anyone')}
+            variant={filter === 'Anyone' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Anyone
+          </Button>
+          <Button
+            onPress={() => setFilter('Following')}
+            variant={filter === 'Following' ? 'solid' : 'outline'}
+            rounded="full"
+          >
+            Following
+          </Button>
+        </HStack>
+        <Leaderboard data={data} />
+      </VStack>
     </Center>
   );
 };

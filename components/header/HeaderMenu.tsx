@@ -7,6 +7,11 @@ import { auth } from '../../xplat/Firebase';
 import { UserStatus } from '../../xplat/types';
 import ChangeEmailModal from '../profile/ChangeEmailModal';
 import LightDarkIcon from '../util/LightDarkIcon';
+import { openURL } from 'expo-linking';
+import { permissionLevelCanWrite } from '../../utils/permissions';
+
+export const TERMS_OF_SERVICE_URL = 'https://tylerhm.dev/tower-eula';
+export const FAQ_URL = 'https://ucf-tower.web.app/faq';
 
 export const PressableDots = (triggerProps: any) => {
   return (
@@ -25,6 +30,9 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
   const userPermissionLevel = useRecoilValue(userPermissionLevelAtom);
   const [changeEmail, setChangeEmail] = useState<boolean>(false);
 
+  const shouldDisplayPostOption =
+    hasPostOption && permissionLevelCanWrite(userPermissionLevel);
+
   return (
     <>
       <ChangeEmailModal
@@ -37,11 +45,7 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Verify Knights Email
           </Menu.Item>
         ) : null}
-        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
-        <Menu.Item onPress={() => navigation.navigate('Settings')}>
-          Settings
-        </Menu.Item>
-        {hasPostOption ? (
+        {shouldDisplayPostOption ? (
           <Menu.Item
             onPress={() =>
               navigation.navigate('Tabs', {
@@ -56,6 +60,14 @@ const HeaderMenu = ({ hasPostOption = false }: Props) => {
             Post
           </Menu.Item>
         ) : null}
+        <Menu.Item onPress={() => navigation.navigate('Settings')}>
+          Settings
+        </Menu.Item>
+        <Menu.Item onPress={() => openURL(FAQ_URL)}>FAQ</Menu.Item>
+        <Menu.Item onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
+          Term of Service
+        </Menu.Item>
+        <Menu.Item onPress={() => auth.signOut()}>Logout</Menu.Item>
       </Menu>
     </>
   );

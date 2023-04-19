@@ -40,23 +40,24 @@ const RouteSearchHeader = ({
   setFilter,
   setQuery,
 }: HeaderProps) => {
+  const [debounceSession] = useState<DebounceSession>(new DebounceSession(500));
+
   return (
-    <VStack mt={1}>
+    <VStack my={2} px={2}>
       <SearchBar
         queryHandler={{
           onChangeQuery: (newQuery: string) => setQuery(newQuery.toLowerCase()),
-          onChangeQueryDebounceSession: new DebounceSession(500),
+          onChangeQueryDebounceSession: debounceSession,
         }}
       />
-      <HStack mt={1} justifyContent={'center'}>
+      <HStack mt={2} space={2} justifyContent="space-between">
         <Select
-          minWidth={'45%'}
+          flexGrow={1}
           selectedValue={filter}
           placeholder="Filter"
           onValueChange={(value) =>
             setFilter(value === 'None' ? '' : (value as Filter))
           }
-          mr={'2%'}
         >
           <Select.Item label="None" value="None" />
           <Select.Item label="Top-Rope" value="Top-Rope" />
@@ -66,7 +67,7 @@ const RouteSearchHeader = ({
         </Select>
 
         <Select
-          minWidth={'45%'}
+          flexGrow={1}
           selectedValue={ordering}
           placeholder="Order By"
           onValueChange={(value) =>
